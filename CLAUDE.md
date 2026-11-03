@@ -20,7 +20,7 @@
 
 ## Working rules
 
-- George designs in Figma himself and must defend every decision live. Claude researches, drafts copy and specs, and checks. Claude doesn't produce the design for him to pass off.
+- Claude builds first drafts in Figma through the Figma MCP (Foundations, Components, Screens, Prototype storyboard), one page at a time, pausing for George's review after each. George reviews, changes and owns every decision, and must be able to rework anything live in the 45-minute round. Every AI-generated piece is logged in `ai-log/log.md` with what George changed (changed 3 Nov 2026, at George's request).
 - Log every AI contribution in `ai-log/` the same day, honestly, including what was wrong or discarded.
 - Facts and numbers need a source (Eurostat, INE, Banco de Portugal, EU law). Mark anything unverified.
 - Keep the scope to one core journey, polished. Breadth shows up as hand-offs ("this is a mortgage question…"), not extra flows.
@@ -36,3 +36,10 @@
 - Image uploads to Figma: the container and the Mac shell can't reach Figma's upload endpoint; go through Claude in Chrome (fetch image → POST to the `upload_assets` submit URL). See `ai-log/learnings.md`.
 - Log every AI contribution in `ai-log/log.md` the same day, including corrections; add process lessons to `ai-log/learnings.md`.
 
+## Three flows (decided 3 Nov 2026)
+
+- **J1 Save for the holiday** (core, the clickable Figma prototype): intent → understanding → recommendation → adjust (state change) → gap → review → Face ID → confirmation.
+- **J2 Christmas allowance lands**: proactive message, approve moving €600 to the goal.
+- **J3 Off-track month**: short margin, suggest skipping or lowering one transfer, with undo.
+- J4 (borrowing handoff) and J5 (consent) stay single frames. All three flows get a storyboard on page 5; J1 is wired.
+- Code: `prototype/` (Vite + React + TS, private repo github.com/georgehfc/wit-ai-banking-challenge). Local dev server only while building; share as a static build. Port the planner maths to TypeScript for live recalculation; assistant replies are scripted, no live LLM.
