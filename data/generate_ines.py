@@ -99,6 +99,10 @@ data = {
     "intent": {"text": "Quero poupar 3.000 € para umas férias no próximo verão, mas não sei quanto consigo pôr de lado por mês.",
                "text_en": "I want to save €3,000 for a holiday next summer, but I don't know how much I can afford to save every month.",
                "goal": 3000.00, "deadline": "2027-07-15", "trip": "with friends, July 2027"},
+    "scenarios": {
+        "_note": "Future events for J2/J3 storyboards. Not transactions yet; the planner turns them into numbers.",
+        "off_track_month": {"month": "2027-01", "bill": {"label": "Laptop repair", "amount": 180.00, "due": "2027-01-12"}},
+    },
     "transactions": txns,
 }
 json.dump(data, open("data/ines.json", "w"), ensure_ascii=False, indent=2)

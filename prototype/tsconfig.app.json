@@ -23,5 +23,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "../data/plan-output.json"]
+  "include": ["src", "../data/plan-output.json", "../data/ines.json"]
 }

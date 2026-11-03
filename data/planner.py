@@ -74,6 +74,48 @@ new_subs = [{"merchant": k, "since": v[0], "monthly": v[1]} for k, v in first_se
 card = [t for t in tx if t["amount"] < 0 and t["category"] in {"groceries", "eating_out", "transport_extra", "shopping", "health", "leisure"}]
 roundups = round(sum(math.ceil(-t["amount"]) + t["amount"] for t in card) / len(picture), 2)
 
+# 8. Scenarios. J1 what-if (slider), J1 chosen plan (Inês picks September), J2 (Christmas allowance lands), J3 (off-track month)
+def run(m, trans):
+    ev = sorted([(t, m, "monthly") for t in trans] + [(date(2026, 12, 15), a.christmas, "christmas_allowance")])
+    b, pr = 0.0, []
+    for when, amt, kind in ev:
+        b += amt; pr.append({"date": when.isoformat(), "add": amt, "kind": kind, "saved": round(b, 2)})
+    return round(b, 2), pr
+what_if = []
+for m in (250,):
+    tot, wp = run(m, transfers)
+    what_if.append({"monthly": m, "projection": wp, "total_by_deadline": tot, "gap": round(goal - tot, 2),
+                    "short_months_in_history": [r["month"] for r in picture if r["margin"] < m],
+                    "ok_months_in_history": [r["month"] for r in picture if r["margin"] >= m]})
+sep_transfers = transfers + [date(2027, 8, 1), date(2027, 9, 1)]
+sep_total, sep_proj = run(monthly, sep_transfers)
+hol = next(e for e in d["expected_income"] if e["type"] == "holiday_allowance")
+chosen = {"option": "september", "monthly": monthly, "transfers": len(sep_transfers), "first_transfer": sep_transfers[0].isoformat(),
+          "last_transfer": sep_transfers[-1].isoformat(), "scheduled_total": round(monthly * len(sep_transfers), 2), "christmas_share": a.christmas, "total_from_transfers": sep_total,
+          "holiday_allowance_topup": round(goal - sep_total, 2), "holiday_allowance_date": hol["expected_by"],
+          "holiday_allowance_net": hol["amount_net_estimate"], "goal": goal, "projection": sep_proj}
+xmas = next(e for e in d["expected_income"] if e["type"] == "christmas_allowance")
+saved_before_xmas = next(r["saved"] for r in sep_proj if r["kind"] == "christmas_allowance") - a.christmas
+j2 = {"date": xmas["expected_by"], "allowance": xmas["amount_net_estimate"], "to_goal": a.christmas,
+      "stays_in_account": round(xmas["amount_net_estimate"] - a.christmas, 2),
+      "goal_saved_before": round(saved_before_xmas, 2), "goal_saved_after": round(saved_before_xmas + a.christmas, 2)}
+ot = d["scenarios"]["off_track_month"]
+expected_left = round(sum(margins) / len(margins) - ot["bill"]["amount"], 2)    # estimate: average month minus the bill
+later = [t for t in sep_transfers if t.isoformat()[:7] > ot["month"]]
+extra = math.ceil(monthly / len(later))
+spread_monthly = monthly + extra
+saved_jan = next(r["saved"] for r in sep_proj if r["date"] == "2026-12-15")
+j3 = {"based_on": "chosen plan (September)", "month": ot["month"], "bill": ot["bill"], "expected_left_estimate": expected_left,
+      "transfer": monthly, "saved_now": saved_jan, "plan_total": sep_total,
+      "buffer_dip_if_kept": round(max(0, monthly - expected_left), 2),
+      "options": [
+          {"id": "skip", "label": f"Skip January's €{monthly:,.0f}", "total_by_deadline": round(sep_total - monthly, 2), "short_of_plan": monthly},
+          {"id": "spread", "label": f"Skip it and add €{extra} to the next {len(later)} transfers",
+           "months": [later[0].isoformat()[:7], later[-1].isoformat()[:7]], "count": len(later), "extra": extra, "new_monthly": spread_monthly,
+           "total_by_deadline": round(sep_total - monthly + extra * len(later), 2),
+           "short_months_in_history_at_new_monthly": [r["month"] for r in picture if r["margin"] < spread_monthly]},
+          {"id": "keep", "label": "Keep it as planned", "buffer_dip": round(max(0, monthly - expected_left), 2)}]}
+
 out = {"generated_from": "data/ines.json", "picture": picture,
        "margin": {"min": min(margins), "max": max(margins), "avg": round(sum(margins) / len(margins), 2)},
        "fixed_avg": fixed_avg, "buffer": buffer,
@@ -82,7 +124,8 @@ out = {"generated_from": "data/ines.json", "picture": picture,
                 "total_by_deadline": total, "gap": gap},
        "projection": proj, "interest": interest, "gap_options": options,
        "side_widgets": {"new_subscriptions_this_summer": new_subs, "new_subscriptions_monthly": round(sum(s["monthly"] for s in new_subs), 2),
-                        "roundups_monthly_estimate": roundups}}
+                        "roundups_monthly_estimate": roundups},
+       "scenarios": {"j1_what_if": what_if, "j1_chosen": chosen, "j2_christmas_lands": j2, "j3_off_track_month": j3}}
 json.dump(out, open("data/plan-output.json", "w"), ensure_ascii=False, indent=2)
 print(f"Margins {margins} | buffer ok={buffer['ok']} (€{balance:.0f} vs €{fixed_avg:.0f})")
 print(f"Plan: €{monthly:.0f}/mo x{len(transfers)} + €{a.christmas:.0f} Christmas = €{total:,.0f}; gap €{gap:,.0f}; fit={fit}; needed €{needed}/mo")

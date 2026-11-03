@@ -4,13 +4,16 @@ Inputs: `data/plan-output.json` (numbers), `design/*.md` (rules), `research/02�
 
 ## 1. User journeys
 
+### J0 · The assistant asleep (added 3 Nov)
+The assistant is dormant in a pill above the tab bar (Notion pattern, see research/06). Each journey has an entry trigger and ends by handing back to the app: J1 you ask · J2 money arrives · J3 planner forecast · J4 guardrail mid-chat · J5 first tap / consent renewal. Figma: row J0 (pill states + entry points map); every journey row now starts with its entry and ends "Back in the app".
+
 ### J1 · Save for the holiday (core, prototyped)
 | # | Inês | Assistant / system | Screen | Widgets | Brief requirement |
 |---|---|---|---|---|---|
 | 1 | Types her intent | Acknowledges, says what it'll read | 01 Intent | IntentInput, AI label | Express intent naturally |
 | 2 | — | Reads Aug–Oct, shows steps, then her monthly picture | 02 Understanding | StepsReceipt, MarginSnapshot | Meaningful visuals |
 | 3 | Reads the plan | Buffer kept (€900); full goal = stretch (€375); proposes €220 + €600 Christmas → €2,360, gap €640 | 03 Recommendation | PlanCard(stretch), ProjectionChart, ExtraMoneyCalendar | AI recommendation |
-| 4 | Drags to €250, then back | Projection + copy update live ("August would have been short") | 04 Adjust | AmountControl, ProjectionChart(adjusting) | Adjust assumptions; **state change** |
+| 4 | Drags to €250, then back | Projection + copy update live (€2,600, gap €400; "only fitted September; August and October would have been short", from `scenarios.j1_what_if`) | 04 Adjust | AmountControl, ProjectionChart(adjusting) | Adjust assumptions; **state change** |
 | 5 | Opens the gap, picks September (+€200 holiday allowance) | Shows 3 options; never picks | 04b Gap | GapResolver | Meaningful decision |
 | 6 | Reviews | Exact payload, how to pause | 05 Review | ApprovalRequest(move-money) → Face ID | Explicit approval |
 | 7 | Done | Goal created, next transfer 1 Dec, Christmas reminder, Pause | 06 Confirmation | PlanStatus, receipt | Confirmation / next step |
@@ -20,7 +23,7 @@ Continuity: from 06, "Ask about this plan" reopens the chat at the same point (c
 Notification → "Your Christmas allowance arrived. Send €600 to Holiday as planned?" → ApprovalRequest → done. Shows the monitor role and the "intent mandate" idea (limit + expiry, revocable).
 
 ### J3 · Off-track month (walkthrough only)
-A big bill in January → PlanStatus(short-this-month) → "Skip January's €220 and spread it over Feb–Jun (+€44/month)?" → approve.
+A €180 laptop repair in January → PlanStatus(short-this-month) → three options from the planner (`scenarios.j3_off_track_month`, computed on the September plan Inês chose in J1): skip January (€2,580 by Sep, €220 short of plan) · spread it, +€28 on the next 8 transfers (€248/month, €2,804) · keep it (€180 from the buffer) → review → approve, undo until 1 Jan. (Was "+€44 over Feb–Jun", typed by hand; replaced by the planner on 3 Nov.)
 
 ### J4 · "Could I borrow to go sooner?" (side moment, one frame)
 Guardrail catches credit → HandoffCard: why the assistant won't suggest borrowing, costs and a human review exist, "I'll pass on what we discussed". Shows breadth + judgement.
@@ -38,24 +41,57 @@ Guardrail catches credit → HandoffCard: why the assistant won't suggest borrow
   - Dark mode only if time allows; tokens are ready for it.
 - **Claude Code can**: push tokens.json into Figma variables via the Figma MCP; lint contrast; generate a foundations doc frame.
 
-## 3. Components (page "3 · Components") — build order
-1. Basics: Button, ListRow, TopBar, Sheet, Toast (fast; Auto Layout + variants).
-2. Conversation: IntentInput, Message, ReplyChip, **StepsReceipt** (working → done → expanded → reverted).
-3. Widgets: PlanCard, ProjectionChart, AmountControl, ExtraMoneyCalendar, GapResolver, MarginSnapshot.
-4. Trust: **ApprovalRequest** (read-data / move-money / approved / declined), PlanStatus, HandoffCard.
-- **Ideas**:
-  - ApprovalRequest anatomy from Claude's own permission card: "<Assistant> wants to <action> from <source>" → parameter rows → Not now / Approve with Face ID. Move-money variant has no "Always allow" by design: say why in the component description.
-  - StepsReceipt names the roles ("Read your account · Planner calculated · Checked rules"): the architecture becomes a trust feature.
-  - ProjectionChart uses Figma variables for the monthly amount so the prototype slider really changes the bar heights (variable modes or conditional).
-  - Every component description in Figma = its code name + props (sets up the handoff).
+## 3. Components (page "3 · Components") — only what J1 actually uses
+Decided 3 Nov: scope frozen to J1; the list below is taken from the code prototype (`prototype/src/components.tsx`), so Figma builds what the experience really uses. Built in Figma after George settles the experience in code. Code name = Figma name.
+
+| Group | Component | Variants / states used in J1 |
+|---|---|---|
+| Basics | `Button` | primary · secondary · tertiary · disabled |
+| | `StatusBadge` | positive · warning · danger (label + icon, never colour alone) |
+| | `ProgressBar`, `Row` (key–value), `Toast` (with action), `Icon` (one set, 24 grid) | — |
+| | `TopBar` | assistant (close + "AI" + disclosure) · screen (back + title + subtitle) |
+| | `TabBar`, `ListRow` | shortcut · transaction |
+| Conversation | `AssistantPill` | idle · working · ready (nudge kept for J2/J3) |
+| | `IntentInput` | empty · typing |
+| | `Message` | user · assistant (AI rule) |
+| | `StepsReceipt` | working · done collapsed · done expanded |
+| Widgets | `MarginSnapshot` | default |
+| | `PlanCard` | default · adjusting (badge from the planner's fit) |
+| | `ProjectionChart` | with-gap · goal-reached (dashed = planned/gap) |
+| | `AmountControl` | slider + preset `Chip`s (default · selected) |
+| | `GapResolver` + `Option` | default · selected · uncertain (dashed) |
+| Trust | `ApprovalRequest` (review) | move-money |
+| | `FaceIdOverlay` | scanning · approved |
+| | `GoalCard` / `PlanStatus` | active · paused · highlighted (hand-back) |
+
+Added while building J0, J2–J5 in code (3 Nov):
+
+| Group | Component | Variants / states | Used in |
+|---|---|---|---|
+| Conversation | `ReplyChips` | default | J1 fallback ("I'm not sure I got that"), J5 limited mode |
+| | `ContextChip` | default | J4 (earlier context carried into the chat) |
+| | `StepsReceipt` | + custom summary (e.g. "Rules: credit question → a person") | J4 |
+| Widgets | `OptionList` + `Option` | default · selected · uncertain | J1 gap (as `GapResolver`), J3 January options |
+| Trust | `ApprovalCard` (inline move-money) | pending · approved · declined; no "always allow" | J2 |
+| | `HandoffCard` | credit (open · done) | J4 |
+| | `Mandate` note | default | J2 (standing instruction + Change) |
+| Shell | `GoalCard` | active · short-this-month · paused · highlighted | Home in J1–J3 |
+| | `Home` | balance shown · masked; Recent · Today · Coming up | all |
+| | `BottomSheet` | intro · consent · share-confirm | J4, J5 |
+| | `LockScreen` + `Notification` | amounts hidden | J2 (app closed) |
+| | `Screen` (full, with `TopBar` + `ActionDock`) | review · confirmation | J1, J3 |
+
+Dropped: `ExtraMoneyCalendar` (the Christmas allowance is a line in the plan card + a lighter bar segment); `ReplyChip` merged into `Chip`/`ReplyChips`.
 
 ## 4. Screens (page "4 · Screens") — content from the data
+
+Figma layout (3 Nov): one section (row) per journey. J1 row 01–06 incl. 04b Gap; J2 row notification → approve → done; J3 row short-this-month → review → done with undo; J4 handoff and J5 consent as single frames. Chosen-plan numbers (September, 10 × €220 = €2,200 scheduled) from `scenarios.j1_chosen`.
 | Screen | Must show (numbers from planner) | Idea |
 |---|---|---|
 | 01 Intent | "I want to…", 3 shortcuts (Save for something · Where did my money go · Check a message), AI label | Shortcuts are Origin's "Plan with AI" pattern; one of them is the scam check (anti-fraud) |
 | 02 Understanding | Steps ticking; margin €150 / €280 / €230; fixed €732 | Salary bars hint at 14 payments (June/Dec taller) |
 | 03 Recommendation | Buffer €900 kept · needs €375 = stretch · €220 + €600 → €2,360 · gap €640 | Gap is visible on the chart, not in small print |
-| 04 Adjust (state change) | €220 → €250: total and copy change; Aug flagged short | Chat line and slider update together (same state) |
+| 04 Adjust (state change) | €220 → €250: €2,600, gap €400; Aug and Oct flagged short | Chat line and slider update together (same state) |
 | 04b Gap | IRS (uncertain, dashed) · September €2,800 · €2,300 trip | Uncertain option styled with the dashed language |
 | 05 Review | €220 monthly, Conta à ordem → Holiday, 1 Dec–1 Sep, pause any time; Face ID | Sentence review (Ubank) + approval request |
 | 06 Confirmation | Goal created, next transfer 1 Dec, Christmas reminder, Pause | Receipt + Notion-style "Revert" (undo window) |

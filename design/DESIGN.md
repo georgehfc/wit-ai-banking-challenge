@@ -3,27 +3,32 @@
 # visual direction in Figma; the source of truth for values is tokens/tokens.json (DTCG 2025.10).
 name: "PoC bank · savings assistant"
 version: 0.1.0
-colors:
-  surface: "#FFFFFF"          # placeholder
-  surface-raised: "#F4F4F5"   # placeholder
-  text: "#18181B"             # placeholder
-  text-muted: "#6B6B73"       # placeholder
-  border: "#E4E4E7"           # placeholder
-  accent: "#TBD"              # George picks
-  ai: "#TBD"                  # the assistant's colour: used ONLY for AI-generated content markers
-  positive: "#TBD"
-  warning: "#TBD"
-  danger: "#TBD"
+colors:                       # DRAFT values (Claude, 3 Nov), mirror Figma "Semantic" Light; George confirms
+  surface: "#FFFFFF"
+  surface-raised: "#F4F4F5"
+  text: "#18181B"
+  text-muted: "#6B6B73"
+  text-on-accent: "#FFFFFF"
+  border: "#E4E4E7"
+  border-strong: "#6B6B73"
+  accent: "#0E5F73"           # petrol teal, draft
+  ai: "#5B3FD6"               # the assistant's colour: used ONLY for AI-generated content markers
+  positive: "#1F7A34"
+  warning: "#9A5B00"
+  danger: "#B4291E"
 typography:
-  family: "TBD (George)"      # check Portuguese diacritics and tabular figures
+  family: "Inter"             # draft: tnum + PT diacritics; Figma text styles of the same names
   display: { size: 40, weight: 700, line: 44 }
   title: { size: 22, weight: 600, line: 28 }
   body: { size: 16, weight: 400, line: 22 }
+  body-strong: { size: 16, weight: 600, line: 22 }
   label: { size: 14, weight: 500, line: 18 }
   caption: { size: 12, weight: 400, line: 16 }
   amount: { size: 48, weight: 700, line: 52, features: ["tnum"] }
+  amount-sm: { size: 20, weight: 600, line: 24, features: ["tnum"] }
 spacing: { unit: 4, scale: [4, 8, 12, 16, 20, 24, 32, 40, 56] }
 rounded: { sm: 8, md: 16, lg: 24, pill: 999 }
+elevation: { card: "0 1 2 / 4%, 0 2 8 / 4%", sheet: "0 -4 24 / 8%" }
 components:
   approval-request: { surface: "{colors.surface-raised}", radius: "{rounded.lg}" }
   message-assistant: { marker: "{colors.ai}" }
@@ -61,6 +66,7 @@ How this product should look and behave. Read with `TONE.md`, `ASSISTANT.md`, `A
 ## Components (Figma ⇄ code names match)
 | Component | Variants / states |
 |---|---|
+| `AssistantPill` | idle · nudge · working · ready (the dormant assistant; built in Figma 3 Nov) |
 | `IntentInput` | empty · typing · sending · disabled |
 | `Message` | user · assistant · assistant-with-widget · system |
 | `StepsReceipt` | working · done (collapsed) · done (expanded) · reverted |

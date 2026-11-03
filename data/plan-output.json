@@ -148,5 +148,210 @@
     ],
     "new_subscriptions_monthly": 17.98,
     "roundups_monthly_estimate": 6.85
+  },
+  "scenarios": {
+    "j1_what_if": [
+      {
+        "monthly": 250,
+        "projection": [
+          {
+            "date": "2026-12-01",
+            "add": 250,
+            "kind": "monthly",
+            "saved": 250.0
+          },
+          {
+            "date": "2026-12-15",
+            "add": 600.0,
+            "kind": "christmas_allowance",
+            "saved": 850.0
+          },
+          {
+            "date": "2027-01-01",
+            "add": 250,
+            "kind": "monthly",
+            "saved": 1100.0
+          },
+          {
+            "date": "2027-02-01",
+            "add": 250,
+            "kind": "monthly",
+            "saved": 1350.0
+          },
+          {
+            "date": "2027-03-01",
+            "add": 250,
+            "kind": "monthly",
+            "saved": 1600.0
+          },
+          {
+            "date": "2027-04-01",
+            "add": 250,
+            "kind": "monthly",
+            "saved": 1850.0
+          },
+          {
+            "date": "2027-05-01",
+            "add": 250,
+            "kind": "monthly",
+            "saved": 2100.0
+          },
+          {
+            "date": "2027-06-01",
+            "add": 250,
+            "kind": "monthly",
+            "saved": 2350.0
+          },
+          {
+            "date": "2027-07-01",
+            "add": 250,
+            "kind": "monthly",
+            "saved": 2600.0
+          }
+        ],
+        "total_by_deadline": 2600.0,
+        "gap": 400.0,
+        "short_months_in_history": [
+          "2026-08",
+          "2026-10"
+        ],
+        "ok_months_in_history": [
+          "2026-09"
+        ]
+      }
+    ],
+    "j1_chosen": {
+      "option": "september",
+      "monthly": 220,
+      "transfers": 10,
+      "first_transfer": "2026-12-01",
+      "last_transfer": "2027-09-01",
+      "scheduled_total": 2200,
+      "christmas_share": 600.0,
+      "total_from_transfers": 2800.0,
+      "holiday_allowance_topup": 200.0,
+      "holiday_allowance_date": "2027-06-28",
+      "holiday_allowance_net": 1130.0,
+      "goal": 3000.0,
+      "projection": [
+        {
+          "date": "2026-12-01",
+          "add": 220,
+          "kind": "monthly",
+          "saved": 220.0
+        },
+        {
+          "date": "2026-12-15",
+          "add": 600.0,
+          "kind": "christmas_allowance",
+          "saved": 820.0
+        },
+        {
+          "date": "2027-01-01",
+          "add": 220,
+          "kind": "monthly",
+          "saved": 1040.0
+        },
+        {
+          "date": "2027-02-01",
+          "add": 220,
+          "kind": "monthly",
+          "saved": 1260.0
+        },
+        {
+          "date": "2027-03-01",
+          "add": 220,
+          "kind": "monthly",
+          "saved": 1480.0
+        },
+        {
+          "date": "2027-04-01",
+          "add": 220,
+          "kind": "monthly",
+          "saved": 1700.0
+        },
+        {
+          "date": "2027-05-01",
+          "add": 220,
+          "kind": "monthly",
+          "saved": 1920.0
+        },
+        {
+          "date": "2027-06-01",
+          "add": 220,
+          "kind": "monthly",
+          "saved": 2140.0
+        },
+        {
+          "date": "2027-07-01",
+          "add": 220,
+          "kind": "monthly",
+          "saved": 2360.0
+        },
+        {
+          "date": "2027-08-01",
+          "add": 220,
+          "kind": "monthly",
+          "saved": 2580.0
+        },
+        {
+          "date": "2027-09-01",
+          "add": 220,
+          "kind": "monthly",
+          "saved": 2800.0
+        }
+      ]
+    },
+    "j2_christmas_lands": {
+      "date": "2026-12-15",
+      "allowance": 1130.0,
+      "to_goal": 600.0,
+      "stays_in_account": 530.0,
+      "goal_saved_before": 220.0,
+      "goal_saved_after": 820.0
+    },
+    "j3_off_track_month": {
+      "based_on": "chosen plan (September)",
+      "month": "2027-01",
+      "bill": {
+        "label": "Laptop repair",
+        "amount": 180.0,
+        "due": "2027-01-12"
+      },
+      "expected_left_estimate": 40.0,
+      "transfer": 220,
+      "saved_now": 820.0,
+      "plan_total": 2800.0,
+      "buffer_dip_if_kept": 180.0,
+      "options": [
+        {
+          "id": "skip",
+          "label": "Skip January's €220",
+          "total_by_deadline": 2580.0,
+          "short_of_plan": 220
+        },
+        {
+          "id": "spread",
+          "label": "Skip it and add €28 to the next 8 transfers",
+          "months": [
+            "2027-02",
+            "2027-09"
+          ],
+          "count": 8,
+          "extra": 28,
+          "new_monthly": 248,
+          "total_by_deadline": 2804.0,
+          "short_months_in_history_at_new_monthly": [
+            "2026-08",
+            "2026-10"
+          ]
+        },
+        {
+          "id": "keep",
+          "label": "Keep it as planned",
+          "buffer_dip": 180.0
+        }
+      ]
+    }
   }
 }
