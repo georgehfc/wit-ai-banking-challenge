@@ -1,0 +1,152 @@
+{
+  "generated_from": "data/ines.json",
+  "picture": [
+    {
+      "month": "2026-08",
+      "income": 1130.0,
+      "fixed": 732.45,
+      "variable": 247.55,
+      "margin": 150.0
+    },
+    {
+      "month": "2026-09",
+      "income": 1148.11,
+      "fixed": 732.45,
+      "variable": 135.66,
+      "margin": 280.0
+    },
+    {
+      "month": "2026-10",
+      "income": 1130.0,
+      "fixed": 732.45,
+      "variable": 167.55,
+      "margin": 230.0
+    }
+  ],
+  "margin": {
+    "min": 150.0,
+    "max": 280.0,
+    "avg": 220.0
+  },
+  "fixed_avg": 732.45,
+  "buffer": {
+    "balance": 900.0,
+    "target": 732.45,
+    "ok": true,
+    "say": "Keep your €900 as a safety buffer; the plan doesn't touch it."
+  },
+  "plan": {
+    "goal": 3000.0,
+    "monthly": 220,
+    "needed_for_full_goal": 375.0,
+    "fit": "stretch_some_months",
+    "short_months_in_history": [
+      "2026-08"
+    ],
+    "christmas_share": 600.0,
+    "transfers": 8,
+    "first_transfer": "2026-12-01",
+    "total_by_deadline": 2360.0,
+    "gap": 640.0
+  },
+  "projection": [
+    {
+      "date": "2026-12-01",
+      "add": 220,
+      "kind": "monthly",
+      "saved": 220.0
+    },
+    {
+      "date": "2026-12-15",
+      "add": 600.0,
+      "kind": "christmas_allowance",
+      "saved": 820.0
+    },
+    {
+      "date": "2027-01-01",
+      "add": 220,
+      "kind": "monthly",
+      "saved": 1040.0
+    },
+    {
+      "date": "2027-02-01",
+      "add": 220,
+      "kind": "monthly",
+      "saved": 1260.0
+    },
+    {
+      "date": "2027-03-01",
+      "add": 220,
+      "kind": "monthly",
+      "saved": 1480.0
+    },
+    {
+      "date": "2027-04-01",
+      "add": 220,
+      "kind": "monthly",
+      "saved": 1700.0
+    },
+    {
+      "date": "2027-05-01",
+      "add": 220,
+      "kind": "monthly",
+      "saved": 1920.0
+    },
+    {
+      "date": "2027-06-01",
+      "add": 220,
+      "kind": "monthly",
+      "saved": 2140.0
+    },
+    {
+      "date": "2027-07-01",
+      "add": 220,
+      "kind": "monthly",
+      "saved": 2360.0
+    }
+  ],
+  "interest": {
+    "rate_tanb": 0.025,
+    "gross": 23.16,
+    "net": 16.68,
+    "note": "illustrative rate; 28% withholding"
+  },
+  "gap_options": [
+    {
+      "id": "irs",
+      "label": "Count my IRS refund if it arrives",
+      "result": "Covers the €640 gap if the refund is at least that (national average ~€980). Not guaranteed.",
+      "certain": false
+    },
+    {
+      "id": "september",
+      "label": "Move the trip to September",
+      "result": "Two more transfers: €2,800 saved, €200 short.",
+      "saved": 2800.0,
+      "certain": true
+    },
+    {
+      "id": "trim",
+      "label": "Make it a €2,300 trip",
+      "result": "Reached on the current plan.",
+      "saved": 2360.0,
+      "certain": true
+    }
+  ],
+  "side_widgets": {
+    "new_subscriptions_this_summer": [
+      {
+        "merchant": "Disney+",
+        "since": "2026-08-03",
+        "monthly": 9.99
+      },
+      {
+        "merchant": "Strava",
+        "since": "2026-08-17",
+        "monthly": 7.99
+      }
+    ],
+    "new_subscriptions_monthly": 17.98,
+    "roundups_monthly_estimate": 6.85
+  }
+}

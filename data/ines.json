@@ -1,0 +1,767 @@
+{
+  "_note": "Illustrative mock data for the WIT challenge PoC. Fictional person, fictional bank. Real merchant names used only for realism.",
+  "as_of": "2026-11-02",
+  "customer": {
+    "name": "Inês Marques",
+    "age": 28,
+    "city": "Lisboa (Arroios)",
+    "job": "Junior marketing coordinator, Agência Lumen Lda",
+    "salary": {
+      "gross_monthly": 1450.0,
+      "payments_per_year": 14,
+      "net_monthly_estimate": 1130.0,
+      "payday": 28,
+      "note": "Net is an estimate (SS 11% + 2026 IRS withholding). Meal allowance goes to a separate meal card and is not in this account."
+    },
+    "housing": {
+      "type": "room in a shared T2",
+      "rent_share": 575.0
+    },
+    "meal_card": {
+      "provider_type": "employer meal card",
+      "monthly": 224.4,
+      "note": "covers most groceries and weekday lunches; outside this account"
+    },
+    "consents": {
+      "account_data_for_assistant": {
+        "granted": "2026-11-02",
+        "scope": "current account, last 3 months",
+        "expires": "2027-02-02"
+      }
+    }
+  },
+  "accounts": [
+    {
+      "id": "acc_current",
+      "type": "current",
+      "name": "Conta à ordem",
+      "iban_display": "PT50 •••• •••• •••• 4821",
+      "currency": "EUR",
+      "opening_balance_2026_08_01": 240.0,
+      "balance": 900.0,
+      "features": [
+        "MB WAY",
+        "Multibanco",
+        "salary domiciled"
+      ]
+    }
+  ],
+  "products_available": [
+    {
+      "id": "prod_savings",
+      "name": "Poupança diária",
+      "type": "savings",
+      "rate_tanb_illustrative": 0.025,
+      "interest_paid": "daily",
+      "withdraw": "any time, no interest lost",
+      "tax_on_interest": 0.28,
+      "lane": "do_with_approval"
+    },
+    {
+      "id": "prod_goal",
+      "name": "Objetivo",
+      "type": "goal_pot",
+      "inside": "prod_savings",
+      "lane": "do_with_approval"
+    },
+    {
+      "id": "prod_scheduled",
+      "name": "Transferência programada",
+      "type": "scheduled_transfer",
+      "lane": "do_with_approval",
+      "approval": "Face ID every time"
+    },
+    {
+      "id": "prod_roundups",
+      "name": "Arredondamentos",
+      "type": "round_ups",
+      "lane": "do_with_approval"
+    },
+    {
+      "id": "prod_budget",
+      "name": "Orçamento",
+      "type": "budget",
+      "lane": "do_with_approval"
+    },
+    {
+      "id": "prod_credit",
+      "name": "Crédito pessoal",
+      "type": "personal_credit",
+      "lane": "hand_off",
+      "why": "CCD2: no nudging, costs + human review"
+    },
+    {
+      "id": "prod_invest",
+      "name": "Investimentos / PPR",
+      "type": "investments",
+      "lane": "hand_off",
+      "why": "MiFID II suitability"
+    },
+    {
+      "id": "prod_mortgage",
+      "name": "Crédito habitação",
+      "type": "mortgage",
+      "lane": "hand_off",
+      "why": "simulation + FINE + advisor"
+    },
+    {
+      "id": "prod_insurance",
+      "name": "Seguro de viagem",
+      "type": "insurance",
+      "lane": "hand_off",
+      "why": "IDD demands-and-needs"
+    }
+  ],
+  "expected_income": [
+    {
+      "type": "christmas_allowance",
+      "label": "Subsídio de Natal",
+      "expected_by": "2026-12-15",
+      "amount_net_estimate": 1130.0,
+      "certainty": "legal right (Código do Trabalho art. 263)"
+    },
+    {
+      "type": "holiday_allowance",
+      "label": "Subsídio de férias",
+      "expected_by": "2027-06-28",
+      "amount_net_estimate": 1130.0,
+      "certainty": "legal right (art. 264); paid before the holiday, so treated as trip spending money"
+    },
+    {
+      "type": "irs_refund",
+      "label": "Reembolso de IRS",
+      "window": [
+        "2027-04-01",
+        "2027-08-31"
+      ],
+      "amount_net_estimate": null,
+      "national_average_2026": 980,
+      "certainty": "unknown: never counted in the base plan"
+    }
+  ],
+  "intent": {
+    "text": "Quero poupar 3.000 € para umas férias no próximo verão, mas não sei quanto consigo pôr de lado por mês.",
+    "text_en": "I want to save €3,000 for a holiday next summer, but I don't know how much I can afford to save every month.",
+    "goal": 3000.0,
+    "deadline": "2027-07-15",
+    "trip": "with friends, July 2027"
+  },
+  "transactions": [
+    {
+      "date": "2026-08-01",
+      "merchant": "Transfer to landlord · Arroios",
+      "category": "rent",
+      "amount": -575.0,
+      "balance_after": -335.0,
+      "id": "tx_001"
+    },
+    {
+      "date": "2026-08-02",
+      "merchant": "Navegante metropolitano",
+      "category": "transport",
+      "amount": -40.0,
+      "balance_after": -375.0,
+      "id": "tx_002"
+    },
+    {
+      "date": "2026-08-03",
+      "merchant": "Disney+",
+      "category": "subscription",
+      "amount": -9.99,
+      "balance_after": -384.99,
+      "id": "tx_003"
+    },
+    {
+      "date": "2026-08-03",
+      "merchant": "Café O Sol",
+      "category": "eating_out",
+      "amount": -7.62,
+      "balance_after": -392.61,
+      "id": "tx_004"
+    },
+    {
+      "date": "2026-08-05",
+      "merchant": "EDP Comercial (½ share)",
+      "category": "utilities",
+      "amount": -34.6,
+      "balance_after": -427.21,
+      "id": "tx_005"
+    },
+    {
+      "date": "2026-08-05",
+      "merchant": "Farmácia Estácio",
+      "category": "health",
+      "amount": -5.13,
+      "balance_after": -432.34,
+      "id": "tx_006"
+    },
+    {
+      "date": "2026-08-06",
+      "merchant": "EPAL água (½ share)",
+      "category": "utilities",
+      "amount": -11.4,
+      "balance_after": -443.74,
+      "id": "tx_007"
+    },
+    {
+      "date": "2026-08-07",
+      "merchant": "Tasca do Zé",
+      "category": "eating_out",
+      "amount": -7.31,
+      "balance_after": -451.05,
+      "id": "tx_008"
+    },
+    {
+      "date": "2026-08-07",
+      "merchant": "Café O Sol",
+      "category": "eating_out",
+      "amount": -7.48,
+      "balance_after": -458.53,
+      "id": "tx_009"
+    },
+    {
+      "date": "2026-08-08",
+      "merchant": "MEO fibra (½ share)",
+      "category": "utilities",
+      "amount": -22.5,
+      "balance_after": -481.03,
+      "id": "tx_010"
+    },
+    {
+      "date": "2026-08-10",
+      "merchant": "Vodafone mobile",
+      "category": "phone",
+      "amount": -12.99,
+      "balance_after": -494.02,
+      "id": "tx_011"
+    },
+    {
+      "date": "2026-08-14",
+      "merchant": "Spotify",
+      "category": "subscription",
+      "amount": -7.99,
+      "balance_after": -502.01,
+      "id": "tx_012"
+    },
+    {
+      "date": "2026-08-15",
+      "merchant": "Comboios de Portugal",
+      "category": "travel",
+      "amount": -46.3,
+      "balance_after": -548.31,
+      "id": "tx_013"
+    },
+    {
+      "date": "2026-08-16",
+      "merchant": "MB WAY · Sofia (alojamento Lagos)",
+      "category": "travel",
+      "amount": -60.0,
+      "balance_after": -608.31,
+      "id": "tx_014"
+    },
+    {
+      "date": "2026-08-17",
+      "merchant": "Strava",
+      "category": "subscription",
+      "amount": -7.99,
+      "balance_after": -616.3,
+      "id": "tx_015"
+    },
+    {
+      "date": "2026-08-17",
+      "merchant": "Gira bicicletas",
+      "category": "transport_extra",
+      "amount": -7.14,
+      "balance_after": -623.44,
+      "id": "tx_016"
+    },
+    {
+      "date": "2026-08-20",
+      "merchant": "Netflix",
+      "category": "subscription",
+      "amount": -9.99,
+      "balance_after": -633.43,
+      "id": "tx_017"
+    },
+    {
+      "date": "2026-08-20",
+      "merchant": "Fnac",
+      "category": "shopping",
+      "amount": -33.1,
+      "balance_after": -666.53,
+      "id": "tx_018"
+    },
+    {
+      "date": "2026-08-21",
+      "merchant": "Mercado de Arroios",
+      "category": "groceries",
+      "amount": -15.16,
+      "balance_after": -681.69,
+      "id": "tx_019"
+    },
+    {
+      "date": "2026-08-21",
+      "merchant": "Fábrica Braço de Prata",
+      "category": "leisure",
+      "amount": -10.6,
+      "balance_after": -692.29,
+      "id": "tx_020"
+    },
+    {
+      "date": "2026-08-23",
+      "merchant": "Pingo Doce",
+      "category": "groceries",
+      "amount": -8.72,
+      "balance_after": -701.01,
+      "id": "tx_021"
+    },
+    {
+      "date": "2026-08-23",
+      "merchant": "Uber",
+      "category": "transport_extra",
+      "amount": -4.06,
+      "balance_after": -705.07,
+      "id": "tx_022"
+    },
+    {
+      "date": "2026-08-24",
+      "merchant": "Pingo Doce",
+      "category": "groceries",
+      "amount": -12.55,
+      "balance_after": -717.62,
+      "id": "tx_023"
+    },
+    {
+      "date": "2026-08-26",
+      "merchant": "El Corte Inglés",
+      "category": "shopping",
+      "amount": -12.71,
+      "balance_after": -730.33,
+      "id": "tx_024"
+    },
+    {
+      "date": "2026-08-27",
+      "merchant": "Tasca do Zé",
+      "category": "eating_out",
+      "amount": -9.67,
+      "balance_after": -740.0,
+      "id": "tx_025"
+    },
+    {
+      "date": "2026-08-28",
+      "merchant": "SALARIO · Agência Lumen Lda",
+      "category": "salary",
+      "amount": 1130.0,
+      "balance_after": 390.0,
+      "id": "tx_026"
+    },
+    {
+      "date": "2026-09-01",
+      "merchant": "Transfer to landlord · Arroios",
+      "category": "rent",
+      "amount": -575.0,
+      "balance_after": -185.0,
+      "id": "tx_027"
+    },
+    {
+      "date": "2026-09-01",
+      "merchant": "Tasca do Zé",
+      "category": "eating_out",
+      "amount": -5.17,
+      "balance_after": -190.17,
+      "id": "tx_028"
+    },
+    {
+      "date": "2026-09-02",
+      "merchant": "Navegante metropolitano",
+      "category": "transport",
+      "amount": -40.0,
+      "balance_after": -230.17,
+      "id": "tx_029"
+    },
+    {
+      "date": "2026-09-03",
+      "merchant": "Disney+",
+      "category": "subscription",
+      "amount": -9.99,
+      "balance_after": -240.16,
+      "id": "tx_030"
+    },
+    {
+      "date": "2026-09-04",
+      "merchant": "Bolt",
+      "category": "transport_extra",
+      "amount": -7.89,
+      "balance_after": -248.05,
+      "id": "tx_031"
+    },
+    {
+      "date": "2026-09-05",
+      "merchant": "EDP Comercial (½ share)",
+      "category": "utilities",
+      "amount": -34.6,
+      "balance_after": -282.65,
+      "id": "tx_032"
+    },
+    {
+      "date": "2026-09-05",
+      "merchant": "Gira bicicletas",
+      "category": "transport_extra",
+      "amount": -5.99,
+      "balance_after": -288.64,
+      "id": "tx_033"
+    },
+    {
+      "date": "2026-09-06",
+      "merchant": "EPAL água (½ share)",
+      "category": "utilities",
+      "amount": -11.4,
+      "balance_after": -300.04,
+      "id": "tx_034"
+    },
+    {
+      "date": "2026-09-07",
+      "merchant": "Lidl",
+      "category": "groceries",
+      "amount": -6.83,
+      "balance_after": -306.87,
+      "id": "tx_035"
+    },
+    {
+      "date": "2026-09-08",
+      "merchant": "MEO fibra (½ share)",
+      "category": "utilities",
+      "amount": -22.5,
+      "balance_after": -329.37,
+      "id": "tx_036"
+    },
+    {
+      "date": "2026-09-08",
+      "merchant": "Ticketline",
+      "category": "leisure",
+      "amount": -16.66,
+      "balance_after": -346.03,
+      "id": "tx_037"
+    },
+    {
+      "date": "2026-09-10",
+      "merchant": "Vodafone mobile",
+      "category": "phone",
+      "amount": -12.99,
+      "balance_after": -359.02,
+      "id": "tx_038"
+    },
+    {
+      "date": "2026-09-10",
+      "merchant": "Pastelaria Versailles",
+      "category": "eating_out",
+      "amount": -5.09,
+      "balance_after": -364.11,
+      "id": "tx_039"
+    },
+    {
+      "date": "2026-09-11",
+      "merchant": "Time Out Market",
+      "category": "eating_out",
+      "amount": -10.42,
+      "balance_after": -374.53,
+      "id": "tx_040"
+    },
+    {
+      "date": "2026-09-13",
+      "merchant": "Lidl",
+      "category": "groceries",
+      "amount": -16.04,
+      "balance_after": -390.57,
+      "id": "tx_041"
+    },
+    {
+      "date": "2026-09-14",
+      "merchant": "Spotify",
+      "category": "subscription",
+      "amount": -7.99,
+      "balance_after": -398.56,
+      "id": "tx_042"
+    },
+    {
+      "date": "2026-09-14",
+      "merchant": "Mercado de Arroios",
+      "category": "groceries",
+      "amount": -10.48,
+      "balance_after": -409.04,
+      "id": "tx_043"
+    },
+    {
+      "date": "2026-09-17",
+      "merchant": "Strava",
+      "category": "subscription",
+      "amount": -7.99,
+      "balance_after": -417.03,
+      "id": "tx_044"
+    },
+    {
+      "date": "2026-09-17",
+      "merchant": "Tasca do Zé",
+      "category": "eating_out",
+      "amount": -5.53,
+      "balance_after": -422.56,
+      "id": "tx_045"
+    },
+    {
+      "date": "2026-09-18",
+      "merchant": "Lidl",
+      "category": "groceries",
+      "amount": -14.71,
+      "balance_after": -437.27,
+      "id": "tx_046"
+    },
+    {
+      "date": "2026-09-19",
+      "merchant": "Mercado de Arroios",
+      "category": "groceries",
+      "amount": -16.63,
+      "balance_after": -453.9,
+      "id": "tx_047"
+    },
+    {
+      "date": "2026-09-19",
+      "merchant": "Farmácia Estácio",
+      "category": "health",
+      "amount": -6.59,
+      "balance_after": -460.49,
+      "id": "tx_048"
+    },
+    {
+      "date": "2026-09-20",
+      "merchant": "Netflix",
+      "category": "subscription",
+      "amount": -9.99,
+      "balance_after": -470.48,
+      "id": "tx_049"
+    },
+    {
+      "date": "2026-09-23",
+      "merchant": "Pastelaria Versailles",
+      "category": "eating_out",
+      "amount": -7.63,
+      "balance_after": -478.11,
+      "id": "tx_050"
+    },
+    {
+      "date": "2026-09-27",
+      "merchant": "MB WAY · Rita (jantar e bilhetes)",
+      "category": "transfer_in",
+      "amount": 18.11,
+      "balance_after": -460.0,
+      "id": "tx_051"
+    },
+    {
+      "date": "2026-09-28",
+      "merchant": "SALARIO · Agência Lumen Lda",
+      "category": "salary",
+      "amount": 1130.0,
+      "balance_after": 670.0,
+      "id": "tx_052"
+    },
+    {
+      "date": "2026-10-01",
+      "merchant": "Transfer to landlord · Arroios",
+      "category": "rent",
+      "amount": -575.0,
+      "balance_after": 95.0,
+      "id": "tx_053"
+    },
+    {
+      "date": "2026-10-02",
+      "merchant": "Navegante metropolitano",
+      "category": "transport",
+      "amount": -40.0,
+      "balance_after": 55.0,
+      "id": "tx_054"
+    },
+    {
+      "date": "2026-10-02",
+      "merchant": "Continente",
+      "category": "groceries",
+      "amount": -11.23,
+      "balance_after": 43.77,
+      "id": "tx_055"
+    },
+    {
+      "date": "2026-10-03",
+      "merchant": "Disney+",
+      "category": "subscription",
+      "amount": -9.99,
+      "balance_after": 33.78,
+      "id": "tx_056"
+    },
+    {
+      "date": "2026-10-05",
+      "merchant": "EDP Comercial (½ share)",
+      "category": "utilities",
+      "amount": -34.6,
+      "balance_after": -0.82,
+      "id": "tx_057"
+    },
+    {
+      "date": "2026-10-06",
+      "merchant": "EPAL água (½ share)",
+      "category": "utilities",
+      "amount": -11.4,
+      "balance_after": -12.22,
+      "id": "tx_058"
+    },
+    {
+      "date": "2026-10-06",
+      "merchant": "Gira bicicletas",
+      "category": "transport_extra",
+      "amount": -8.33,
+      "balance_after": -20.55,
+      "id": "tx_059"
+    },
+    {
+      "date": "2026-10-08",
+      "merchant": "MEO fibra (½ share)",
+      "category": "utilities",
+      "amount": -22.5,
+      "balance_after": -43.05,
+      "id": "tx_060"
+    },
+    {
+      "date": "2026-10-10",
+      "merchant": "Vodafone mobile",
+      "category": "phone",
+      "amount": -12.99,
+      "balance_after": -56.04,
+      "id": "tx_061"
+    },
+    {
+      "date": "2026-10-12",
+      "merchant": "Time Out Market",
+      "category": "eating_out",
+      "amount": -3.94,
+      "balance_after": -59.98,
+      "id": "tx_062"
+    },
+    {
+      "date": "2026-10-13",
+      "merchant": "Tasca do Zé",
+      "category": "eating_out",
+      "amount": -9.12,
+      "balance_after": -69.1,
+      "id": "tx_063"
+    },
+    {
+      "date": "2026-10-14",
+      "merchant": "Spotify",
+      "category": "subscription",
+      "amount": -7.99,
+      "balance_after": -77.09,
+      "id": "tx_064"
+    },
+    {
+      "date": "2026-10-15",
+      "merchant": "Pingo Doce",
+      "category": "groceries",
+      "amount": -8.83,
+      "balance_after": -85.92,
+      "id": "tx_065"
+    },
+    {
+      "date": "2026-10-17",
+      "merchant": "Strava",
+      "category": "subscription",
+      "amount": -7.99,
+      "balance_after": -93.91,
+      "id": "tx_066"
+    },
+    {
+      "date": "2026-10-17",
+      "merchant": "Worten",
+      "category": "shopping",
+      "amount": -33.77,
+      "balance_after": -127.68,
+      "id": "tx_067"
+    },
+    {
+      "date": "2026-10-20",
+      "merchant": "Netflix",
+      "category": "subscription",
+      "amount": -9.99,
+      "balance_after": -137.67,
+      "id": "tx_068"
+    },
+    {
+      "date": "2026-10-20",
+      "merchant": "Tasca do Zé",
+      "category": "eating_out",
+      "amount": -4.3,
+      "balance_after": -141.97,
+      "id": "tx_069"
+    },
+    {
+      "date": "2026-10-20",
+      "merchant": "Glovo",
+      "category": "eating_out",
+      "amount": -3.79,
+      "balance_after": -145.76,
+      "id": "tx_070"
+    },
+    {
+      "date": "2026-10-21",
+      "merchant": "Time Out Market",
+      "category": "eating_out",
+      "amount": -12.58,
+      "balance_after": -158.34,
+      "id": "tx_071"
+    },
+    {
+      "date": "2026-10-22",
+      "merchant": "Lidl",
+      "category": "groceries",
+      "amount": -11.28,
+      "balance_after": -169.62,
+      "id": "tx_072"
+    },
+    {
+      "date": "2026-10-24",
+      "merchant": "Farmácia Estácio",
+      "category": "health",
+      "amount": -9.01,
+      "balance_after": -178.63,
+      "id": "tx_073"
+    },
+    {
+      "date": "2026-10-26",
+      "merchant": "El Corte Inglés",
+      "category": "shopping",
+      "amount": -28.9,
+      "balance_after": -207.53,
+      "id": "tx_074"
+    },
+    {
+      "date": "2026-10-27",
+      "merchant": "Continente",
+      "category": "groceries",
+      "amount": -13.78,
+      "balance_after": -221.31,
+      "id": "tx_075"
+    },
+    {
+      "date": "2026-10-28",
+      "merchant": "Fábrica Braço de Prata",
+      "category": "leisure",
+      "amount": -8.69,
+      "balance_after": -230.0,
+      "id": "tx_076"
+    },
+    {
+      "date": "2026-10-28",
+      "merchant": "SALARIO · Agência Lumen Lda",
+      "category": "salary",
+      "amount": 1130.0,
+      "balance_after": 900.0,
+      "id": "tx_077"
+    }
+  ]
+}
