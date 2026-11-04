@@ -1,4 +1,4 @@
-// AiOrb: the assistant's mark. A delicate soap bubble: see-through, iridescent film, glassy highlights.
+// AiOrb: the assistant's mark. A soft bubble: see-through body, glowing violet rim that wobbles, bright arc on top.
 // The noise and setup are ported from a 21st.dev "gradient orb" (three.js + react-three-fiber) to plain WebGL:
 // no new dependencies, one tiny canvas per orb. Colours come from the design tokens (AI violet, accent teal, warm coral),
 // so it follows light/dark mode. Idle is calm; thinking turns faster and brighter. Pauses off screen; still under
@@ -10,7 +10,7 @@ export type OrbState = 'idle' | 'thinking' | 'listening'
 const VERT = `attribute vec2 p; varying vec2 vUv; void main(){ vUv = p * 0.5 + 0.5; gl_Position = vec4(p, 0.0, 1.0); }`
 const FRAG = `
 precision highp float;
-uniform float iTime; uniform vec2 iRes; uniform float rot; uniform float glow;
+uniform float iTime; uniform vec2 iRes; uniform float rot; uniform float glow; uniform float px; uniform float light;
 uniform vec3 c0; uniform vec3 c1; uniform vec3 c2;
 varying vec2 vUv;
 vec3 hash33(vec3 p3){ p3 = fract(p3 * vec3(0.1031, 0.11369, 0.13787)); p3 += dot(p3, p3.yxz + 19.19); return -1.0 + 2.0 * fract(vec3(p3.x + p3.y, p3.x + p3.z, p3.y + p3.z) * p3.zyx); }
@@ -23,39 +23,38 @@ float snoise3(vec3 p){
   vec4 n = h * h * h * h * vec4(dot(d0, hash33(i)), dot(d1, hash33(i + i1)), dot(d2, hash33(i + i2)), dot(d3, hash33(i + 1.0)));
   return dot(vec4(31.316), n);
 }
-// Thin-film interference: colour shifts with film thickness, like a soap bubble.
-vec3 film(float t){ return 0.5 + 0.5 * cos(6.28318 * (t + vec3(0.0, 0.33, 0.67))); }
+// A soft bubble: see-through body, glowing rim that wobbles slowly, bright arc on top, mauve at the bottom.
 void main(){
-  vec2 uv = (vUv * iRes - iRes * 0.5) / min(iRes.x, iRes.y) * 2.0 * 1.04;
+  vec2 uv = (vUv * iRes - iRes * 0.5) / min(iRes.x, iRes.y) * 2.0;
   float r = length(uv);
-  float edge = smoothstep(1.0, 0.965, r);
-  if (edge <= 0.0) { gl_FragColor = vec4(0.0); return; }
-  float z = sqrt(max(0.0, 1.0 - r * r));
-  float fres = pow(1.0 - z, 2.4);
-  float s = sin(rot), c = cos(rot); vec2 ru = vec2(c * uv.x - s * uv.y, s * uv.x + c * uv.y);
-  float n0 = snoise3(vec3(ru * 1.4, iTime * 0.22)) * 0.5 + 0.5;
-  float n1 = snoise3(vec3(ru * 3.0 + 7.0, iTime * 0.35));
-  float thick = n0 * 0.9 + r * 0.6 + n1 * 0.08 + iTime * 0.04;
-  vec3 irid = film(thick);
-  vec3 brand = c0 * irid.r + c1 * irid.g + c2 * irid.b;
-  brand /= max(max(brand.r, brand.g), max(brand.b, 0.001));
-  vec3 colr = mix(irid, brand, 0.55);
-  float body = 0.05 + 0.05 * n0;
-  float alpha = body + fres * (0.75 + 0.25 * glow);
-  vec3 col = colr * (0.55 + 0.6 * fres) * mix(1.0, 1.25, glow - 1.0);
-  float ring = smoothstep(0.86, 0.985, r) * 0.35;
-  col += colr * ring; alpha += ring * 0.5;
-  vec2 h1 = uv - vec2(-0.38, 0.40); float spec = exp(-dot(h1, h1) * 16.0) * 0.85;
-  vec2 h2 = uv - vec2(0.42, -0.46); float spec2 = exp(-dot(h2, h2) * 45.0) * 0.35;
-  col += vec3(spec + spec2); alpha = max(alpha, (spec + spec2) * 0.9);
-  alpha = clamp(alpha, 0.0, 1.0) * edge;
-  gl_FragColor = vec4(clamp(col, 0.0, 1.0) * alpha, alpha);
+  vec2 dir = r > 0.0 ? uv / r : vec2(0.0, 1.0);
+  float s = sin(rot), c = cos(rot); vec2 rd = vec2(c * dir.x - s * dir.y, s * dir.x + c * dir.y);
+  float wob = snoise3(vec3(rd * 1.1, iTime * 0.3));
+  float R = 0.78 + 0.045 * wob;
+  float d = r - R;
+  float w = max(0.055, 3.4 / px);
+  float rim = exp(-(d * d) / (w * w));
+  float inner = d < 0.0 ? exp(d * 3.5) : 0.0;
+  float outer = d > 0.0 ? exp(-d * 12.0) : 0.0;
+  float top = pow(max(0.0, dot(dir, normalize(vec2(-0.12, 1.0)))), 5.0);
+  float bottom = smoothstep(0.1, -0.9, dir.y);
+  vec3 col = mix(c1, c0, 0.5 + 0.5 * rd.x);
+  col = mix(col, c2, bottom * 0.7);
+  vec3 hi = mix(vec3(1.0), c0, light * 0.6);
+  col = mix(col, hi, top * 0.85);
+  float a = rim * (0.62 + 0.18 * glow) * (1.0 - 0.15 * light) + inner * (0.3 + 0.12 * glow) + outer * 0.3 + light * 0.05 * step(d, 0.0);
+  a *= smoothstep(1.0, 0.94, r);
+  a = clamp(a, 0.0, 1.0);
+  gl_FragColor = vec4(col * a, a);
 }`
 
 const hex = (h: string): [number, number, number] => { const m = h.trim().replace('#', ''); return [0, 2, 4].map((i) => parseInt(m.slice(i, i + 2), 16) / 255) as [number, number, number] }
+// Lavender (top), violet (sides), mauve (bottom). Light mode uses the deeper violet so the rim shows on white.
+const isDark = () => document.documentElement.dataset.theme === 'dark'
 const tokenColours = () => {
   const cs = getComputedStyle(document.documentElement)
-  return [cs.getPropertyValue('--p-color-accent-300') || '#7CC7D8', cs.getPropertyValue('--p-color-ai-500') || '#5B3FD6', '#FF7A59'].map(hex)
+  const ai300 = cs.getPropertyValue('--p-color-ai-300') || '#B3A4F7'
+  return (isDark() ? [ai300, '#8B6CFF', '#D98BC9'] : ['#9D86F7', '#A894FA', '#E2A4D6']).map(hex)
 }
 const SPEED: Record<OrbState, number> = { idle: 0.7, thinking: 2.4, listening: 1.6 }
 
@@ -81,7 +80,8 @@ export function AiOrb({ size = 32, state = 'idle', label }: { size?: number; sta
     canvas.width = size * dpr; canvas.height = size * dpr; gl.viewport(0, 0, canvas.width, canvas.height)
     gl.uniform2f(u('iRes'), canvas.width, canvas.height)
     gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
-    const setColours = () => { const [a, b, c] = tokenColours(); gl.uniform3f(u('c0'), ...a); gl.uniform3f(u('c1'), ...b); gl.uniform3f(u('c2'), ...c) }
+    const setColours = () => { const [a, b, c] = tokenColours(); gl.uniform3f(u('c0'), ...a); gl.uniform3f(u('c1'), ...b); gl.uniform3f(u('c2'), ...c); gl.uniform1f(u('light'), isDark() ? 0 : 1) }
+    gl.uniform1f(u('px'), size * dpr)
     setColours()
     const themeObs = new MutationObserver(setColours); themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches

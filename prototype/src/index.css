@@ -335,10 +335,10 @@ h2.title { margin: 0; }
 .quote-img { width: 100%; max-height: 140px; object-fit: cover; border-radius: 10px; }
 
 /* ---------- AI orb: the assistant's mark ---------- */
-.orb { position: relative; display: inline-grid; place-items: center; flex: none; border-radius: 50%; -webkit-backdrop-filter: blur(3px) saturate(1.4); backdrop-filter: blur(3px) saturate(1.4); filter: drop-shadow(0 2px 6px rgb(91 63 214 / 16%)); }
+.orb { position: relative; display: inline-grid; place-items: center; flex: none; border-radius: 50%; filter: drop-shadow(0 0 6px rgb(139 108 255 / 22%)); }
 .orb canvas { position: relative; }
 .orb canvas { display: block; }
-.orb-css { position: relative; width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle at 32% 28%, rgb(255 255 255 / 85%) 0 8%, transparent 22%), conic-gradient(from 0deg, rgb(91 63 214 / 55%), rgb(124 199 216 / 55%), rgb(255 122 89 / 45%), rgb(91 63 214 / 55%)); -webkit-mask: radial-gradient(circle, rgb(0 0 0 / 12%) 0 52%, #000 78%, transparent 80%); mask: radial-gradient(circle, rgb(0 0 0 / 12%) 0 52%, #000 78%, transparent 80%); animation: spin 8s linear infinite; }
+.orb-css { position: relative; width: 78%; height: 78%; border-radius: 50%; background: radial-gradient(circle at 50% 50%, transparent 58%, rgb(139 108 255 / 35%) 82%, rgb(179 164 247 / 90%) 98%); box-shadow: 0 -1.5px 0 rgb(255 255 255 / 70%) inset, 0 1px 6px rgb(217 139 201 / 35%) inset, 0 0 8px rgb(139 108 255 / 30%); }
 .app-icon { display: grid; place-items: center; background: rgb(255 255 255 / 12%); overflow: hidden; }
 .app-icon .orb-css { width: 18px; height: 18px; }
 .brand { display: inline-flex; align-items: center; gap: 6px; }
