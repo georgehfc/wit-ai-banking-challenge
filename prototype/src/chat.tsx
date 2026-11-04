@@ -16,10 +16,11 @@ export function TypingDots() {
 }
 
 // One assistant reply. Mounts once per turn: typing dots, then the text streams in, then the widget rises in.
-export function AiReply({ text, widget, onGrow, skip = false }: { text: string; widget?: ReactNode; onGrow?: () => void; skip?: boolean }) {
+// tone: 'status' = quiet progress line (no typing dots) · 'reply' = plain text · 'callout' = key result, marked with the gradient rule.
+export function AiReply({ text, widget, onGrow, skip = false, tone = 'reply' }: { text: string; widget?: ReactNode; onGrow?: () => void; skip?: boolean; tone?: 'status' | 'reply' | 'callout' }) {
   const words = text.split(/(\s+)/)
   const total = words.filter((w) => w.trim()).length
-  const [phase, setPhase] = useState<'typing' | 'text' | 'done'>('typing')
+  const [phase, setPhase] = useState<'typing' | 'text' | 'done'>(tone === 'status' ? 'text' : 'typing')
   const [n, setN] = useState(0)
   useEffect(() => { const t = setTimeout(() => setPhase('text'), TYPING_MS); return () => clearTimeout(t) }, [])
   useEffect(() => { if (skip) setPhase('done') }, [skip])
@@ -32,8 +33,8 @@ export function AiReply({ text, widget, onGrow, skip = false }: { text: string; 
   useEffect(() => { onGrow?.() }, [phase, n === total]) // eslint-disable-line react-hooks/exhaustive-deps
   let shown = 0
   return (
-    <div className="msg-ai">
-      <span className="ai-rule" aria-hidden="true" />
+    <div className={`msg-ai ${tone}`}>
+      {tone === 'callout' && <span className="ai-rule" aria-hidden="true" />}
       <div className="msg-ai-content">
         {phase === 'typing' ? <TypingDots /> : (
           <p aria-label={text}>{words.map((w, i) => {

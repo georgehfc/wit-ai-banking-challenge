@@ -433,3 +433,19 @@ h2.title { margin: 0; }
 .sphere-fab.working .orb { box-shadow: 0 0 0 3px var(--color-ai-subtle); }
 
 .home .chip { background: var(--color-surface-default); }
+
+/* ---------- message hierarchy, neutral steps, fades (4 Nov) ---------- */
+.msg-ai.reply, .msg-ai.status { gap: 0; }
+.msg-ai.status p { font-size: 14px; line-height: 20px; color: var(--color-text-muted); }
+.msg-ai.status .word { animation: wordin .3s ease-out both; }
+.msg-ai.callout { gap: 12px; }
+.msg-ai.callout > .msg-ai-content > p { font-weight: 500; }
+.steps { background: var(--color-surface-raised); color: var(--color-text-default); }
+.steps-collapsed { background: none; padding: 2px 0; color: var(--color-text-muted); font-size: 13px; gap: 6px; }
+.steps-collapsed .step-dot.done, .step.done .step-dot { background: var(--color-text-muted); border-color: var(--color-text-muted); }
+.step-dot { border-color: var(--color-text-muted); }
+.input-dock { position: relative; z-index: 1; }
+.input-dock::before { content: ''; position: absolute; left: 0; right: 0; top: -32px; height: 32px; background: linear-gradient(to bottom, transparent, var(--color-surface-default)); pointer-events: none; }
+.conversation { -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18px); mask-image: linear-gradient(to bottom, transparent 0, #000 18px); }
+.suggestions { -webkit-mask-image: linear-gradient(to right, #000 82%, transparent); mask-image: linear-gradient(to right, #000 82%, transparent); padding-right: 40px; }
+.dock::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 96px; background: linear-gradient(to bottom, transparent, var(--color-surface-raised) 70%); pointer-events: none; }

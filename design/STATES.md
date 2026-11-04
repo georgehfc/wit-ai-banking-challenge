@@ -112,6 +112,10 @@ stateDiagram-v2
 
 Main button: mic (Empty) · send (Typing/Attached) · stop (Replying, Recording).
 
+## Message hierarchy (`chat.tsx` · `AiReply`)
+
+Three levels, so the important things stand out: **status** (quiet muted progress line, e.g. "Checking your account…"; no typing dots) · **reply** (plain body text) · **callout** (key result: the plan, the spending summary, the scam verdict; the only messages with the gradient rule). The steps receipt is neutral ("Worked for 2 s ›"), not coloured.
+
 ---
 
 ## Gaps found while drawing these (4 Nov)
@@ -120,7 +124,7 @@ Drawing the diagrams from the code turned up these. Fixed ones are marked.
 
 1. **Fixed:** "Save for something" after a plan existed went nowhere ("I can't help with that yet"). Now it opens the plan.
 2. **Fixed:** with several chats, a second "Save for something" would have started a second plan. Now it points to the chat that owns it.
-3. **Open:** Face ID failure has no screen. The diagram shows `Authenticating → Reviewing`, but the prototype always succeeds. Worth one frame (retry / use passcode).
-4. **Open:** "Not now" on review keeps the draft, but nothing reminds Inês later. Decide whether a draft plan should show on Home ("Holiday plan · draft").
-5. **Open:** the alert only covers "summary ready". The other proactive events (money arrived, short month) live in the page 5 wireframes, not in the prototype. That is fine for scope; say so in the walkthrough.
-6. **Open:** Paused is reachable from chat and the goal card, but the confirmation screen no longer offers Pause. Consistent with "one place to manage the plan" (the goal), but check it reads clearly.
+3. **Decided (George, 4 Nov):** Face ID failure is a Figma frame only; the prototype always succeeds.
+4. **Decided:** no reminder for a plan left at "Not now" (out of scope, low value). The draft stays in its chat.
+5. **Decided:** the prototype's alert is "summary ready" only; money arrived and short month stay as Figma wireframes (page 5).
+6. **Decided:** keep Pause where it is (chat suggestions and the goal).

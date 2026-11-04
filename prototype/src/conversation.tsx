@@ -29,7 +29,7 @@ export type Actions = {
 }
 
 type Widget = 'margin' | 'plan' | 'gap' | 'review' | 'spending' | 'verdict' | 'card' | 'fraudline' | 'shortcuts' | 'openplan'
-type Turn = { id: number; who: 'user' | 'ai' | 'steps'; text?: string; quote?: string; image?: string; widget?: Widget; snap?: number; steps?: Step[]; summary?: string; instant?: boolean }
+type Turn = { id: number; who: 'user' | 'ai' | 'steps'; tone?: 'status' | 'reply' | 'callout'; text?: string; quote?: string; image?: string; widget?: Widget; snap?: number; steps?: Step[]; summary?: string; instant?: boolean }
 type NewTurn = Omit<Turn, 'id'>
 type ScamStage = 'paste' | 'verdict' | 'tapped' | 'safe' | 'entered' | 'reported' | null
 
@@ -78,14 +78,16 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
     for (const it of items) {
       const t = { ...it, id: nextId.current++, instant: it.instant || (skipRef.current && it.who === 'ai') }
       setTurns((x) => [...x, t])
-      const ms = skipRef.current ? 60 : it.who === 'steps' ? (it.steps!.length * 650 + 350) : it.who === 'ai' && !it.instant ? replyDuration(it.text ?? '', !!it.widget) : 220
+      const ms = skipRef.current ? 60 : it.who === 'steps' ? (it.steps!.length * 650 + 350) : it.tone === 'status' ? 400 + (it.text ?? '').split(/\s+/).length * 28 : it.who === 'ai' && !it.instant ? replyDuration(it.text ?? '', !!it.widget) : 220
       await wait(ms)
     }
     setBusy(false); skipRef.current = false; setSkipping(false)
     if (!visibleRef.current) setUnseen(true)
   }
   const user = (text: string, quote?: string, image?: string): NewTurn => ({ who: 'user', text, quote, image })
-  const ai = (text: string, widget?: Widget, extra?: Partial<NewTurn>): NewTurn => ({ who: 'ai', text, widget, ...extra })
+  // Callouts (the gradient rule) only for the key results: the plan, the spending summary, the scam verdict.
+  const ai = (text: string, widget?: Widget, extra?: Partial<NewTurn>): NewTurn => ({ who: 'ai', text, widget, tone: widget && ['plan', 'spending', 'verdict'].includes(widget) ? 'callout' : 'reply', ...extra })
+  const status = (text: string): NewTurn => ({ who: 'ai', text, tone: 'status' })
 
   const p = plan(monthly)
   const has = (w: Widget) => turns.some((t) => t.widget === w)
@@ -93,7 +95,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
 
   // ---------- Save for something ----------
   const startSave = (text: string) => say(user(text),
-    ai('Checking your account for August to October.'),
+    status('Checking your account for August to October.'),
     { who: 'steps', steps: [{ label: 'Read your current account, Aug–Oct', role: 'Data' }, { label: 'Worked out what was left each month', role: 'Planner' }, { label: 'Made sure the plan keeps your buffer', role: 'Rules' }], summary: 'Read Aug–Oct · Planner · Rules' },
     ai(`After rent, bills and spending, you had ${eur(out.margin.min)} to ${eur(out.margin.max)} left each month.`, 'margin'),
     ai(`Your ${eur(BUFFER)} buffer stays untouched. Saving the full ${eur(GOAL)} by July would take ${eur(NEEDED)} a month, more than any month left you. This is what fits:`, 'plan', { snap: SUGGESTED }))
@@ -123,7 +125,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
   // ---------- Where did my money go? ----------
   const startSpending = (text: string | null) => {
     const avg = SP.spent_total / 3, hi = SP.highest_everyday_month
-    const first: NewTurn[] = text ? [user(text), ai('Checking your account for August to October.'), { who: 'steps', steps: [{ label: 'Read your transactions, Aug–Oct', role: 'Data' }, { label: 'Grouped them by type', role: 'Planner' }], summary: 'Read Aug–Oct · Grouped by type' }] : []
+    const first: NewTurn[] = text ? [user(text), status('Checking your account for August to October.'), { who: 'steps', steps: [{ label: 'Read your transactions, Aug–Oct', role: 'Data' }, { label: 'Grouped them by type', role: 'Planner' }], summary: 'Read Aug–Oct · Grouped by type' }] : []
     setMonth('all')
     say(...first,
       ai(`You spent ${eur(SP.spent_total)} over three months, about ${eur(avg)} a month. ${eur(SP.fixed_avg)} a month is fixed: rent, bills, your transport pass and subscriptions.`, 'spending'),
@@ -135,7 +137,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
   const startScam = (text: string) => { setScam('paste'); say(user(text), ai('Paste the message here, or attach a screenshot. I read it as text only and never open links in it.')) }
   const checkSms = (sms: string, image?: string) => {
     setScam('verdict')
-    say(user('', sms, image), ai(image ? 'Reading the screenshot.' : 'Checking the message.'),
+    say(user('', sms, image), status(image ? 'Reading the screenshot.' : 'Checking the message.'),
       { who: 'steps', steps: [{ label: 'Read the message as text', role: 'Data' }, { label: 'Compared it with how the bank contacts you', role: 'Rules' }, { label: 'Checked where the link goes', role: 'Rules' }], summary: 'Read as text · Rules' },
       ai('This looks like a scam. Don’t tap the link, and you can delete the message.', 'verdict'))
   }
@@ -258,8 +260,8 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
   const renderTurn = (t: Turn) => {
     if (t.who === 'user') return <UserBubble key={t.id} text={t.text} quote={t.quote} image={t.image} />
     if (t.who === 'steps') return <StepsReceipt key={t.id} steps={t.steps!} summary={t.summary} />
-    if (t.instant) return <div key={t.id} className="msg-ai"><span className="ai-rule" aria-hidden="true" /><div className="msg-ai-content"><p>{t.text}</p>{t.widget && widget(t)}</div></div>
-    return <AiReply key={t.id} text={t.text ?? ''} widget={t.widget ? widget(t) : undefined} onGrow={smart} skip={skipping} />
+    if (t.instant) return <div key={t.id} className={`msg-ai ${t.tone ?? 'reply'}`}>{t.tone === 'callout' && <span className="ai-rule" aria-hidden="true" />}<div className="msg-ai-content"><p>{t.text}</p>{t.widget && widget(t)}</div></div>
+    return <AiReply key={t.id} text={t.text ?? ''} widget={t.widget ? widget(t) : undefined} onGrow={smart} skip={skipping} tone={t.tone} />
   }
 
   // ---------- review / confirm (J1) ----------
