@@ -69,9 +69,12 @@ export function Home({ pill, goal, toast, onOpen, masked, recentTitle = 'Recent'
           ))}
         </section>
       </div>
+      {/* The pill floats over the content: cards scroll under it to the tab bar (no cropped gap). */}
       <div className="dock">
-        {toast && <TimedToast key={toast.text} {...toast} />}
-        <AssistantPill {...pill} onOpen={onOpen} />
+        <div className="dock-float">
+          {toast && <TimedToast key={toast.text} {...toast} />}
+          <AssistantPill {...pill} onOpen={onOpen} />
+        </div>
       </div>
       <nav className="tabbar" aria-label="Main">
         {[['home', 'Home', true], ['swap', 'Payments'], ['target', 'Savings'], ['card', 'Cards']].map(([i, l, on]) => (

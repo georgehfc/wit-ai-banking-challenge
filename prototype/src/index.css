@@ -393,3 +393,8 @@ h2.title { margin: 0; }
 .prompt { border-radius: 26px; box-shadow: 0 1px 2px rgb(23 22 20 / 4%), 0 10px 30px rgb(23 22 20 / 8%); }
 .prompt:focus-within { box-shadow: 0 1px 2px rgb(23 22 20 / 4%), 0 10px 30px rgb(23 22 20 / 10%), 0 0 0 3px var(--color-accent-subtle); }
 .prompt-main.send { background: var(--color-accent-default); }
+
+/* Floating Ask AI: content scrolls under the pill (4 Nov) */
+.dock { position: relative; height: 0; padding: 0; z-index: 2; }
+.dock-float { position: absolute; left: 16px; right: 16px; bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
+.home-scroll { padding-bottom: 88px; }
