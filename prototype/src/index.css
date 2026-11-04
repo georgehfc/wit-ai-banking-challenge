@@ -453,9 +453,11 @@ h2.title { margin: 0; }
 .steps-title { font-weight: 600; font-size: 13px; color: var(--color-text-default); }
 
 /* ---------- Data viz colour from the AI sphere's palette, used to highlight one thing per chart (4 Nov) ---------- */
-:root { --grad-v: linear-gradient(0deg, #0B4ABB 0%, #0D5DF4 38%, #FC681E 78%, #FAB615 100%); --grad-h: linear-gradient(90deg, #0D5DF4 0%, #FC681E 62%, #FAB615 100%); --viz-muted: var(--p-color-neutral-300); --viz-faint: var(--p-color-neutral-200); }
-:root[data-theme='dark'] { --viz-muted: var(--p-color-neutral-700); --viz-faint: var(--p-color-neutral-800); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) { --viz-muted: var(--p-color-neutral-700); --viz-faint: var(--p-color-neutral-800); } }
+:root { --grad-v: linear-gradient(0deg, #0B4ABB 0%, #0D5DF4 38%, #FC681E 78%, #FAB615 100%); --grad-h: linear-gradient(90deg, #0D5DF4 0%, #FC681E 62%, #FAB615 100%);
+  /* Chart greys: cooler and darker than the UI neutrals so marks read against the cream (muted 3.9:1, strong 6.9:1 on white) */
+  --viz-muted: #84817C; --viz-strong: #5C5955; --viz-faint: #E4E2DE; }
+:root[data-theme='dark'] { --viz-muted: #8F8B84; --viz-strong: #C9C5BE; --viz-faint: #34322E; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) { --viz-muted: #8F8B84; --viz-strong: #C9C5BE; --viz-faint: #34322E; } }
 .bar { background: var(--viz-muted); }
 .bar.highlight { background: var(--grad-v); box-shadow: 0 6px 16px -6px rgb(13 93 244 / 45%); }
 .bar-xmas { background: #FAB615; opacity: .55; }
@@ -463,9 +465,12 @@ h2.title { margin: 0; }
 .bar-gap { border-color: #FC681E; }
 .spend-bar { background: var(--viz-faint); }
 .spend-bar i { background: var(--viz-muted); }
+.spend-bar i.fixed { background: var(--viz-strong); }
+.progress { background: var(--viz-faint); }
+.bar-xmas { opacity: .9; }
 .spend-bar i.top { background: var(--grad-h); }
-.seg.fixed, .legend .fixed { background: var(--viz-muted); }
-.seg.spend, .legend .spend { background: var(--viz-faint); }
+.seg.fixed, .legend .fixed { background: var(--viz-strong); }
+.seg.spend, .legend .spend { background: var(--viz-muted); }
 .seg.left, .legend .left { background: var(--grad-h); }
 .progress > div { background: var(--grad-h); }
 .amount-control input[type='range']::-webkit-slider-runnable-track { background: linear-gradient(to right, transparent var(--pct), var(--viz-faint) var(--pct)), var(--grad-h); }
@@ -482,3 +487,8 @@ h2.title { margin: 0; }
 .shortcut-card > .icon { color: var(--color-text-muted); }
 .lead-icon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--color-surface-default); box-shadow: 0 1px 2px rgb(23 22 20 / 6%); }
 .empty { gap: 10px; }
+
+/* Full screens (review, confirmation) sit above the thread's input dock */
+.thread > .screen, .thread > .bsheet-wrap { z-index: 5; }
+.result .amount-sm { white-space: nowrap; }
+.result { align-items: flex-start; gap: 12px; }

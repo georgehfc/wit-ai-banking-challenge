@@ -231,7 +231,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
       <div className="row-between result">
         <span className="stack"><span className="amount-sm"><Num value={q.total} /> até julho</span><span className="caption muted">Calculado pelo planeador</span></span>
         {q.gap > 0 ? <span className="stack end"><span className="amount-sm warn"><Num value={q.gap} format={(v) => `faltam ${eur(v)}`} /></span><span className="caption muted">de {eur(GOAL)} · tracejado</span></span>
-          : <span className="stack end"><span className="amount-sm pos">Objetivo completo</span></span>}
+          : <StatusBadge kind="positive">Objetivo atingido</StatusBadge>}
       </div>
       {live && !choice && <Button kind="secondary" onClick={() => setAdjusting(!adjusting)}>{adjusting ? 'Feito' : 'Mudar valor'}</Button>}
     </div>
