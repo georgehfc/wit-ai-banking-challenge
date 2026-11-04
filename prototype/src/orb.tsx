@@ -1,4 +1,4 @@
-// AiOrb: the assistant's mark. A soft bubble: see-through body, glowing violet rim that wobbles, bright arc on top.
+// AiOrb: the assistant's mark. An elegant ring: thin luminous rim with a bright arc sweeping round it.
 // The noise and setup are ported from a 21st.dev "gradient orb" (three.js + react-three-fiber) to plain WebGL:
 // no new dependencies, one tiny canvas per orb. Colours come from the design tokens (AI violet, accent teal, warm coral),
 // so it follows light/dark mode. Idle is calm; thinking turns faster and brighter. Pauses off screen; still under
@@ -23,38 +23,37 @@ float snoise3(vec3 p){
   vec4 n = h * h * h * h * vec4(dot(d0, hash33(i)), dot(d1, hash33(i + i1)), dot(d2, hash33(i + i2)), dot(d3, hash33(i + 1.0)));
   return dot(vec4(31.316), n);
 }
-// A soft bubble: see-through body, glowing rim that wobbles slowly, bright arc on top, mauve at the bottom.
+// An elegant ring: thin luminous rim, a bright arc sweeping round it, a little grain, near-still shape.
+float grain(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 void main(){
   vec2 uv = (vUv * iRes - iRes * 0.5) / min(iRes.x, iRes.y) * 2.0;
   float r = length(uv);
   vec2 dir = r > 0.0 ? uv / r : vec2(0.0, 1.0);
-  float s = sin(rot), c = cos(rot); vec2 rd = vec2(c * dir.x - s * dir.y, s * dir.x + c * dir.y);
-  float wob = snoise3(vec3(rd * 1.1, iTime * 0.3));
-  float R = 0.78 + 0.045 * wob;
+  float ang = atan(dir.y, dir.x);
+  float wob = snoise3(vec3(dir * 1.2, iTime * 0.25));
+  float R = 0.80 + 0.012 * wob;
   float d = r - R;
-  float w = max(0.055, 3.4 / px);
+  float w = max(0.02, 1.4 / px);
   float rim = exp(-(d * d) / (w * w));
-  float inner = d < 0.0 ? exp(d * 3.5) : 0.0;
-  float outer = d > 0.0 ? exp(-d * 12.0) : 0.0;
-  float top = pow(max(0.0, dot(dir, normalize(vec2(-0.12, 1.0)))), 5.0);
-  float bottom = smoothstep(0.1, -0.9, dir.y);
-  vec3 col = mix(c1, c0, 0.5 + 0.5 * rd.x);
-  col = mix(col, c2, bottom * 0.7);
-  vec3 hi = mix(vec3(1.0), c0, light * 0.6);
-  col = mix(col, hi, top * 0.85);
-  float a = rim * (0.62 + 0.18 * glow) * (1.0 - 0.15 * light) + inner * (0.3 + 0.12 * glow) + outer * 0.3 + light * 0.05 * step(d, 0.0);
-  a *= smoothstep(1.0, 0.94, r);
+  float halo = exp(-abs(d) * (d < 0.0 ? 9.0 : 16.0));
+  float sweep = pow(max(0.0, cos(ang - iTime * 0.9)), 6.0);
+  float sweep2 = pow(max(0.0, cos(ang - iTime * 0.9 + 3.14159)), 30.0) * 0.4;
+  float lit = 0.42 + 0.9 * (sweep + sweep2) * (0.8 + 0.2 * glow);
+  vec3 col = mix(c1, c0, sweep + sweep2);
+  float g = grain(floor(vUv * iRes)) * 0.18;
+  float a = rim * lit + halo * (0.16 + 0.42 * sweep) * glow + (halo * g * (0.6 + sweep));
+  a *= smoothstep(1.0, 0.95, r);
   a = clamp(a, 0.0, 1.0);
   gl_FragColor = vec4(col * a, a);
 }`
 
 const hex = (h: string): [number, number, number] => { const m = h.trim().replace('#', ''); return [0, 2, 4].map((i) => parseInt(m.slice(i, i + 2), 16) / 255) as [number, number, number] }
-// Lavender (top), violet (sides), mauve (bottom). Light mode uses the deeper violet so the rim shows on white.
+// Dark: silver-white sweep on a lavender rim. Light: deep violet sweep on a violet rim, so it shows on white.
 const isDark = () => document.documentElement.dataset.theme === 'dark'
 const tokenColours = () => {
   const cs = getComputedStyle(document.documentElement)
   const ai300 = cs.getPropertyValue('--p-color-ai-300') || '#B3A4F7'
-  return (isDark() ? [ai300, '#8B6CFF', '#D98BC9'] : ['#9D86F7', '#A894FA', '#E2A4D6']).map(hex)
+  return (isDark() ? ['#FFFFFF', ai300, ai300] : ['#5B3FD6', '#8B6CFF', '#8B6CFF']).map(hex)
 }
 const SPEED: Record<OrbState, number> = { idle: 0.7, thinking: 2.4, listening: 1.6 }
 

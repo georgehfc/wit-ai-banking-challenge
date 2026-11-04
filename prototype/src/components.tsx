@@ -24,6 +24,7 @@ const paths: Record<string, ReactNode> = {
   clip: <path d="M20 11.5l-7.8 7.8a5 5 0 01-7.1-7.1l8.5-8.5a3.3 3.3 0 014.7 4.7l-8.5 8.5a1.7 1.7 0 01-2.4-2.4l7.8-7.8" />,
   mic: <><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0014 0M12 18v3" /></>,
   square: <rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor" />,
+  sparkle: <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7z" />,
   lock: <><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" /></>,
   phone: <path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z" />,
 }
@@ -49,6 +50,7 @@ export function Toast({ text, action, onAction }: { text: string; action?: strin
 }
 
 // ---------- AssistantPill: the assistant asleep ----------
+// Glass pill with a shimmer travelling round its border (adapted from a 21st.dev glassmorphism CTA, in plain CSS).
 export type PillState = 'idle' | 'nudge' | 'working' | 'ready'
 export function AssistantPill({ state, label, action, onOpen }: { state: PillState; label?: string; action?: string; onOpen: () => void }) {
   const text = label ?? 'Ask AI'
@@ -56,7 +58,7 @@ export function AssistantPill({ state, label, action, onOpen }: { state: PillSta
     <button className={`pill pill-${state}`} onClick={onOpen} aria-label={state === 'idle' ? 'Ask AI, AI assistant' : `AI assistant: ${text}`}>
       <span className="pill-glyph"><AiOrb size={32} state={state === 'working' ? 'thinking' : 'idle'} />{(state === 'nudge' || state === 'ready') && <span className="badge" />}</span>
       <span className="pill-label">{text}</span>
-      {action && <span className="pill-action">{action}</span>}
+      {action ? <span className="pill-action">{action}</span> : <span className="pill-spark" aria-hidden="true"><Icon name="sparkle" size={16} /></span>}
     </button>
   )
 }
