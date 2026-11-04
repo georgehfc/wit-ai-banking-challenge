@@ -46,7 +46,7 @@ export default function App() {
       <div className="phone" key={`${start}-${trigger}-${run}`}><Assistant startClosed={start === 'closed'} trigger={trigger} /></div>
 
       <div className="edge-zone" aria-hidden="true" onPointerDown={down('open')} onPointerMove={move} onPointerUp={up} onPointerCancel={up} />
-      {!open && <button className="tweaks-handle" onClick={() => setOpen(true)} aria-label="Abrir ajustes do protótipo (T)" title="Ajustes (T)"><i /></button>}
+      {!open && <button className="tweaks-handle" onClick={() => setOpen(true)} aria-label="Abrir ajustes do protótipo (T)" title="Ajustes (T)"><i /><span className="tweaks-label">Ajustes</span><kbd>T</kbd></button>}
       <div className={`tweaks-scrim ${open ? 'open' : ''}`} onClick={() => setOpen(false)} aria-hidden="true" />
       <aside className={`tweaks ${open ? 'open' : ''}`} aria-label="Ajustes do protótipo" aria-hidden={!open} onPointerDown={down('close')} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
         <div className="panel">

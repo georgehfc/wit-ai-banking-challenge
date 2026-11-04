@@ -566,3 +566,12 @@ h2.title { margin: 0; }
 .tweaks-back { width: 100%; min-height: 44px !important; border-radius: var(--p-radius-pill) !important; background: var(--color-accent-default) !important; color: var(--color-text-on-accent); text-align: center !important; font-weight: 600; border: 0 !important; }
 @media (max-width: 500px) { .tweaks-handle { height: 48px; width: 12px; opacity: .5; } }
 .edge-zone { user-select: none; -webkit-user-select: none; cursor: w-resize; }
+/* Desktop: the tweaks handle is a visible corner button; phones keep the thin edge tab */
+.tweaks-handle .tweaks-label, .tweaks-handle kbd { display: none; }
+@media (min-width: 501px) {
+  .tweaks-handle { top: auto; bottom: 20px; right: 20px; transform: none; width: auto; height: 36px; padding: 0 8px 0 12px; gap: 8px; display: inline-flex; align-items: center; border-radius: var(--p-radius-pill); border: 1px solid var(--color-border-default); opacity: 1; font: 500 13px/16px var(--font); color: var(--color-text-default); box-shadow: 0 1px 2px rgb(23 22 20 / 6%), 0 6px 18px rgb(23 22 20 / 10%); }
+  .tweaks-handle:hover { width: auto; background: var(--color-surface-raised); }
+  .tweaks-handle i { width: 12px; height: 2px; box-shadow: 0 -4px 0 currentColor, 0 4px 0 currentColor; background: currentColor; color: var(--color-text-muted); }
+  .tweaks-handle .tweaks-label { display: inline; }
+  .tweaks-handle kbd { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 6px; background: var(--color-surface-raised); border: 1px solid var(--color-border-default); font: 600 11px/1 var(--font); color: var(--color-text-muted); }
+}
