@@ -67,7 +67,7 @@ export function SearchScreen({ onClose, onAsk, onGo }: { onClose: () => void; on
           <section className="search-group">
             <span className="label muted">Perguntar à IA</span>
             {['Quanto gastei em restaurantes?', 'Posso poupar para umas férias?', 'Recebi uma mensagem estranha'].map((s) => (
-              <button key={s} className="list-line" onClick={() => onAsk(s)}><span className="row-gap"><AiOrb size={18} /><span>{s}</span></span><Icon name="chevron" size={18} /></button>
+              <button key={s} className="list-line" onClick={() => onAsk(s)}><span className="row-gap"><AiOrb size={18} /><span>{s}</span></span><span className="chev"><Icon name="chevron" size={20} /></span></button>
             ))}
           </section>
         </> : <>
@@ -75,7 +75,7 @@ export function SearchScreen({ onClose, onAsk, onGo }: { onClose: () => void; on
           {places.length > 0 && <section className="search-group">
             <span className="label muted">Na app</span>
             {places.slice(0, 3).map((p) => (
-              <button key={p.label} className="list-line" onClick={() => onGo(p.tab)}><span className="row-gap"><span className="lead-icon sm"><Icon name={p.icon} size={16} /></span><span className="stack"><span>{p.label}</span><span className="caption muted">{p.sub}</span></span></span><Icon name="chevron" size={18} /></button>
+              <button key={p.label} className="list-line" onClick={() => onGo(p.tab)}><span className="row-gap"><span className="lead-icon sm"><Icon name={p.icon} size={16} /></span><span className="stack"><span>{p.label}</span><span className="caption muted">{p.sub}</span></span></span><span className="chev"><Icon name="chevron" size={20} /></span></button>
             ))}
           </section>}
           {tx.length > 0 && <section className="search-group">

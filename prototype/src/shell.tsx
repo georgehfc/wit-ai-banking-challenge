@@ -114,7 +114,7 @@ export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFr
           <h1 className="page-title">Cartões</h1>
           <CardControl frozen={frozen} onToggle={onFreeze} />
           <section className="card list-card">
-            {['Limites do cartão', 'Ver PIN', 'Substituir cartão'].map((r) => <button key={r} className="list-line"><span>{r}</span><Icon name="chevron" size={18} /></button>)}
+            {['Limites do cartão', 'Ver PIN', 'Substituir cartão'].map((r) => <button key={r} className="list-line"><span>{r}</span><span className="chev"><Icon name="chevron" size={20} /></span></button>)}
           </section>
         </>}
       </div>

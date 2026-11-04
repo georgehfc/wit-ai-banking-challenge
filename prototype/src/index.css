@@ -613,3 +613,9 @@ h2.title { margin: 0; }
 .bank-card > .frost { position: absolute; inset: 0; z-index: 2; background: rgb(240 238 234 / 45%); color: #171614; }
 /* Wrapped chip rows: 8 px between chips, 4 px between rows (George, Figma E2) */
 .search-group .chips.wrap { column-gap: var(--p-space-2); row-gap: var(--p-space-1); }
+
+/* List rows: chevron in a 40 px touch area (George, 4 Nov) */
+.chev { width: 40px; height: 40px; margin-right: -10px; display: grid; place-items: center; flex: none; color: var(--color-text-muted); }
+/* Bank pages: content scrolls clear of the floating button; the full-width fade belongs to the Home dock only */
+.home-scroll { padding-bottom: 120px; }
+.dock:has(.dock-float.compact)::before { display: none; }
