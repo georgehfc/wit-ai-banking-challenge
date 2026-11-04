@@ -79,7 +79,7 @@ export function AssistantMessage({ children, text }: { children?: ReactNode; tex
 }
 
 export type Step = { label: string; role: string }
-export function StepsReceipt({ steps, onDone, summary = 'Read Aug–Oct · Calculated by planner · Checked rules' }: { steps: Step[]; onDone?: () => void; summary?: string }) {
+export function StepsReceipt({ steps, onDone, summary = 'Read Aug–Oct · Calculated by planner · Checked rules', title }: { steps: Step[]; onDone?: () => void; summary?: string; title?: string }) {
   const [n, setN] = useState(0)
   const [open, setOpen] = useState(false)
   useEffect(() => {
@@ -90,7 +90,7 @@ export function StepsReceipt({ steps, onDone, summary = 'Read Aug–Oct · Calcu
   const done = n >= steps.length
   if (!done || open) return (
     <div className="steps" role="status" aria-live="polite">
-      {done && <button className="steps-head" onClick={() => setOpen(false)}>Worked for 2 s <Icon name="down" size={14} /></button>}
+      {done ? <button className="steps-head" onClick={() => setOpen(false)}>Worked for 2 s <Icon name="down" size={14} /></button> : title && <span className="steps-title">{title}</span>}
       {steps.map((s, i) => (
         <div key={s.label} className={`step ${i < n ? 'done' : i === n ? 'now' : 'todo'}`}>
           <span className="step-dot">{i < n && <Icon name="check" size={11} />}</span>

@@ -449,3 +449,5 @@ h2.title { margin: 0; }
 .conversation { -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18px); mask-image: linear-gradient(to bottom, transparent 0, #000 18px); }
 .suggestions { -webkit-mask-image: linear-gradient(to right, #000 82%, transparent); mask-image: linear-gradient(to right, #000 82%, transparent); padding-right: 40px; }
 .dock::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 96px; background: linear-gradient(to bottom, transparent, var(--color-surface-raised) 70%); pointer-events: none; }
+
+.steps-title { font-weight: 600; font-size: 13px; color: var(--color-text-default); }

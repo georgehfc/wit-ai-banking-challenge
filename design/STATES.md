@@ -23,10 +23,10 @@ stateDiagram-v2
     Recommendation --> Adjusting: change amount (slider / chips / "make it 250")
     Adjusting --> Recommendation: new plan card, old one folds
     Recommendation --> Gap: "What about the gap?"
-    Gap --> Chosen: pick IRS / September / smaller trip
+    Gap --> Chosen: pick IRS / September / smaller trip / keep as it is
     Recommendation --> Review: full goal reached
     Chosen --> Review: Review the plan
-    Review --> Chosen: Not now (nothing moved)
+    Review --> Chosen: Not now ("Nothing has moved")
     Review --> FaceID: Approve with Face ID
     FaceID --> Confirmed: approved
     Confirmed --> [*]: Done
@@ -117,6 +117,14 @@ Main button: mic (Empty) · send (Typing/Attached) · stop (Replying, Recording)
 Three levels, so the important things stand out: **status** (quiet muted progress line, e.g. "Checking your account…"; no typing dots) · **reply** (plain body text) · **callout** (key result: the plan, the spending summary, the scam verdict; the only messages with the gradient rule). The steps receipt is neutral ("Worked for 2 s ›"), not coloured.
 
 ---
+
+## J1 coherence rules (4 Nov)
+
+- One progress element per answer: the steps receipt, titled ("Checking your account, Aug–Oct"), collapsing to "Worked for 2 s ›".
+- Fold only what came before your latest message; the current answer stays open.
+- Every promise in the copy has a control ("keep the plan as it is" is a button).
+- Chat speaks as the assistant ("I'll ask…"); bank screens (review, confirmation) speak as the bank ("You'll be asked…").
+- A shortfall stays visible to the end: review repeats it when the plan doesn't reach the goal.
 
 ## Gaps found while drawing these (4 Nov)
 

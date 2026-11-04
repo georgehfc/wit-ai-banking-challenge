@@ -18,7 +18,7 @@ const SP = out.spending
 const newSubs = out.side_widgets.new_subscriptions_this_summer
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
-export type Choice = 'irs' | 'september' | 'trim' | null
+export type Choice = 'irs' | 'september' | 'trim' | 'keep' | null
 export type Goal = { monthly: number; choice: Choice; paused: boolean }
 export type Autostart = { text?: string; image?: string; proactive?: 'spending' }
 export type ThreadStatus = { busy: boolean; unseen: boolean; hasPlan: boolean; preview: string }
@@ -29,7 +29,7 @@ export type Actions = {
 }
 
 type Widget = 'margin' | 'plan' | 'gap' | 'review' | 'spending' | 'verdict' | 'card' | 'fraudline' | 'shortcuts' | 'openplan'
-type Turn = { id: number; who: 'user' | 'ai' | 'steps'; tone?: 'status' | 'reply' | 'callout'; text?: string; quote?: string; image?: string; widget?: Widget; snap?: number; steps?: Step[]; summary?: string; instant?: boolean }
+type Turn = { id: number; who: 'user' | 'ai' | 'steps'; tone?: 'status' | 'reply' | 'callout'; title?: string; text?: string; quote?: string; image?: string; widget?: Widget; snap?: number; steps?: Step[]; summary?: string; instant?: boolean }
 type NewTurn = Omit<Turn, 'id'>
 type ScamStage = 'paste' | 'verdict' | 'tapped' | 'safe' | 'entered' | 'reported' | null
 
@@ -87,7 +87,6 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
   const user = (text: string, quote?: string, image?: string): NewTurn => ({ who: 'user', text, quote, image })
   // Callouts (the gradient rule) only for the key results: the plan, the spending summary, the scam verdict.
   const ai = (text: string, widget?: Widget, extra?: Partial<NewTurn>): NewTurn => ({ who: 'ai', text, widget, tone: widget && ['plan', 'spending', 'verdict'].includes(widget) ? 'callout' : 'reply', ...extra })
-  const status = (text: string): NewTurn => ({ who: 'ai', text, tone: 'status' })
 
   const p = plan(monthly)
   const has = (w: Widget) => turns.some((t) => t.widget === w)
@@ -95,8 +94,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
 
   // ---------- Save for something ----------
   const startSave = (text: string) => say(user(text),
-    status('Checking your account for August to October.'),
-    { who: 'steps', steps: [{ label: 'Read your current account, Aug–Oct', role: 'Data' }, { label: 'Worked out what was left each month', role: 'Planner' }, { label: 'Made sure the plan keeps your buffer', role: 'Rules' }], summary: 'Read Aug–Oct · Planner · Rules' },
+    { who: 'steps', title: 'Checking your account, Aug–Oct', steps: [{ label: 'Read your current account, Aug–Oct', role: 'Data' }, { label: 'Worked out what was left each month', role: 'Planner' }, { label: 'Made sure the plan keeps your buffer', role: 'Rules' }], summary: 'Read Aug–Oct · Planner · Rules' },
     ai(`After rent, bills and spending, you had ${eur(out.margin.min)} to ${eur(out.margin.max)} left each month.`, 'margin'),
     ai(`Your ${eur(BUFFER)} buffer stays untouched. Saving the full ${eur(GOAL)} by July would take ${eur(NEEDED)} a month, more than any month left you. This is what fits:`, 'plan', { snap: SUGGESTED }))
   const setAmount = (v: number, text: string) => { setMonthly(v); setAdjusting(true); say(user(text), ai(reaction(plan(v)), 'plan', { snap: v })) }
@@ -105,13 +103,14 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
     say(user(text), ai(`It’s what you had left on average over August to October (${eur(avg)}), rounded down to the nearest €10. ${list(plan(SUGGESTED).okMonths.map(monthLong))} covered it. ${monthLong(low.month)} left ${eur(low.margin)}, ${eur(SUGGESTED - low.margin)} short.`))
   }
   const showGap = (text: string) => say(user(text), ai(`At ${eur(monthly)} a month you’d be ${eur(p.gap)} short by July. Three ways to close it. Pick one, or keep the plan as it is.`, 'gap'))
-  const pick = (gid: 'irs' | 'september' | 'trim') => {
+  const pick = (gid: 'irs' | 'september' | 'trim' | 'keep') => {
     setChoice(gid)
     const sep = plan(monthly, 'september'), trimTo = Math.floor(p.total / 100) * 100
-    const label = gapOptions(p).find((o) => o.id === gid)!.label
+    const label = gid === 'keep' ? 'Keep the plan as it is' : gapOptions(p).find((o) => o.id === gid)!.label
     const reply = gid === 'september'
       ? (sep.gap > 0 ? `Then it’s ${eur(sep.total)} from transfers by ${day(sep.transfers[sep.transfers.length - 1])}. ${eur(sep.gap)} of your holiday allowance (${day(HOLIDAY_ALLOWANCE_DATE)}) makes ${eur(GOAL)}. I’ll ask before moving it.` : `Then it’s ${eur(sep.total)} by ${day(sep.transfers[sep.transfers.length - 1])}, the full goal.`)
       : gid === 'trim' ? `Then the goal is ${eur(trimTo)}, reached by July on this plan.`
+      : gid === 'keep' ? `OK. ${eur(p.total)} by July, ${eur(p.gap)} short of ${eur(GOAL)}. You can change it any time.`
       : `The plan stays at July without counting the refund. If one arrives and it’s at least ${eur(p.gap)}, you’re there. I’ll let you know.`
     say(user(label), ai(reply, 'review'))
   }
@@ -125,7 +124,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
   // ---------- Where did my money go? ----------
   const startSpending = (text: string | null) => {
     const avg = SP.spent_total / 3, hi = SP.highest_everyday_month
-    const first: NewTurn[] = text ? [user(text), status('Checking your account for August to October.'), { who: 'steps', steps: [{ label: 'Read your transactions, Aug–Oct', role: 'Data' }, { label: 'Grouped them by type', role: 'Planner' }], summary: 'Read Aug–Oct · Grouped by type' }] : []
+    const first: NewTurn[] = text ? [user(text), { who: 'steps', title: 'Checking your account, Aug–Oct', steps: [{ label: 'Read your transactions, Aug–Oct', role: 'Data' }, { label: 'Grouped them by type', role: 'Planner' }], summary: 'Read Aug–Oct · Grouped by type' }] : []
     setMonth('all')
     say(...first,
       ai(`You spent ${eur(SP.spent_total)} over three months, about ${eur(avg)} a month. ${eur(SP.fixed_avg)} a month is fixed: rent, bills, your transport pass and subscriptions.`, 'spending'),
@@ -137,8 +136,8 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
   const startScam = (text: string) => { setScam('paste'); say(user(text), ai('Paste the message here, or attach a screenshot. I read it as text only and never open links in it.')) }
   const checkSms = (sms: string, image?: string) => {
     setScam('verdict')
-    say(user('', sms, image), status(image ? 'Reading the screenshot.' : 'Checking the message.'),
-      { who: 'steps', steps: [{ label: 'Read the message as text', role: 'Data' }, { label: 'Compared it with how the bank contacts you', role: 'Rules' }, { label: 'Checked where the link goes', role: 'Rules' }], summary: 'Read as text · Rules' },
+    say(user('', sms, image),
+      { who: 'steps', title: image ? 'Reading the screenshot' : 'Checking the message', steps: [{ label: 'Read the message as text', role: 'Data' }, { label: 'Compared it with how the bank contacts you', role: 'Rules' }, { label: 'Checked where the link goes', role: 'Rules' }], summary: 'Read as text · Rules' },
       ai('This looks like a scam. Don’t tap the link, and you can delete the message.', 'verdict'))
   }
   const tapped = (text: string) => { setScam('tapped'); say(user(text), ai('Did you type anything on that page?')) }
@@ -176,7 +175,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
       if (/gap|short|close/i.test(text) && p.gap > 0) return showGap(text)
       if (/review|approve|looks good|go ahead/i.test(text)) { say(user(text)); setView('review'); return }
     }
-    if (saveStage === 'gap' && !choice) { if (/sep/i.test(text)) return pick('september'); if (/irs|refund/i.test(text)) return pick('irs'); if (/trim|smaller|2,?300/i.test(text)) return pick('trim') }
+    if (saveStage === 'gap' && !choice) { if (/keep|as it is/i.test(text)) return pick('keep'); if (/sep/i.test(text)) return pick('september'); if (/irs|refund/i.test(text)) return pick('irs'); if (/trim|smaller|2,?300/i.test(text)) return pick('trim') }
     if (saveStage === 'chosen' && !goalOn && /review|approve|ok|yes/i.test(text)) { say(user(text)); setView('review'); return }
     say(user(text), ai('I can’t help with that yet. These I can do:', 'shortcuts'))
   }
@@ -216,6 +215,8 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
   useEffect(() => { smart() }, [turns.length, active]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ---------- rendering ----------
+  // Fold only what came before your latest message; everything in the current answer stays open.
+  const lastUserId = [...turns].reverse().find((t) => t.who === 'user')?.id ?? 0
   const lastWidgetId = [...turns].reverse().find((t) => t.widget && !['review', 'fraudline', 'shortcuts', 'openplan'].includes(t.widget))?.id
   const toggle = (k: number) => setExpanded((s) => { const nx = new Set(s); if (nx.has(k)) nx.delete(k); else nx.add(k); return nx })
   const planCard = (q: Plan, live: boolean) => (
@@ -234,7 +235,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
     </div>
   )
   const widget = (t: Turn): ReactNode => {
-    const latest = t.id === lastWidgetId
+    const latest = t.id === lastWidgetId || t.id > lastUserId
     switch (t.widget) {
       case 'margin': return latest ? <MarginSnapshot months={out.picture} />
         : <Folded open={expanded.has(t.id)} onToggle={() => toggle(t.id)} summary={<>Left each month: {out.picture.map((m) => eur(m.margin)).join(' · ')}</>}><MarginSnapshot months={out.picture} /></Folded>
@@ -245,8 +246,8 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
         return <Folded open={expanded.has(t.id)} onToggle={() => toggle(t.id)} summary={<>Plan: {eur(q.monthly)} a month · {eur(q.total)} by July</>}>{planCard(q, false)}</Folded>
       }
       case 'gap': return choice
-        ? <Folded open={expanded.has(t.id)} onToggle={() => toggle(t.id)} summary={<>Chosen: {gapOptions(p).find((o) => o.id === choice)!.label}</>}><GapResolver gap={p.gap} options={gapOptions(p)} picked={choice} onPick={() => {}} /></Folded>
-        : <GapResolver gap={p.gap} options={gapOptions(p)} picked={choice} onPick={(gid) => !busy && pick(gid)} />
+        ? <Folded open={expanded.has(t.id)} onToggle={() => toggle(t.id)} summary={<>Chosen: {choice === 'keep' ? 'Keep the plan as it is' : gapOptions(p).find((o) => o.id === choice)!.label}</>}><GapResolver gap={p.gap} options={gapOptions(p)} picked={choice} onPick={() => {}} /></Folded>
+        : <><GapResolver gap={p.gap} options={gapOptions(p)} picked={choice} onPick={(gid) => !busy && pick(gid)} /><Button kind="tertiary" onClick={() => !busy && pick('keep')}>Keep the plan as it is</Button></>
       case 'review': return t.id === [...turns].reverse().find((x) => x.widget === 'review')?.id && !goalOn ? <Button onClick={() => setView('review')}>Review the plan</Button> : null
       case 'spending': return latest ? <SpendingBreakdown month={month} onMonth={setMonth} />
         : <Folded open={expanded.has(t.id)} onToggle={() => toggle(t.id)} summary={<>Spent Aug–Oct: {eur(SP.spent_total)}</>}><SpendingBreakdown month={month} onMonth={setMonth} /></Folded>
@@ -259,7 +260,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
   }
   const renderTurn = (t: Turn) => {
     if (t.who === 'user') return <UserBubble key={t.id} text={t.text} quote={t.quote} image={t.image} />
-    if (t.who === 'steps') return <StepsReceipt key={t.id} steps={t.steps!} summary={t.summary} />
+    if (t.who === 'steps') return <StepsReceipt key={t.id} steps={t.steps!} summary={t.summary} title={t.title} />
     if (t.instant) return <div key={t.id} className={`msg-ai ${t.tone ?? 'reply'}`}>{t.tone === 'callout' && <span className="ai-rule" aria-hidden="true" />}<div className="msg-ai-content"><p>{t.text}</p>{t.widget && widget(t)}</div></div>
     return <AiReply key={t.id} text={t.text ?? ''} widget={t.widget ? widget(t) : undefined} onGrow={smart} skip={skipping} tone={t.tone} />
   }
@@ -291,13 +292,14 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
         <hr />
         <Row k="First transfer" v={`${day(first)} · ${eur(fp.q.monthly, 2)}`} />
       </div>
-      <div className="card flat"><span className="label accent">{day(CHRISTMAS_DATE)}</span><p>I’ll ask before moving {eur(CHRISTMAS)} of your Christmas allowance.</p></div>
+      <div className="card flat"><span className="label accent">{day(CHRISTMAS_DATE)}</span><p>You’ll be asked before {eur(CHRISTMAS)} of your Christmas allowance moves.</p></div>
     </Screen>
   ) : (
     <Screen label="Review your plan" title="Review your plan" sub="Drafted by AI · you approve" onBack={() => setView('chat')}
       dock={<><p className="caption muted">Nothing moves until you approve.</p>
-        <div className="actions"><Button kind="secondary" grow onClick={() => setView('chat')}>Not now</Button><Button grow onClick={() => setView('faceid')}>Approve with Face ID</Button></div></>}>
+        <div className="actions"><Button kind="secondary" grow onClick={() => { setView('chat'); say(ai('Nothing has moved. The plan stays here for when you’re ready.')) }}>Not now</Button><Button grow onClick={() => setView('faceid')}>Approve with Face ID</Button></div></>}>
       <h1 className="title">{eur(fp.q.monthly)} every month from {account.name} to Holiday, {day(first, true)} to {day(lastT, true)}.</h1>
+      {(choice === 'keep' || choice === 'irs') && fp.q.gap > 0 && <p className="caption warn">This gets you {eur(fp.q.total)} by July, {eur(fp.q.gap)} short of {eur(GOAL)}{choice === 'irs' ? ' unless your IRS refund covers it' : ''}.</p>}
       <div className="card">
         <Row k="Amount" v={`${eur(fp.q.monthly, 2)} a month`} strong />
         <Row k="From" v={`${account.name} ··${last4}`} />
