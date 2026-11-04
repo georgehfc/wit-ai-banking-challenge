@@ -611,3 +611,5 @@ h2.title { margin: 0; }
 .msg-user p, .quote { border-radius: 16px; }
 .quote.small { border-radius: var(--p-radius-sm); }
 .bank-card > .frost { position: absolute; inset: 0; z-index: 2; background: rgb(240 238 234 / 45%); color: #171614; }
+/* Wrapped chip rows: 8 px between chips, 4 px between rows (George, Figma E2) */
+.search-group .chips.wrap { column-gap: var(--p-space-2); row-gap: var(--p-space-1); }
