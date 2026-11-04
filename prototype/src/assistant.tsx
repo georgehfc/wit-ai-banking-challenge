@@ -110,6 +110,12 @@ export function Assistant({ startClosed, trigger = 'rest' }: { startClosed: bool
     say(user(label), ai(reply, 'review'))
   }
 
+  const backToPlan = (text: string) => {
+    if (goalOn) { const q = plan(monthly, choice === 'september' ? 'september' : 'july'); return say(user(text), ai(`Your Holiday plan is ${paused ? 'paused' : 'active'}: ${eur(monthly)} a month from ${day(q.transfers[0])} to ${day(q.transfers[q.transfers.length - 1])}.`)) }
+    if (choice) return say(user(text), ai('Your plan is ready to review whenever you are.', 'review'))
+    return say(user(text), ai(reaction(plan(monthly)), 'plan', { snap: monthly }))
+  }
+
   // ---------- Where did my money go? ----------
   const startSpending = (text: string | null) => {
     const avg = SP.spent_total / 3, hi = SP.highest_everyday_month
@@ -155,6 +161,10 @@ export function Assistant({ startClosed, trigger = 'rest' }: { startClosed: bool
     if (/where.*money|spen[dt]|money go|gastei|breakdown/i.test(text)) return startSpending(text)
     if (/message|sms|scam|text i got|e-?mail|mensagem/i.test(text)) return startScam(text)
     if (has('spending') && /aug|sep|oct/i.test(text) && !/save/i.test(text)) { const m = SP.months.find((x) => monthShort(x).toLowerCase() === text.match(/aug|sep|oct/i)![0].toLowerCase())!; return showMonth(m, text) }
+    if (/^(back to my plan|show my plan)$/i.test(text) || (saveStage !== 'none' && /^save for something$/i.test(text))) return backToPlan(text)
+    if (has('spending') && /aug.?–?.?oct|all|three/i.test(text)) { setMonth('all'); return say(user(text), ai(`Back to all three months: ${eur(SP.spent_total)} spent.`)) }
+    if (goalOn && /^pause/i.test(text)) { setPaused(true); return say(user(text), ai('Paused. No transfers go out until you resume. Nothing else changes.')) }
+    if (goalOn && /^resume/i.test(text)) { setPaused(false); return say(user(text), ai(`Resumed. Next transfer: ${eur(monthly)} on ${day(plan(monthly, choice === 'september' ? 'september' : 'july').transfers[0])}.`)) }
     if (saveStage === 'none' && /sav|poup|holiday|férias|trip|€|\d/i.test(text)) return startSave(/^save for something$/i.test(text) ? INTENT : text)
     if (saveStage === 'plan' || saveStage === 'gap') {
       if (/why/i.test(text)) return why(text)
@@ -169,13 +179,17 @@ export function Assistant({ startClosed, trigger = 'rest' }: { startClosed: bool
 
   // ---------- suggested replies for where the conversation is ----------
   const last = [...turns].reverse().find((t) => t.widget)?.widget
-  const suggestions: string[] = busy ? [] :
+  // Suggestions follow where the conversation is; once a plan exists, "Save for something" becomes "Back to my plan".
+  const saveChip = saveStage === 'none' ? 'Save for something' : goalOn ? 'Show my plan' : 'Back to my plan'
+  const monthChip = month === 'all' ? `Show ${monthLong(SP.highest_everyday_month)}` : 'Show Aug–Oct'
+  const suggestions: string[] = busy || view !== 'chat' ? [] :
     scam === 'paste' ? ['Paste the message'] :
     scam === 'verdict' && last === 'verdict' ? ['Report it', 'I tapped the link'] :
     scam === 'tapped' ? ['No, I only opened it', 'Yes, I typed my card details'] :
-    last === 'spending' ? [`Show ${monthLong(SP.highest_everyday_month)}`, 'Save for something', 'Check a message I got'] :
-    saveStage === 'plan' ? (p.gap > 0 ? [monthly === SUGGESTED ? `Why ${eur(SUGGESTED)}?` : `Back to ${eur(SUGGESTED)}`, monthly === 250 ? 'Make it €280' : 'Make it €250', 'What about the gap?'] : ['Review the plan']) :
-        turns.length && (scam === 'safe' || scam === 'reported' || (scam === 'entered' && frozen)) ? ['Where did my money go?', 'Save for something'] : []
+    last === 'spending' ? [monthChip, saveChip, 'Check a message I got'] :
+    goalOn ? [paused ? 'Resume my plan' : 'Pause my plan', 'Where did my money go?', 'Check a message I got'] :
+    saveStage === 'plan' && last === 'plan' ? (p.gap > 0 ? [monthly === SUGGESTED ? `Why ${eur(SUGGESTED)}?` : `Back to ${eur(SUGGESTED)}`, monthly === 250 ? 'Make it €280' : 'Make it €250', 'What about the gap?'] : ['Review the plan']) :
+    turns.length && (scam === 'safe' || scam === 'reported' || (scam === 'entered' && frozen)) ? ['Where did my money go?', saveChip] : []
 
   // ---------- rendering ----------
   const lastWidgetId = [...turns].reverse().find((t) => t.widget && t.widget !== 'review' && t.widget !== 'fraudline' && t.widget !== 'shortcuts')?.id
@@ -217,7 +231,7 @@ export function Assistant({ startClosed, trigger = 'rest' }: { startClosed: bool
       case 'verdict': return <ScamVerdict domain={SMS_DOMAIN} reasons={['It asks you to confirm your details through a link. The bank never does that.', `The link goes to ${SMS_DOMAIN}, which isn’t a bank address.`, 'It gives you 24 hours to act. Scams use deadlines to rush you.']} />
       case 'card': return <CardControl frozen={frozen} onToggle={toggleFreeze} />
       case 'fraudline': return <Button kind="secondary" onClick={() => {}}><Icon name="phone" size={18} />Call the fraud line</Button>
-      case 'shortcuts': return <div className="shortcut-list">{SHORTCUTS.map(([t2]) => <button key={t2} className="list-row compact" onClick={() => send(t2)}><span className="body-strong">{t2}</span><Icon name="chevron" /></button>)}</div>
+      case 'shortcuts': return <div className="shortcut-list">{SHORTCUTS.map(([t2]) => t2 === 'Save for something' ? saveChip : t2).map((t2) => <button key={t2} className="list-row compact" onClick={() => send(t2)}><span className="body-strong">{t2}</span><Icon name="chevron" /></button>)}</div>
     }
   }
 

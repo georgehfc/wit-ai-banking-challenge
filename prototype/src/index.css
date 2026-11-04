@@ -398,3 +398,7 @@ h2.title { margin: 0; }
 .dock { position: relative; height: 0; padding: 0; z-index: 2; }
 .dock-float { position: absolute; left: 16px; right: 16px; bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
 .home-scroll { padding-bottom: 88px; }
+
+/* Layering: Home is its own stacking context, so its floating pill never sits above the assistant sheet. */
+.home { z-index: 0; isolation: isolate; }
+.sheet { z-index: 10; }
