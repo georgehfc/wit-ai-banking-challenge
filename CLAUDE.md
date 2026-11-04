@@ -46,5 +46,6 @@
 - Prototype tweaks: app open (default) or closed (lock-screen notification opens the spending summary), colour mode, reset (Esc too).
 - UI copy: TONE.md, plain, no AI-sounding phrases ("Got it", "Let's", "Here's", em dashes, exclamation marks).
 - **Language (decided 4 Nov):** the whole prototype is in Portuguese (Portugal), informal "tu", assistant named "IA", pt-PT formats (2360 €, 220,00 €, 1 dez). See TONE.md.
+- **Search + AI merged (4 Nov, D1 in `design/DECISIONS.md`):** one Home field "Pesquisar ou perguntar": instant non-AI results plus a "Perguntar à IA" row. Must be in the summary slides. Log product decisions in DECISIONS.md.
 - **Data-viz colour (4 Nov):** charts stay neutral; one element per chart gets the sphere palette (`--grad-v` / `--grad-h`, Figma style `brand/viz-highlight`).
 - Code: `prototype/` (Vite + React + TS, private repo github.com/georgehfc/wit-ai-banking-challenge). `src/assistant.tsx` (app level: threads, account state, Ask AI modes), `src/conversation.tsx` (one thread: engine and the three conversations), `src/chat.tsx` (chat primitives and new widgets), `src/shell.tsx`, `src/components.tsx`, `src/planner.ts` (checked with `npm run check:planner`). Replies are scripted, no live LLM. The assistant is named "IA" (PT).

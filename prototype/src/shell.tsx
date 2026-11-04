@@ -64,10 +64,10 @@ function TimedToast(t: { text: string; action?: string; onAction?: () => void })
   return on ? <Toast {...t} /> : null
 }
 
-export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFreeze, onPlanWithAI }: {
+export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFreeze, onPlanWithAI, onSearch }: {
   tab: Tab; onTab: (t: Tab) => void; pill: PillProps; goal?: GoalCardProps | null
   toast?: null | { text: string; action?: string; onAction?: () => void }
-  onOpen: () => void; frozen: boolean; onFreeze: () => void; onPlanWithAI: () => void
+  onOpen: () => void; frozen: boolean; onFreeze: () => void; onPlanWithAI: () => void; onSearch: () => void
 }) {
   const oct = tx.filter((t) => t.date.startsWith('2026-10')).slice(0, 8).map((t) => ({ initial: t.merchant[0], title: pretty(t.merchant), sub: day(t.date), amount: t.amount }))
   return (
@@ -77,7 +77,7 @@ export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFr
         {tab === 'home' && <>
           <header className="home-header">
             <span className="avatar">IM</span>
-            <div className="search"><Icon name="search" size={18} /><span>Pesquisar</span></div>
+            <button className="search" onClick={onSearch} aria-label="Pesquisar ou perguntar"><Icon name="search" size={18} /><span>Pesquisar ou perguntar</span><span className="search-orb"><AiOrb size={18} /></span></button>
           </header>
           <p className="greeting">Olá, {ines.customer.name.split(' ')[0]}</p>
           <section className="balance" aria-label="Saldo">

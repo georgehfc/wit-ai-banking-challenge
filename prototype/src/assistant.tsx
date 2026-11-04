@@ -8,6 +8,7 @@ import { Conversation, INTENT, SAVE, SHORTCUTS, type Autostart, type Choice, typ
 import { GOAL, day, eur, plan } from './planner'
 import { AppScreens, BottomSheet, Sheet, type PillProps, type Tab } from './shell'
 import { AiOrb } from './orb'
+import { SearchScreen } from './search'
 
 export type Trigger = 'rest' | 'alert' | 'processing'
 type Thread = { id: string; title: string; autostart?: Autostart }
@@ -28,6 +29,7 @@ export function Assistant({ startClosed, trigger = 'rest' }: { startClosed: bool
   const [status, setStatus] = useState<Record<string, ThreadStatus>>({})
   const [open, setOpen] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
+  const [searching, setSearching] = useState(false)
   const [renaming, setRenaming] = useState<string | null>(null)
   const [rootInput, setRootInput] = useState('')
   const [tab, setTab] = useState<Tab>('home')
@@ -116,7 +118,9 @@ export function Assistant({ startClosed, trigger = 'rest' }: { startClosed: bool
   return (
     <div className="app-launch">
       <AppScreens tab={tab} onTab={setTab} pill={pill} toast={toast} onOpen={openFromPill} goal={goalCard}
-        frozen={frozen} onFreeze={() => setFrozen((f) => !f)} onPlanWithAI={() => shortcut(SAVE)} />
+        frozen={frozen} onFreeze={() => setFrozen((f) => !f)} onPlanWithAI={() => shortcut(SAVE)} onSearch={() => setSearching(true)} />
+      {searching && <SearchScreen onClose={() => setSearching(false)} onGo={(t) => { setSearching(false); setTab(t) }}
+        onAsk={(q) => { setSearching(false); shortcut(q); setOpen(true) }} />}
       <Sheet open={open} onClose={() => setOpen(false)} title={active ? active.title : undefined} busy={!!(active && status[active.id]?.busy)} onHistory={() => setHistoryOpen(true)}>
         {/* Root: the start of every chat */}
         <div className="thread" style={{ display: active ? 'none' : 'flex' }}>

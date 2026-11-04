@@ -16,6 +16,7 @@ stateDiagram-v2
   state "App (any tab)" as App
   state "Start screen (root)" as Root
   state "Chats panel" as History
+  state "Search or ask (Home field)" as Search
   state "Thread" as Thread {
     direction TB
     [*] --> Understanding: intent ("I want to save €3,000…")
@@ -33,6 +34,9 @@ stateDiagram-v2
   }
   [*] --> App
   App --> Root: tap Ask AI (no chats yet)
+  App --> Search: tap "Pesquisar ou perguntar"
+  Search --> App: result (page, action) · Cancelar
+  Search --> Thread: "Perguntar à IA" / Enter (query sent)
   App --> Thread: tap Ask AI (reopens last chat) · tap "Ready"
   App --> Thread: tap Alert → new "Aug–Oct summary" chat
   App --> Thread: lock-screen notification (app closed)

@@ -511,3 +511,22 @@ h2.title { margin: 0; }
 /* Spending rows: room for the hover fill, space above an open row */
 .spend-row { padding: 0 8px; margin: 0 -8px; width: calc(100% + 16px); }
 .merchants { margin: 6px 0 10px; }
+
+/* Search and ask (one field) */
+.home-header .search { text-align: left; cursor: text; }
+.home-header .search span:nth-child(2) { flex: 1; }
+.search-orb { display: grid; place-items: center; }
+.search-screen { z-index: 6; }
+.search-head { display: flex; align-items: center; gap: 12px; padding: 4px 16px 8px; }
+.search.field { background: var(--color-surface-raised); }
+.search.field input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; color: var(--color-text-default); }
+.search.field:focus-within { box-shadow: 0 0 0 2px var(--color-focus, var(--color-ai-default)); }
+.search-head .link { text-decoration: none; color: var(--color-text-default); font-size: 15px; }
+.search-body { padding-top: 8px; gap: 20px; }
+.search-group { display: flex; flex-direction: column; gap: 6px; }
+.search-group .list-line:last-child { border-bottom: 0; }
+.lead-icon.sm { width: 32px; height: 32px; background: var(--color-surface-raised); box-shadow: none; }
+.search-ask { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--p-radius-md, 14px); background: var(--color-surface-raised); text-align: left; position: relative; }
+.search-ask::before { content: ''; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; border-radius: 2px; background: var(--grad-v); }
+.search-note { display: flex; align-items: center; gap: 6px; }
+.search-head .link { flex: none; } .search.field { min-width: 0; padding-right: 8px; }
