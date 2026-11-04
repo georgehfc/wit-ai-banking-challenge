@@ -291,7 +291,7 @@ export function Assistant({ startClosed }: { startClosed: boolean }) {
       <div className="lock-clock"><span className="muted">Monday 2 November</span><span className="lock-time">9:41</span></div>
       <div className="lock-stack">
         <button className="notification" onClick={unlock}>
-          <span className="row-between"><span className="row-gap"><span className="app-icon"><span className="orb-css" /></span><span className="caption muted">AI · your bank</span></span><span className="caption muted">now</span></span>
+          <span className="row-between"><span className="row-gap"><AiOrb size={20} /><span className="caption muted">AI · your bank</span></span><span className="caption muted">now</span></span>
           <span className="body-strong">Where your money went</span>
           <span>Your summary for August to October is ready.</span>
         </button>
