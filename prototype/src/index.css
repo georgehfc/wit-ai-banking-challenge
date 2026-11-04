@@ -492,3 +492,22 @@ h2.title { margin: 0; }
 .thread > .screen, .thread > .bsheet-wrap { z-index: 5; }
 .result .amount-sm { white-space: nowrap; }
 .result { align-items: flex-start; gap: 12px; }
+
+/* Card: ink body with a grainy glow of the sphere palette in the corner (the accent, not a full gradient card) */
+.bank-card { background: #121110; isolation: isolate; }
+.bank-card::before { content: ''; position: absolute; inset: -20px; z-index: -1; background:
+  radial-gradient(42% 55% at 98% 98%, #0B4ABB 0%, #0D5DF4 35%, rgb(13 93 244 / 0) 100%),
+  radial-gradient(38% 48% at 70% 108%, #FC681E 0%, rgb(252 104 30 / .6) 40%, rgb(252 104 30 / 0) 100%),
+  radial-gradient(26% 34% at 100% 58%, #FAB615 0%, rgb(250 182 21 / 0) 100%),
+  radial-gradient(22% 26% at 88% 74%, rgb(255 246 230 / .7) 0%, rgb(255 246 230 / 0) 100%);
+  filter: blur(10px); }
+.bank-card::after { content: ''; position: absolute; inset: 0; z-index: -1; opacity: .35; mix-blend-mode: overlay; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.bank-card.frozen::before { filter: blur(14px) grayscale(1); opacity: .5; }
+
+/* Toggle on: the same gradient */
+.switch-row input:checked { background: var(--grad-h); }
+
+/* Spending rows: room for the hover fill, space above an open row */
+.spend-row { padding: 0 8px; margin: 0 -8px; width: calc(100% + 16px); }
+.merchants { margin: 6px 0 10px; }
