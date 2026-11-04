@@ -2,6 +2,7 @@
 // animated numbers, and the widgets for "Where did my money go?" and "Check a message I got".
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import out from '../../data/plan-output.json' with { type: 'json' }
+import ines from '../../data/ines.json' with { type: 'json' }
 import { Icon, StatusBadge } from './components'
 import { AiOrb } from './orb'
 import { eur, monthLong, monthShort } from './planner'
@@ -151,9 +152,10 @@ export function CardControl({ frozen, onToggle }: { frozen: boolean; onToggle: (
   return (
     <div className="card">
       <div className={`bank-card ${frozen ? 'frozen' : ''}`} aria-hidden="true">
-        <span className="caption">Cartão de débito</span>
+        <div className="bc-row"><span className="bc-label">Débito</span>
+          <svg className="bc-contactless" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M8.5 8.5a5 5 0 010 7M12 6a8.5 8.5 0 010 12M15.5 3.5a12 12 0 010 17" /></svg></div>
         <span className="bank-card-chip" />
-        <span className="caption">Inês Marques</span>
+        <div className="bc-row bc-bottom"><span className="bc-name">{ines.customer.name}</span><span className="bc-num">•••• {ines.accounts[0].iban_display.slice(-4)}</span></div>
         {frozen && <span className="frost"><Icon name="lock" size={22} />Congelado</span>}
       </div>
       <label className="switch-row">

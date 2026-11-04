@@ -587,3 +587,27 @@ h2.title { margin: 0; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .search-fab { background: rgb(23 22 20 / 82%); } }
 .pill-voice { margin-right: 11px; flex: none; position: relative; z-index: 2; transition: transform .12s var(--ease); }
 .pill-voice:active { transform: scale(.9); }
+
+/* ---------- Debit card v2 (4 Nov): real ID-1 proportions (85.6 × 54 mm), soft glow from layered radials, no blur filter ---------- */
+.bank-card { height: auto; aspect-ratio: 85.6 / 54; border-radius: 16px; padding: 18px 20px; justify-content: space-between; color: #fff; isolation: isolate; overflow: hidden;
+  background:
+    radial-gradient(circle at 106% 136%, #0B4ABB 0%, #0D5DF4 20%, #5A73DB 27%, #FC681E 35%, #FAB615 42%, rgb(250 182 21 / 30%) 48%, rgb(250 182 21 / 0) 56%),
+    linear-gradient(160deg, #22201d 0%, #141311 48%, #0b0a09 100%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 9%), 0 14px 30px -16px rgb(0 0 0 / 55%); transition: filter .3s var(--ease); }
+.bank-card::before { content: none; }
+.bank-card::after { inset: 0; border-radius: inherit; opacity: .22; mix-blend-mode: soft-light; z-index: 0; }
+.bank-card > * { position: relative; z-index: 1; }
+.bank-card.frozen { filter: grayscale(.85) brightness(.9); }
+.bc-row { display: flex; align-items: center; justify-content: space-between; }
+.bc-label { font: 600 13px/16px var(--font); letter-spacing: .02em; opacity: .9; }
+.bc-contactless { opacity: .8; }
+.bank-card-chip { width: 40px; height: 30px; border-radius: 7px; background: linear-gradient(135deg, #efe2b4, #b89b4e 60%, #d9c27e); box-shadow: inset 0 0 0 1px rgb(0 0 0 / 18%); }
+.bc-bottom { align-items: flex-end; }
+.bc-name { font: 500 13px/16px var(--font); opacity: .9; }
+.bc-num { font: 500 14px/16px var(--font); letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+.frost { z-index: 2; border-radius: inherit; }
+
+/* Same roundness on every corner: no "tail" corner on bubbles (George, 4 Nov) */
+.msg-user p, .quote { border-radius: 16px; }
+.quote.small { border-radius: var(--p-radius-sm); }
+.bank-card > .frost { position: absolute; inset: 0; z-index: 2; background: rgb(240 238 234 / 45%); color: #171614; }
