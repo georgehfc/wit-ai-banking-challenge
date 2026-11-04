@@ -124,7 +124,7 @@ export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFr
           {toast && <TimedToast key={toast.text} {...toast} />}
           {tab === 'home'
             ? <AssistantPill {...pill} onOpen={onOpen} />
-            : <button className={`sphere-fab ${pill.state}`} onClick={onOpen} aria-label={pill.state === 'idle' ? 'Pergunta à IA' : `Assistente de IA: ${pill.label ?? ''}`}>
+            : <button className={`sphere-fab ${pill.state} ai-ring${pill.state === 'working' ? ' ai-busy' : ''}`} onClick={onOpen} aria-label={pill.state === 'idle' ? 'Pergunta à IA' : `Assistente de IA: ${pill.label ?? ''}`}>
                 <AiOrb size={48} state={pill.state === 'working' ? 'thinking' : 'idle'} />{(pill.state === 'nudge' || pill.state === 'ready') && <span className="badge" />}
               </button>}
         </div>

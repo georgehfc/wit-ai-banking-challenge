@@ -61,7 +61,7 @@ export type PillState = 'idle' | 'nudge' | 'working' | 'ready'
 export function AssistantPill({ state, label, action, onOpen, onDismiss }: { state: PillState; label?: string; action?: string; onOpen: () => void; onDismiss?: () => void }) {
   const text = label ?? 'Pergunta à IA'
   return (
-    <div className={`pill pill-${state}`}>
+    <div className={`pill pill-${state} ai-ring${state === 'working' ? ' ai-busy' : ''}`}>
       <button className="pill-main" onClick={onOpen} aria-label={state === 'idle' ? 'Pergunta à IA, assistente de IA' : `Assistente de IA: ${text}${action ? `. ${action}` : ''}`}>
         <span className="pill-glyph"><AiOrb size={32} state={state === 'working' ? 'thinking' : 'idle'} />{(state === 'nudge' || state === 'ready') && <span className="badge" />}</span>
         <span className="pill-label">{text}</span>
@@ -124,7 +124,7 @@ export function PromptBox({ value, onChange, onSend, busy = false, onStop, place
   const pickFile = (f?: File) => { if (!f || !f.type.startsWith('image/')) return; const r = new FileReader(); r.onload = () => setImage({ url: String(r.result), name: f.name }); r.readAsDataURL(f) }
   const mode = busy ? 'stop' : rec ? 'rec' : has ? 'send' : 'mic'
   return (
-    <form className={`prompt ${busy ? 'busy' : ''} ${rec ? 'recording' : ''}`} onSubmit={(e) => { e.preventDefault(); submit() }}>
+    <form className={`prompt ${busy ? 'busy' : ''} ${rec ? 'recording' : ''}${busy || rec ? ' ai-ring ai-busy' : has ? ' ai-ring' : ''}`} onSubmit={(e) => { e.preventDefault(); submit() }}>
       {image && !rec && (
         <div className="prompt-attachments">
           <span className="thumb"><img src={image.url} alt={`Anexo: ${image.name}`} /><button type="button" aria-label="Remover captura de ecrã" onClick={() => setImage(null)}><Icon name="close" size={12} /></button></span>
@@ -226,7 +226,7 @@ export function OptionList({ title, options, picked, onPick, label }: { title?: 
     <div className="option-list" role="radiogroup" aria-label={label}>
       {title && <p className="body-strong">{title}</p>}
       {options.map((o) => (
-        <button key={o.id} role="radio" aria-checked={picked === o.id} className={`option ${picked === o.id ? 'selected' : ''} ${o.certain === false ? 'uncertain' : ''}`} onClick={() => onPick(o.id)}>
+        <button key={o.id} role="radio" aria-checked={picked === o.id} className={`option ${picked === o.id ? 'selected ai-ring' : ''} ${o.certain === false ? 'uncertain' : ''}`} onClick={() => onPick(o.id)}>
           <span className="radio" aria-hidden="true" />
           <span className="option-text"><span className="body-strong">{o.label}</span><span className="caption muted">{o.result}</span></span>
         </button>

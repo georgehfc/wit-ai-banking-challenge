@@ -110,7 +110,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
     const sep = plan(monthly, 'september'), trimTo = Math.floor(p.total / 100) * 100
     const label = gid === 'keep' ? KEEP : gapOptions(p).find((o) => o.id === gid)!.label
     const reply = gid === 'september'
-      ? (sep.gap > 0 ? `Então são ${eur(sep.total)} em transferências até ${day(sep.transfers[sep.transfers.length - 1])}. ${eur(sep.gap)} do teu subsídio de férias (${day(HOLIDAY_ALLOWANCE_DATE)}) completam os ${eur(GOAL)}. Pergunto-te antes de o mover.` : `Então são ${eur(sep.total)} até ${day(sep.transfers[sep.transfers.length - 1])}, o objetivo completo.`)
+      ? (sep.gap > 0 ? `Então são ${eur(sep.total)} até ${day(sep.transfers[sep.transfers.length - 1])}, com o subsídio de Natal. ${eur(sep.gap)} do teu subsídio de férias (${day(HOLIDAY_ALLOWANCE_DATE)}) completam os ${eur(GOAL)}. Pergunto-te antes de o mover.` : `Então são ${eur(sep.total)} até ${day(sep.transfers[sep.transfers.length - 1])}, o objetivo completo.`)
       : gid === 'trim' ? `Então o objetivo passa a ${eur(trimTo)}, atingido até julho com este plano.`
       : gid === 'keep' ? `Combinado. ${eur(p.total)} até julho, faltam ${eur(p.gap)} para os ${eur(GOAL)}. Podes mudar quando quiseres.`
       : `O plano fica em julho sem contar com o reembolso. Se chegar e for de pelo menos ${eur(p.gap)}, consegues. Eu aviso-te.`
@@ -290,7 +290,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
       <div className="card">
         <div className="row-between"><span className="amount-sm">{eur(0)} de {eur(fp.goal)}</span><StatusBadge kind="positive">Ativo</StatusBadge></div>
         <ProgressBar value={0} />
-        <p className="caption muted">Até {day(lastT, true)} · {eur(fp.q.total)} em transferências{fp.topup ? ` + ${eur(fp.topup)} do subsídio de férias` : ''}</p>
+        <p className="caption muted">Até {day(lastT, true)} · {eur(fp.q.scheduledTotal)} em transferências + {eur(CHRISTMAS)} do subsídio de Natal{fp.topup ? ` + ${eur(fp.topup)} do subsídio de férias` : ''}</p>
         <hr />
         <Row k="Primeira transferência" v={`${day(first)} · ${eur(fp.q.monthly, 2)}`} />
       </div>

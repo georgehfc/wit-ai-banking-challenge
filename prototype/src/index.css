@@ -530,3 +530,39 @@ h2.title { margin: 0; }
 .search-ask::before { content: ''; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; border-radius: 2px; background: var(--grad-v); }
 .search-note { display: flex; align-items: center; gap: 6px; }
 .search-head .link { flex: none; } .search.field { min-width: 0; padding-right: 8px; }
+
+/* ---------- AI ring (George's rule, 4 Nov): gradient stroke = something to act on; rotating gradient = the AI is working ---------- */
+@property --ring-a { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+.ai-ring { position: relative; --ring-w: 1px; --ring-b: 0px; }
+.ai-ring::before { content: ''; position: absolute; inset: calc(-1 * var(--ring-b)); border-radius: inherit; padding: var(--ring-w); background: var(--grad-h); pointer-events: none; z-index: 1;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+.ai-ring.ai-busy::before { background: conic-gradient(from var(--ring-a), #0D5DF4, #FC681E, #FAB615, #0B4ABB, #0D5DF4); animation: ring-spin 2.4s linear infinite; }
+@keyframes ring-spin { to { --ring-a: 360deg; } }
+.pill.ai-ring { border: 0; }
+.prompt.ai-ring, .prompt.ai-ring:focus-within { border-color: transparent; --ring-b: 1px; }
+.prompt.busy, .prompt.recording { border-color: transparent; }
+.prompt:focus-within { border-color: var(--color-border-strong); }
+.option.selected.ai-ring { border-color: transparent; --ring-b: 1.5px; --ring-w: 1.5px; }
+.sphere-fab.ai-ring::before { z-index: 0; }
+.sphere-fab.working .orb { box-shadow: none; }
+
+/* StatusBadge: neutral pill, coloured icon (George, Figma 4 Nov) */
+.status-positive, .status-warning, .status-danger { background: var(--color-surface-raised); color: var(--color-text-default); }
+.status-positive .icon { color: var(--color-positive-default); }
+.status-warning .icon { color: var(--color-warning-default); }
+.status-danger .icon { color: var(--color-danger-default); }
+
+/* ---------- Prototype tweaks: hidden drawer, pull left from the right edge (or tap the handle, or press T) ---------- */
+.edge-zone { position: fixed; top: 0; right: 0; bottom: 0; width: 14px; z-index: 39; touch-action: none; }
+.tweaks-handle { position: fixed; right: 0; top: 50%; transform: translateY(-50%); width: 16px; height: 64px; border-radius: 10px 0 0 10px; display: grid; place-items: center; z-index: 40; background: var(--color-surface-default); box-shadow: -2px 0 12px rgb(23 22 20 / 10%); opacity: .7; transition: opacity .2s, width .2s var(--spring); }
+.tweaks-handle:hover { opacity: 1; width: 20px; }
+.tweaks-handle i { width: 3px; height: 24px; border-radius: 2px; background: var(--color-border-strong); }
+.tweaks-scrim { position: fixed; inset: 0; z-index: 45; background: rgb(0 0 0 / 18%); opacity: 0; pointer-events: none; transition: opacity .2s; }
+.tweaks-scrim.open { opacity: 1; pointer-events: auto; }
+.tweaks { position: fixed; top: 0; right: 0; bottom: 0; width: min(300px, 86vw); z-index: 50; overflow: auto; background: var(--color-surface-default); box-shadow: -8px 0 40px rgb(0 0 0 / 16%); transform: translateX(105%); transition: transform .34s var(--spring); touch-action: pan-y; }
+.tweaks.open { transform: none; }
+.tweaks .panel { width: auto; padding: 24px 20px calc(24px + env(safe-area-inset-bottom)); gap: 12px; }
+.tweaks .panel-head { display: flex; align-items: center; justify-content: space-between; }
+.tweaks-back { width: 100%; min-height: 44px !important; border-radius: var(--p-radius-pill) !important; background: var(--color-accent-default) !important; color: var(--color-text-on-accent); text-align: center !important; font-weight: 600; border: 0 !important; }
+@media (max-width: 500px) { .tweaks-handle { height: 48px; width: 12px; opacity: .5; } }
+.edge-zone { user-select: none; -webkit-user-select: none; cursor: w-resize; }

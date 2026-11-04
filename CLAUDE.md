@@ -43,9 +43,11 @@
 - J0 and J2–J5 are dropped from the prototype. Their wireframes stay on Figma page 5 for the walkthrough.
 - Interaction should feel real: typing indicator, streamed replies, widgets after text, suggested replies above the input, older widgets fold into one-line summaries, scroll anchors on the newest message. Microanimations on; Reduce Motion follows the phone setting.
 - Threads: start screen (shortcuts adapt to the plan, recent chats), chats panel (new, open, rename, delete, clear all); one plan per person, owned by one chat. Bank pages Home · Payments · Savings · Cards: full Ask AI pill on Home, only the sphere elsewhere.
-- Prototype tweaks: app open (default) or closed (lock-screen notification opens the spending summary), colour mode, reset (Esc too).
+- Prototype tweaks (hidden drawer): app open (default) or closed (lock-screen notification opens the spending summary), Ask AI mode, colour mode, reset (Esc too).
 - UI copy: TONE.md, plain, no AI-sounding phrases ("Got it", "Let's", "Here's", em dashes, exclamation marks).
 - **Language (decided 4 Nov):** the whole prototype is in Portuguese (Portugal), informal "tu", assistant named "IA", pt-PT formats (2360 €, 220,00 €, 1 dez). See TONE.md.
 - **Search + AI merged (4 Nov, D1 in `design/DECISIONS.md`):** one Home field "Pesquisar ou perguntar": instant non-AI results plus a "Perguntar à IA" row. Must be in the summary slides. Log product decisions in DECISIONS.md.
+- **Stroke rule (4 Nov, D2):** gradient stroke = something to act on; rotating gradient = AI working (`.ai-ring`, `.ai-busy`; Figma `brand/viz-highlight`, `brand/ai-working`). Status badges neutral with coloured icons.
+- **Prototype tweaks** are a hidden drawer (pull left from the right edge, handle, or T). Not part of the product.
 - **Data-viz colour (4 Nov):** charts stay neutral; one element per chart gets the sphere palette (`--grad-v` / `--grad-h`, Figma style `brand/viz-highlight`).
 - Code: `prototype/` (Vite + React + TS, private repo github.com/georgehfc/wit-ai-banking-challenge). `src/assistant.tsx` (app level: threads, account state, Ask AI modes), `src/conversation.tsx` (one thread: engine and the three conversations), `src/chat.tsx` (chat primitives and new widgets), `src/shell.tsx`, `src/components.tsx`, `src/planner.ts` (checked with `npm run check:planner`). Replies are scripted, no live LLM. The assistant is named "IA" (PT).

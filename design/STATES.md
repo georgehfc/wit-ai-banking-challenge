@@ -77,6 +77,8 @@ stateDiagram-v2
   Open --> Rest: close
 ```
 
+Stroke rule (D2): rest, alert and ready = gradient stroke (act on); processing = rotating gradient (AI working).
+
 Labels: Rest "Ask AI" · Alert "Your Aug–Oct summary is ready · View" · Processing "Working on: <chat>" · Ready "Ready: <chat> · Open".
 
 ## 3. `ApprovalRequest` / review (`conversation.tsx` · review screen) — the code-handoff component

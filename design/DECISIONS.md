@@ -4,6 +4,21 @@ Decisions that change the product's shape, with the reasoning, so they can be de
 
 ---
 
+## D2 · Gradient stroke = where the AI acts (4 Nov 2026)
+
+**Decision (George).** On the assistant's components, a gradient stroke marks something for you to act on, and a rotating gradient stroke marks the AI working. Plain border = idle input.
+
+- **AssistantPill / SphereFab:** rest, alert and ready = static gradient; processing = rotating.
+- **PromptBox:** empty = plain border; text or screenshot ready to send = static; replying or listening = rotating.
+- **GapOption:** the chosen option = static gradient (the AI will act on it after review).
+- Status badges went neutral (raised pill, dark text, coloured icon) so colour is saved for this signal and the one highlight per chart.
+
+**Why.** One visual cue tells people where the AI is acting or about to act, without new labels. Rotation is the simplest "working" signal and stops under Reduce Motion.
+
+**In code:** `.ai-ring` / `.ai-ring.ai-busy` in `prototype/src/index.css` (conic gradient, 2.4 s turn). **In Figma:** stroke styles `brand/viz-highlight` (act on) and `brand/ai-working` (angular, = rotating in code).
+
+---
+
 ## D1 · One field for search and the AI (4 Nov 2026)
 
 **Decision (George).** Home keeps one input, **"Pesquisar ou perguntar"**. As you type, exact results appear instantly (payments, places in the app) with no AI involved. One row, **"Perguntar à IA"**, opens the assistant with the query already sent. It comes first when the query reads as a question ("quanto…", "posso…", "?"), last when it looks like a lookup ("EDP").
