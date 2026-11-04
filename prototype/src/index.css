@@ -619,3 +619,5 @@ h2.title { margin: 0; }
 /* Bank pages: content scrolls clear of the floating button; the full-width fade belongs to the Home dock only */
 .home-scroll { padding-bottom: 120px; }
 .dock:has(.dock-float.compact)::before { display: none; }
+/* Chats panel rows: 8 px between the title and the row actions (George, Figma ThreadRow) */
+.thread-list li { gap: var(--p-space-2); }
