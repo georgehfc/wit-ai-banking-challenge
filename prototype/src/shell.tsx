@@ -36,7 +36,7 @@ export function GoalCard(g: GoalCardProps) {
 }
 
 export function Home({ pill, goal, toast, onOpen, masked, recentTitle = 'Recent', recent = defaultRecent }: {
-  pill: { state: PillState; label?: string; action?: string }
+  pill: { state: PillState; label?: string; action?: string; onDismiss?: () => void }
   goal?: GoalCardProps | null; toast?: null | { text: string; action?: string; onAction?: () => void }
   onOpen: () => void; masked?: boolean; recentTitle?: string; recent?: TxItem[]
 }) {
@@ -113,7 +113,7 @@ export function Sheet({ open, onClose, children, input, overlay, watch, above, n
     <div className={`sheet ${open ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="AI assistant" aria-hidden={!open}>
       <div className="statusbar"><span>9:41</span></div>
       <header className="topbar">
-        <button className="icon-btn" onClick={onClose} aria-label="Close assistant"><Icon name="down" /></button>
+        <button className="icon-btn round" onClick={onClose} aria-label="Close assistant"><Icon name="down" /></button>
         <div className="topbar-title"><span className="brand"><AiOrb size={20} state={input.busy ? 'thinking' : 'idle'} /><span className="body-strong">AI</span></span><span className="caption muted">AI assistant · can make mistakes</span></div>
         <span className="icon-btn" />
       </header>

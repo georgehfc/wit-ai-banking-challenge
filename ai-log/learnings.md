@@ -31,4 +31,5 @@ Running notes on what worked, what didn't and what changed because of it. Feeds 
 - **Suggested replies should be the same as typing.** Routing chips and typed text through one function means "Make it €250" works whether you tap or type, which is the brief's "move smoothly between conversation and graphical controls".
 - **Component galleries are inspiration, not drop-ins.** Two pasted components (prompt box, gradient orb) each assumed a stack we don't use and carried hidden costs (hard-coded colours, global CSS that hurts focus rings, a 600 KB 3D library). Porting the idea onto our tokens took less time than adapting the project to them.
 - **StrictMode and WebGL:** don't lose the context in effect cleanup; React mounts twice in development and the second mount gets a dead context.
+- **Shaders made for big cards look stripy at icon size.** The same gradient that melts across 800 px turns into hard bands across 32 px. Uneven gradient stops plus a small blur inside a clipped circle brought back the soft look without changing the shader's character.
 

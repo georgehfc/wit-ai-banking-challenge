@@ -343,16 +343,6 @@ h2.title { margin: 0; }
 .quote-img { width: 100%; max-height: 140px; object-fit: cover; border-radius: 10px; }
 
 /* ---------- AI orb: the assistant's mark ---------- */
-.orb { position: relative; display: inline-grid; place-items: center; flex: none; border-radius: 50%;
-  background: radial-gradient(circle at 50% 30%, #3a3d46 0, #16171c 52%, #0b0b0e 100%);
-  box-shadow: inset 0 0 0 1px rgb(139 108 255 / 55%), inset 0 0 calc(var(--s, 32px) * .18) rgb(139 108 255 / 45%), 0 0 calc(var(--s, 32px) * .22) rgb(139 108 255 / 30%);
-  transition: box-shadow .4s var(--ease); }
-.orb::after { content: ''; position: absolute; inset: 6% 18% 55%; border-radius: 50%; background: radial-gradient(ellipse at 50% 0, rgb(255 255 255 / 22%), transparent 70%); pointer-events: none; }
-.orb svg { display: block; overflow: visible; }
-.orb-eyes { transform-box: fill-box; transform-origin: center; transition: transform .22s cubic-bezier(.3, .7, .2, 1); }
-.orb-eyes path { fill: none; stroke: #fff; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 1.5px rgb(255 255 255 / 70%)); }
-.orb-thinking { box-shadow: inset 0 0 0 1px rgb(179 164 247 / 85%), inset 0 0 calc(var(--s, 32px) * .24) rgb(139 108 255 / 65%), 0 0 calc(var(--s, 32px) * .32) rgb(139 108 255 / 45%); animation: orbpulse 1.4s ease-in-out infinite; }
-@keyframes orbpulse { 50% { box-shadow: inset 0 0 0 1px rgb(139 108 255 / 55%), inset 0 0 calc(var(--s, 32px) * .14) rgb(139 108 255 / 40%), 0 0 calc(var(--s, 32px) * .18) rgb(139 108 255 / 25%); } }
 .orb canvas { display: block; }
 .app-icon { display: grid; place-items: center; background: rgb(255 255 255 / 12%); overflow: hidden; }
 .app-icon .brand { display: inline-flex; align-items: center; gap: 8px; }
@@ -376,3 +366,30 @@ h2.title { margin: 0; }
   .panel { width: auto; padding: 24px 16px 40px; }
   .lock .statusbar { height: max(env(safe-area-inset-top), 24px); }
 }
+
+/* ---------- 4 Nov: grainy gradient sphere + creamy UI (ElevenLabs-like) ---------- */
+.orb { position: relative; display: inline-grid; place-items: center; flex: none; border-radius: 50%; overflow: hidden; isolation: isolate; }
+.orb canvas { display: block; border-radius: 50%; transform: scale(1.12); filter: blur(calc(var(--s, 32px) * .035)) saturate(1.05); }
+.orb::after { content: ''; position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 25%), inset 0 -6px 14px rgb(0 0 0 / 12%); pointer-events: none; }
+.orb-css { width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(180deg, #fff 0%, #fbf4ec 22%, #fab615 42%, #fc681e 56%, #0d5df4 74%, #0b4abb 86%, #170e07 100%); }
+.orb-thinking { box-shadow: 0 0 0 3px var(--color-ai-subtle); transition: box-shadow .3s var(--ease); }
+.hero-orb .orb { box-shadow: 0 18px 40px -12px rgb(13 93 244 / 35%), 0 8px 18px -10px rgb(252 104 30 / 35%); }
+.ai-rule { background: linear-gradient(180deg, #fab615, #fc681e 40%, #0d5df4); opacity: .85; }
+.topbar { border-bottom: 0; }
+.icon-btn.round { background: var(--color-surface-default); box-shadow: 0 1px 2px rgb(23 22 20 / 6%), 0 4px 14px rgb(23 22 20 / 8%); }
+.chip { border: 0; background: var(--color-surface-raised); }
+.chip.selected { background: var(--color-accent-default); color: var(--color-text-on-accent); border: 0; }
+.suggestions .chip { background: var(--color-surface-raised); }
+.card { box-shadow: none; }
+.pill { --glass: rgb(255 255 255 / 86%); --pill-glow: rgb(23 22 20 / 8%); padding: 0; gap: 0; }
+.pill-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 8px; text-align: left; }
+.pill-dismiss { width: 40px; height: 40px; margin-right: 6px; border-radius: 50%; display: grid; place-items: center; flex: none; color: var(--color-text-muted); }
+.pill-dismiss:hover { background: var(--color-surface-raised); color: var(--color-text-default); }
+.pill-spark { background: var(--color-accent-default); color: var(--color-text-on-accent); }
+.pill-nudge .badge { background: #fc681e; }
+.pill-ready .badge { background: var(--color-ai-marker); }
+:root[data-theme='dark'] .pill { --glass: rgb(23 22 20 / 82%); --pill-glow: rgb(0 0 0 / 35%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .pill { --glass: rgb(23 22 20 / 82%); --pill-glow: rgb(0 0 0 / 35%); } }
+.prompt { border-radius: 26px; box-shadow: 0 1px 2px rgb(23 22 20 / 4%), 0 10px 30px rgb(23 22 20 / 8%); }
+.prompt:focus-within { box-shadow: 0 1px 2px rgb(23 22 20 / 4%), 0 10px 30px rgb(23 22 20 / 10%), 0 0 0 3px var(--color-accent-subtle); }
+.prompt-main.send { background: var(--color-accent-default); }

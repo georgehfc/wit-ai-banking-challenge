@@ -1,7 +1,7 @@
 // The assistant: one conversation, three things it can help with.
 //   Save for something (J1, the core journey) · Where did my money go? · Check a message I got
 // Replies are scripted (no live LLM). Numbers come from planner.ts / plan-output.json. Copy: design/TONE.md.
-import { useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import out from '../../data/plan-output.json' with { type: 'json' }
 import ines from '../../data/ines.json' with { type: 'json' }
 import { AmountControl, Button, FaceId, GapResolver, Icon, MarginSnapshot, ProgressBar, ProjectionChart, Row, StatusBadge, StepsReceipt, fitBadge, type PillState, type Step } from './components'
@@ -33,7 +33,9 @@ function reaction(p: Plan) {
   return `${head} It fitted ${list(ok)}. ${list(short)} would have been short.`
 }
 
-export function Assistant({ startClosed }: { startClosed: boolean }) {
+export type Trigger = 'rest' | 'alert' | 'processing'
+
+export function Assistant({ startClosed, trigger = 'rest' }: { startClosed: boolean; trigger?: Trigger }) {
   const [turns, setTurns] = useState<Turn[]>([])
   const [busy, setBusy] = useState(false)
   const [open, setOpen] = useState(false)
@@ -57,6 +59,9 @@ export function Assistant({ startClosed }: { startClosed: boolean }) {
   const [reportSheet, setReportSheet] = useState(false)
   // lock screen (App closed)
   const [locked, setLocked] = useState(startClosed)
+  // Ask AI modes on Home: rest · alert (dismissible) · processing
+  const [alert, setAlert] = useState(trigger === 'alert')
+  const started = useRef(false)
 
   const nextId = useRef(1)
   const openRef = useRef(open); openRef.current = open
@@ -278,11 +283,18 @@ export function Assistant({ startClosed }: { startClosed: boolean }) {
   )
 
   // ---------- the app around it ----------
-  const pill: { state: PillState; label?: string; action?: string } =
-    busy && !open ? { state: 'working', label: 'Working on it…' }
+  const pill: { state: PillState; label?: string; action?: string; onDismiss?: () => void } =
+    alert && !open && !turns.length ? { state: 'nudge', label: 'Your Aug–Oct summary is ready', action: 'View', onDismiss: dismissAlert }
+    : busy && !open ? { state: 'working', label: 'Working on your holiday plan…' }
       : unseen && !open ? { state: 'ready', label: 'Your answer is ready', action: 'Open' }
       : { state: 'idle' }
-  const openSheet = () => { setOpen(true); setUnseen(false) }
+  const openSheet = () => {
+    setOpen(true); setUnseen(false)
+    if (alert && !turns.length) { setAlert(false); startSpending(null) }
+  }
+  function dismissAlert() { setAlert(false); setToast({ text: 'Dismissed. It’s in Ask AI when you want it.', action: 'Undo', onAction: () => { setAlert(true); setToast(null) } }) }
+  // Processing: the assistant is already working on something the user asked for, with the sheet closed.
+  useEffect(() => { if (trigger === 'processing' && !started.current && !startClosed) { started.current = true; startSave(INTENT) } }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const unlock = () => { setLocked(false); setTimeout(() => { setOpen(true); startSpending(null) }, 450) }
 
   if (locked) return (

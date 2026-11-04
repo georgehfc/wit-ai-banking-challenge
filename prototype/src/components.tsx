@@ -52,14 +52,18 @@ export function Toast({ text, action, onAction }: { text: string; action?: strin
 // ---------- AssistantPill: the assistant asleep ----------
 // Glass pill with a shimmer travelling round its border (adapted from a 21st.dev glassmorphism CTA, in plain CSS).
 export type PillState = 'idle' | 'nudge' | 'working' | 'ready'
-export function AssistantPill({ state, label, action, onOpen }: { state: PillState; label?: string; action?: string; onOpen: () => void }) {
+// Modes: rest (idle) · alert (nudge, dismissible) · processing (working) · ready (answer waiting).
+export function AssistantPill({ state, label, action, onOpen, onDismiss }: { state: PillState; label?: string; action?: string; onOpen: () => void; onDismiss?: () => void }) {
   const text = label ?? 'Ask AI'
   return (
-    <button className={`pill pill-${state}`} onClick={onOpen} aria-label={state === 'idle' ? 'Ask AI, AI assistant' : `AI assistant: ${text}`}>
-      <span className="pill-glyph"><AiOrb size={32} state={state === 'working' ? 'thinking' : 'idle'} />{(state === 'nudge' || state === 'ready') && <span className="badge" />}</span>
-      <span className="pill-label">{text}</span>
-      {action ? <span className="pill-action">{action}</span> : <span className="pill-spark" aria-hidden="true"><Icon name="sparkle" size={16} /></span>}
-    </button>
+    <div className={`pill pill-${state}`}>
+      <button className="pill-main" onClick={onOpen} aria-label={state === 'idle' ? 'Ask AI, AI assistant' : `AI assistant: ${text}${action ? `. ${action}` : ''}`}>
+        <span className="pill-glyph"><AiOrb size={32} state={state === 'working' ? 'thinking' : 'idle'} />{(state === 'nudge' || state === 'ready') && <span className="badge" />}</span>
+        <span className="pill-label">{text}</span>
+        {action ? <span className="pill-action">{action}</span> : state === 'idle' ? <span className="pill-spark" aria-hidden="true"><Icon name="mic" size={16} /></span> : null}
+      </button>
+      {onDismiss && <button className="pill-dismiss" onClick={onDismiss} aria-label="Dismiss"><Icon name="close" size={16} /></button>}
+    </div>
   )
 }
 

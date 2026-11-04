@@ -3,16 +3,17 @@
 # visual direction in Figma; the source of truth for values is tokens/tokens.json (DTCG 2025.10).
 name: "PoC bank · savings assistant"
 version: 0.1.0
-colors:                       # DRAFT values (Claude, 3 Nov), mirror Figma "Semantic" Light; George confirms
+colors:                       # DRAFT (4 Nov): warm "creamy" neutrals, ink actions, blue AI marker (ElevenLabs-like direction)
   surface: "#FFFFFF"
-  surface-raised: "#F4F4F5"
-  text: "#18181B"
-  text-muted: "#6B6B73"
+  surface-raised: "#F6F4F0"
+  text: "#171614"
+  text-muted: "#6B665E"
   text-on-accent: "#FFFFFF"
-  border: "#E4E4E7"
-  border-strong: "#6B6B73"
-  accent: "#0E5F73"           # petrol teal, draft
-  ai: "#5B3FD6"               # the assistant's colour: used ONLY for AI-generated content markers
+  border: "#E5E1DA"
+  border-strong: "#6B665E"
+  accent: "#171614"           # ink: primary buttons, selected, chart bars
+  ai: "#1F5BE8"               # blue from the AI sphere; assistant marker only
+  ai-gradient: ["#FFFFFF", "#FBF4EC", "#FAB615", "#FC681E", "#0D5DF4", "#0B4ABB", "#17131C"]  # the AI sphere and reply rule
   positive: "#1F7A34"
   warning: "#9A5B00"
   danger: "#B4291E"
