@@ -28,6 +28,8 @@ const paths: Record<string, ReactNode> = {
   pencil: <path d="M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4" />,
   trash: <><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" /></>,
   sparkle: <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7z" />,
+  chart: <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />,
+  shield: <><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z" /><path d="M9 12l2 2 4-4" /></>,
   lock: <><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" /></>,
   phone: <path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z" />,
 }
@@ -57,15 +59,15 @@ export function Toast({ text, action, onAction }: { text: string; action?: strin
 export type PillState = 'idle' | 'nudge' | 'working' | 'ready'
 // Modes: rest (idle) · alert (nudge, dismissible) · processing (working) · ready (answer waiting).
 export function AssistantPill({ state, label, action, onOpen, onDismiss }: { state: PillState; label?: string; action?: string; onOpen: () => void; onDismiss?: () => void }) {
-  const text = label ?? 'Ask AI'
+  const text = label ?? 'Pergunta à IA'
   return (
     <div className={`pill pill-${state}`}>
-      <button className="pill-main" onClick={onOpen} aria-label={state === 'idle' ? 'Ask AI, AI assistant' : `AI assistant: ${text}${action ? `. ${action}` : ''}`}>
+      <button className="pill-main" onClick={onOpen} aria-label={state === 'idle' ? 'Pergunta à IA, assistente de IA' : `Assistente de IA: ${text}${action ? `. ${action}` : ''}`}>
         <span className="pill-glyph"><AiOrb size={32} state={state === 'working' ? 'thinking' : 'idle'} />{(state === 'nudge' || state === 'ready') && <span className="badge" />}</span>
         <span className="pill-label">{text}</span>
         {action ? <span className="pill-action">{action}</span> : state === 'idle' ? <span className="pill-spark" aria-hidden="true"><Icon name="mic" size={16} /></span> : null}
       </button>
-      {onDismiss && <button className="pill-dismiss" onClick={onDismiss} aria-label="Dismiss"><Icon name="close" size={16} /></button>}
+      {onDismiss && <button className="pill-dismiss" onClick={onDismiss} aria-label="Dispensar"><Icon name="close" size={16} /></button>}
     </div>
   )
 }
@@ -90,7 +92,7 @@ export function StepsReceipt({ steps, onDone, summary = 'Read Aug–Oct · Calcu
   const done = n >= steps.length
   if (!done || open) return (
     <div className="steps" role="status" aria-live="polite">
-      {done ? <button className="steps-head" onClick={() => setOpen(false)}>Worked for 2 s <Icon name="down" size={14} /></button> : title && <span className="steps-title">{title}</span>}
+      {done ? <button className="steps-head" onClick={() => setOpen(false)}>Trabalhou 2 s <Icon name="down" size={14} /></button> : title && <span className="steps-title">{title}</span>}
       {steps.map((s, i) => (
         <div key={s.label} className={`step ${i < n ? 'done' : i === n ? 'now' : 'todo'}`}>
           <span className="step-dot">{i < n && <Icon name="check" size={11} />}</span>
@@ -99,13 +101,13 @@ export function StepsReceipt({ steps, onDone, summary = 'Read Aug–Oct · Calcu
       ))}
     </div>
   )
-  return <button className="steps steps-collapsed" onClick={() => setOpen(true)} aria-label={`Worked for 2 seconds, ${steps.length} steps. Show steps`}><span className="step-dot done"><Icon name="check" size={11} /></span><span className="grow-text">Worked for 2 s · {summary}</span><Icon name="chevron" size={14} /></button>
+  return <button className="steps steps-collapsed" onClick={() => setOpen(true)} aria-label={`Trabalhou 2 segundos, ${steps.length} passos. Mostrar passos`}><span className="step-dot done"><Icon name="check" size={11} /></span><span className="grow-text">Trabalhou 2 s · {summary}</span><Icon name="chevron" size={14} /></button>
 }
 
 // PromptBox: the assistant's input. Text that grows as you type; attach a screenshot (scam check); voice; send ↔ stop.
 // Adapted from a 21st.dev "AI prompt box" to the design system (tokens, light/dark, focus rings kept);
 // its Search/Think/Canvas modes were left out: they mean nothing in a banking assistant.
-export function PromptBox({ value, onChange, onSend, busy = false, onStop, placeholder = 'Ask anything', transcript }: {
+export function PromptBox({ value, onChange, onSend, busy = false, onStop, placeholder = 'Pergunta o que quiseres', transcript }: {
   value: string; onChange: (v: string) => void; onSend: (image?: { url: string; name: string }) => void
   busy?: boolean; onStop?: () => void; placeholder?: string; transcript: () => string
 }) {
@@ -125,29 +127,29 @@ export function PromptBox({ value, onChange, onSend, busy = false, onStop, place
     <form className={`prompt ${busy ? 'busy' : ''} ${rec ? 'recording' : ''}`} onSubmit={(e) => { e.preventDefault(); submit() }}>
       {image && !rec && (
         <div className="prompt-attachments">
-          <span className="thumb"><img src={image.url} alt={`Attached: ${image.name}`} /><button type="button" aria-label="Remove screenshot" onClick={() => setImage(null)}><Icon name="close" size={12} /></button></span>
-          <span className="caption muted">Screenshot attached. Read as text only.</span>
+          <span className="thumb"><img src={image.url} alt={`Anexo: ${image.name}`} /><button type="button" aria-label="Remover captura de ecrã" onClick={() => setImage(null)}><Icon name="close" size={12} /></button></span>
+          <span className="caption muted">Captura de ecrã anexada. Lida só como texto.</span>
         </div>
       )}
       {rec ? (
         <div className="prompt-rec" role="status" aria-live="polite">
           <span className="rec-time"><i />{`0:${String(secs).padStart(2, '0')}`}</span>
           <span className="rec-bars" aria-hidden="true">{Array.from({ length: 28 }, (_, k) => <i key={k} style={{ animationDelay: `${(k % 7) * 90}ms`, height: `${30 + ((k * 37) % 60)}%` }} />)}</span>
-          <span className="caption muted">Listening… tap stop when you’re done</span>
+          <span className="caption muted">A ouvir… toca em parar quando terminares</span>
         </div>
       ) : (
-        <textarea ref={ta} rows={1} value={value} placeholder={busy ? 'AI is replying…' : placeholder} aria-label="Message the AI assistant"
+        <textarea ref={ta} rows={1} value={value} placeholder={busy ? 'A IA está a responder…' : placeholder} aria-label="Mensagem para a IA"
           onChange={(e) => onChange(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit() } }}
           onPaste={(e) => { const f = [...e.clipboardData.files].find((x) => x.type.startsWith('image/')); if (f) { e.preventDefault(); pickFile(f) } }} />
       )}
       <div className="prompt-actions">
         <span className="prompt-left">
-          {!rec && <button type="button" className="prompt-icon" aria-label="Attach a screenshot" title="Attach a screenshot" onClick={() => file.current?.click()} disabled={busy}><Icon name="clip" size={20} /></button>}
+          {!rec && <button type="button" className="prompt-icon" aria-label="Anexar captura de ecrã" title="Anexar captura de ecrã" onClick={() => file.current?.click()} disabled={busy}><Icon name="clip" size={20} /></button>}
           <input ref={file} type="file" accept="image/*" hidden onChange={(e) => { pickFile(e.target.files?.[0]); e.target.value = '' }} />
         </span>
         <button type={mode === 'send' ? 'submit' : 'button'} className={`prompt-main ${mode}`}
-          aria-label={mode === 'stop' ? 'Stop the reply' : mode === 'rec' ? 'Stop recording' : mode === 'send' ? 'Send' : 'Speak instead'}
-          title={mode === 'stop' ? 'Stop the reply' : mode === 'rec' ? 'Stop recording' : mode === 'send' ? 'Send' : 'Speak instead'}
+          aria-label={mode === 'stop' ? 'Parar a resposta' : mode === 'rec' ? 'Parar a gravação' : mode === 'send' ? 'Enviar' : 'Falar em vez de escrever'}
+          title={mode === 'stop' ? 'Parar a resposta' : mode === 'rec' ? 'Parar a gravação' : mode === 'send' ? 'Enviar' : 'Falar em vez de escrever'}
           onClick={mode === 'stop' ? onStop : mode === 'rec' ? stopRec : mode === 'mic' ? () => setRec(true) : undefined}>
           <Icon name={mode === 'stop' ? 'square' : mode === 'rec' ? 'square' : mode === 'send' ? 'up' : 'mic'} size={18} />
         </button>
@@ -167,29 +169,29 @@ export function MarginSnapshot({ months }: { months: { month: string; income: nu
           <div className="margin-bar" aria-hidden="true">
             <span className="seg fixed" style={{ flex: m.fixed }} /><span className="seg spend" style={{ flex: m.variable }} /><span className="seg left" style={{ flex: m.margin }} />
           </div>
-          <span className="body-strong">{eur(m.margin)} left</span>
+          <span className="body-strong">{eur(m.margin)} livres</span>
         </div>
       ))}
-      <div className="legend"><span><i className="fixed" />Fixed {eur(fixed)}</span><span><i className="spend" />Spending</span><span><i className="left" />Left</span></div>
-      <p className="caption muted">Based on your account, Aug–Oct · Calculated by the planner</p>
+      <div className="legend"><span><i className="fixed" />Fixos {eur(fixed)}</span><span><i className="spend" />Gastos</span><span><i className="left" />Livre</span></div>
+      <p className="caption muted">Com base na tua conta, ago–out · Calculado pelo planeador</p>
     </div>
   )
 }
 
 export function ProjectionChart({ p, goal = GOAL }: { p: Plan; goal?: number }) {
   const last = p.byMonth[p.byMonth.length - 1]
-  const label = `Saved by ${monthShort(last.month)}: ${eur(p.total)} of ${eur(goal)}.${p.gap > 0 ? ` Gap ${eur(goal - p.total)}.` : ' Goal reached.'}`
+  const label = `Poupado até ${monthShort(last.month)}: ${eur(p.total)} de ${eur(goal)}.${p.gap > 0 ? ` Faltam ${eur(goal - p.total)}.` : ' Objetivo atingido.'}`
   const top = Math.max(goal, p.total)
   return (
     <div className="chart" role="img" aria-label={label}>
-      <div className="goal-line" style={{ bottom: `calc(20px + (100% - 24px) * ${goal / top})` }}><span>Goal {eur(goal)}</span></div>
+      <div className="goal-line" style={{ bottom: `calc(20px + (100% - 24px) * ${goal / top})` }}><span>Objetivo {eur(goal)}</span></div>
       {p.byMonth.map((m, i) => {
         const isLast = i === p.byMonth.length - 1
         return (
           <div className="bar-col" key={m.month}>
             <div className="bar-track">
               {isLast && goal > m.saved && <div className="bar-gap" style={{ height: `${((goal - m.saved) / top) * 100}%`, bottom: `${(m.saved / top) * 100}%` }} />}
-              <div className="bar" style={{ height: `${(m.saved / top) * 100}%` }}>{m.christmas > 0 && <div className="bar-xmas" style={{ height: `${(m.christmas / m.saved) * 100}%` }} />}</div>
+              <div className={`bar ${isLast ? 'highlight' : ''}`} style={{ height: `${(m.saved / top) * 100}%` }}>{m.christmas > 0 && <div className="bar-xmas" style={{ height: `${(m.christmas / m.saved) * 100}%` }} />}</div>
             </div>
             <span className="caption muted">{monthShort(m.month)}</span>
           </div>
@@ -200,18 +202,18 @@ export function ProjectionChart({ p, goal = GOAL }: { p: Plan; goal?: number }) 
 }
 
 export function fitBadge(p: Plan) {
-  if (p.fit === 'fits') return <StatusBadge kind="positive">Fits every month</StatusBadge>
-  if (p.fit === 'too_high') return <StatusBadge kind="danger">More than any month</StatusBadge>
-  return <StatusBadge kind="warning">Short {p.shortMonths.length} of 3 months</StatusBadge>
+  if (p.fit === 'fits') return <StatusBadge kind="positive">Cabe em todos os meses</StatusBadge>
+  if (p.fit === 'too_high') return <StatusBadge kind="danger">Mais do que qualquer mês</StatusBadge>
+  return <StatusBadge kind="warning">Curto em {p.shortMonths.length} de 3 meses</StatusBadge>
 }
 
 export function AmountControl({ value, onChange, min, max, presets, total }: { value: number; onChange: (v: number) => void; min: number; max: number; presets: number[]; total: string }) {
   return (
     <div className="amount-control">
       <input type="range" min={min} max={max} step={10} value={value} onChange={(e) => onChange(Number(e.target.value))}
-        aria-label="Monthly amount" aria-valuetext={`${eur(value)} a month, ${total}`} style={{ ['--pct' as string]: `${((value - min) / (max - min)) * 100}%` }} />
-      <div className="ends caption muted"><span>{eur(min)}</span><span>{eur(max)} (full goal)</span></div>
-      <div className="chips" role="group" aria-label="Presets">
+        aria-label="Valor mensal" aria-valuetext={`${eur(value)} a month, ${total}`} style={{ ['--pct' as string]: `${((value - min) / (max - min)) * 100}%` }} />
+      <div className="ends caption muted"><span>{eur(min)}</span><span>{eur(max)} (objetivo completo)</span></div>
+      <div className="chips" role="group" aria-label="Valores sugeridos">
         {presets.map((v) => <button key={v} className={`chip ${v === value ? 'selected' : ''}`} aria-pressed={v === value} onClick={() => onChange(v)}>{eur(v)}</button>)}
       </div>
     </div>
@@ -233,7 +235,7 @@ export function OptionList({ title, options, picked, onPick, label }: { title?: 
   )
 }
 export function GapResolver({ gap, options, picked, onPick }: { gap: number; options: GapOption[]; picked: string | null; onPick: (id: GapOption['id']) => void }) {
-  return <div className="card"><OptionList title={`Close the ${eur(gap)} gap`} label={`Ways to close the ${eur(gap)} gap`} options={options} picked={picked} onPick={(id) => onPick(id as GapOption['id'])} /></div>
+  return <div className="card"><OptionList title={`Fechar a diferença de ${eur(gap)}`} label={`Formas de fechar a diferença de ${eur(gap)}`} options={options} picked={picked} onPick={(id) => onPick(id as GapOption['id'])} /></div>
 }
 
 export function FaceId({ onDone }: { onDone: () => void }) {
@@ -245,7 +247,7 @@ export function FaceId({ onDone }: { onDone: () => void }) {
         <svg width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true">
           {ok ? <path d="M18 33l9 9 19-20" /> : <><path d="M8 20V12a4 4 0 014-4h8M44 8h8a4 4 0 014 4v8M56 44v8a4 4 0 01-4 4h-8M20 56h-8a4 4 0 01-4-4v-8" /><path d="M24 24v4M40 24v4M32 26v10h-3M25 43c4 3 10 3 14 0" /></>}
         </svg>
-        <span>{ok ? 'Approved' : 'Face ID'}</span>
+        <span>{ok ? 'Aprovado' : 'Face ID'}</span>
       </div>
     </div>
   )
@@ -253,7 +255,7 @@ export function FaceId({ onDone }: { onDone: () => void }) {
 
 // ---------- added for J0, J2–J5 ----------
 export function ReplyChips({ items }: { items: { label: string; onClick: () => void }[] }) {
-  return <div className="chips" role="group" aria-label="Suggested replies">{items.map((c) => <button key={c.label} className="chip" onClick={c.onClick}>{c.label}</button>)}</div>
+  return <div className="chips" role="group" aria-label="Respostas sugeridas">{items.map((c) => <button key={c.label} className="chip" onClick={c.onClick}>{c.label}</button>)}</div>
 }
 
 // ApprovalRequest inline in chat (move-money). No "always allow" for money, by design (SECURITY.md).
@@ -263,28 +265,28 @@ export function ApprovalCard({ title, rows, after, note, state, onDecline, onApp
 }) {
   return (
     <div className="card" aria-label={title}>
-      <div className="row-between"><span className="body-strong">{title}</span>{state === 'approved' && <StatusBadge kind="positive">Approved</StatusBadge>}{state === 'declined' && <span className="caption muted">Not now</span>}</div>
+      <div className="row-between"><span className="body-strong">{title}</span>{state === 'approved' && <StatusBadge kind="positive">Aprovado</StatusBadge>}{state === 'declined' && <span className="caption muted">Agora não</span>}</div>
       {rows.map(([k, v, strong]) => <Row key={k} k={k} v={v} strong={strong} />)}
       {after && <><hr />{after.map(([k, v]) => <Row key={k} k={k} v={v} />)}</>}
       {state === 'pending' && <><p className="caption muted">{note}</p>
-        <div className="actions"><Button kind="secondary" grow onClick={onDecline}>Not now</Button><Button grow onClick={onApprove}>Approve with Face ID</Button></div></>}
+        <div className="actions"><Button kind="secondary" grow onClick={onDecline}>Agora não</Button><Button grow onClick={onApprove}>Aprovar com Face ID</Button></div></>}
     </div>
   )
 }
 
 export function HandoffCard({ topic, why, passOn, onKeep, onTalk, done }: { topic: string; why: string; passOn: string[]; onKeep: () => void; onTalk: () => void; done: boolean }) {
   return (
-    <div className="card" aria-label={`${topic}: hand over to a person`}>
-      <div className="row-between"><span className="body-strong">{topic}</span><span className="tag">With a person</span></div>
+    <div className="card" aria-label={`${topic}: passar a uma pessoa`}>
+      <div className="row-between"><span className="body-strong">{topic}</span><span className="tag">Com uma pessoa</span></div>
       <p className="muted">{why}</p>
       <hr />
-      <span className="label muted">What I’ll pass on</span>
+      <span className="label muted">O que vou passar</span>
       <ul className="bullets">{passOn.map((x) => <li key={x}>{x}</li>)}</ul>
-      {!done && <div className="actions"><Button kind="secondary" grow onClick={onKeep}>Keep my plan</Button><Button grow onClick={onTalk}>Talk to a person</Button></div>}
+      {!done && <div className="actions"><Button kind="secondary" grow onClick={onKeep}>Manter o meu plano</Button><Button grow onClick={onTalk}>Falar com uma pessoa</Button></div>}
     </div>
   )
 }
 
 export function ContextChip({ children }: { children: ReactNode }) {
-  return <div className="context-chip"><span className="caption muted">Earlier in this chat</span><span className="caption">{children}</span></div>
+  return <div className="context-chip"><span className="caption muted">Antes nesta conversa</span><span className="caption">{children}</span></div>
 }

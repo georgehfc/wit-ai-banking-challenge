@@ -34,3 +34,5 @@ Running notes on what worked, what didn't and what changed because of it. Feeds 
 - **Shaders made for big cards look stripy at icon size.** The same gradient that melts across 800 px turns into hard bands across 32 px. Uneven gradient stops plus a small blur inside a clipped circle brought back the soft look without changing the shader's character.
 - **Diagrams from the code find gaps.** Writing Mermaid state diagrams straight from the implementation showed states with no exit (a dead-end chip) and a path to a duplicate plan once threads existed. Cheap to write, worth doing before polishing.
 
+
+- **Translating a scripted chat (4 Nov):** routing regexes and suggestion chips must change together with the copy, or tapping a PT chip falls through to "I can't help with that". Keep EN patterns as a fallback, and make number checks compare digits, not formatted strings (pt-PT "2360 €" vs "€2,360").

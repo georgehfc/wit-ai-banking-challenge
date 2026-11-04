@@ -15,29 +15,29 @@ export default function App() {
   }, [])
   return (
     <main className="stage">
-      <aside className="panel" aria-label="Prototype tweaks">
-        <p className="panel-title">Tweaks</p>
+      <aside className="panel" aria-label="Ajustes do protótipo">
+        <p className="panel-title">Ajustes</p>
         <div className="tweak">
-          <span className="panel-note">Start with the app</span>
-          <div className="segmented small" role="radiogroup" aria-label="Start with the app">
-            {(['open', 'closed'] as const).map((s) => <button key={s} role="radio" aria-checked={start === s} className={start === s ? 'on' : ''} onClick={() => { setStart(s); reset() }}>{s === 'open' ? 'Open' : 'Closed'}</button>)}
+          <span className="panel-note">Começar com a app</span>
+          <div className="segmented small" role="radiogroup" aria-label="Começar com a app">
+            {(['open', 'closed'] as const).map((s) => <button key={s} role="radio" aria-checked={start === s} className={start === s ? 'on' : ''} onClick={() => { setStart(s); reset() }}>{s === 'open' ? 'Aberta' : 'Fechada'}</button>)}
           </div>
         </div>
         <div className="tweak">
-          <span className="panel-note">Ask AI on Home</span>
-          <div className="segmented small" role="radiogroup" aria-label="Ask AI on Home">
-            {([['rest', 'Rest'], ['alert', 'Alert'], ['processing', 'Processing']] as const).map(([k, l]) => <button key={k} role="radio" aria-checked={trigger === k} className={trigger === k ? 'on' : ''} onClick={() => { setTrigger(k); setStart('open'); reset() }}>{l}</button>)}
+          <span className="panel-note">IA no Início</span>
+          <div className="segmented small" role="radiogroup" aria-label="IA no Início">
+            {([['rest', 'Repouso'], ['alert', 'Alerta'], ['processing', 'Processar']] as const).map(([k, l]) => <button key={k} role="radio" aria-checked={trigger === k} className={trigger === k ? 'on' : ''} onClick={() => { setTrigger(k); setStart('open'); reset() }}>{l}</button>)}
           </div>
-          <span className="panel-note">{trigger === 'alert' ? 'Tap the pill to open, or × to dismiss (with Undo).' : trigger === 'processing' ? 'Working in the background, then “ready”. Tap to open.' : 'Tap “Ask AI” to start.'}</span>
+          <span className="panel-note">{trigger === 'alert' ? 'Toca no botão para abrir, ou × para dispensar (com Anular).' : trigger === 'processing' ? 'A trabalhar em segundo plano, depois “pronto”. Toca para abrir.' : 'Toca em “Pergunta à IA” para começar.'}</span>
         </div>
         <div className="tweak">
-          <span className="panel-note">Colour</span>
-          <div className="segmented small" role="radiogroup" aria-label="Colour mode">
-            {(['light', 'dark'] as const).map((t) => <button key={t} role="radio" aria-checked={theme === t} className={theme === t ? 'on' : ''} onClick={() => setTheme(t)}>{t === 'light' ? 'Light' : 'Dark'}</button>)}
+          <span className="panel-note">Cor</span>
+          <div className="segmented small" role="radiogroup" aria-label="Modo de cor">
+            {(['light', 'dark'] as const).map((t) => <button key={t} role="radio" aria-checked={theme === t} className={theme === t ? 'on' : ''} onClick={() => setTheme(t)}>{t === 'light' ? 'Clara' : 'Escura'}</button>)}
           </div>
         </div>
-        <button className="panel-btn" onClick={reset}>Reset</button>
-        <p className="panel-note">Esc resets too. Every number comes from the planner.</p>
+        <button className="panel-btn" onClick={reset}>Repor</button>
+        <p className="panel-note">Esc também repõe. Todos os números vêm do planeador.</p>
       </aside>
       <div className="phone" key={`${start}-${trigger}-${run}`}><Assistant startClosed={start === 'closed'} trigger={trigger} /></div>
     </main>

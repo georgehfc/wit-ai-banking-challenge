@@ -67,22 +67,24 @@ export function gapOptions(p: Plan): GapOption[] {
   const sep = plan(p.monthly, 'september')
   const trimTo = Math.floor(p.total / 100) * 100
   return [
-    { id: 'irs', label: 'Count my IRS refund if it arrives', certain: false,
-      result: `Covers it if the refund is ${eur(p.gap)} or more (national average ~${eur(IRS_AVG)}). Not guaranteed.` },
-    { id: 'september', label: 'Move the trip to September', certain: true,
-      result: sep.gap > 0 ? `Two more transfers: ${eur(sep.total)} saved, ${eur(sep.gap)} short.` : `Two more transfers: ${eur(sep.total)} saved. Goal reached.` },
-    { id: 'trim', label: `Make it a ${eur(trimTo)} trip`, certain: true, result: 'Reached on the current plan.' },
+    { id: 'irs', label: 'Contar com o reembolso do IRS, se vier', certain: false,
+      result: `Cobre a diferença se o reembolso for de ${eur(p.gap)} ou mais (média nacional ~${eur(IRS_AVG)}). Não é garantido.` },
+    { id: 'september', label: 'Adiar a viagem para setembro', certain: true,
+      result: sep.gap > 0 ? `Mais duas transferências: ${eur(sep.total)} poupados, faltam ${eur(sep.gap)}.` : `Mais duas transferências: ${eur(sep.total)} poupados. Objetivo atingido.` },
+    { id: 'trim', label: `Fazer uma viagem de ${eur(trimTo)}`, certain: true, result: 'Atingido com o plano atual.' },
   ]
 }
 
 const round2 = (n: number) => Math.round(n * 100) / 100
 
+// Portuguese (Portugal) formats: 2360 € · 220,00 € · 1 dez · "agosto e outubro".
 export const eur = (n: number, digits = 0) =>
-  new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR', maximumFractionDigits: digits, minimumFractionDigits: digits }).format(n)
+  new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR', maximumFractionDigits: digits, minimumFractionDigits: digits }).format(n)
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-const LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+const MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']
+const LONG = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro']
 export const monthShort = (ym: string) => MONTHS[Number(ym.slice(5, 7)) - 1]
 export const monthLong = (ym: string) => LONG[Number(ym.slice(5, 7)) - 1]
+export const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 export const day = (iso: string, withYear = false) => `${Number(iso.slice(8, 10))} ${monthShort(iso)}${withYear ? ' ' + iso.slice(0, 4) : ''}`
-export const list = (xs: string[]) => xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`
+export const list = (xs: string[]) => xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} e ${xs[xs.length - 1]}`

@@ -451,3 +451,34 @@ h2.title { margin: 0; }
 .dock::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 96px; background: linear-gradient(to bottom, transparent, var(--color-surface-raised) 70%); pointer-events: none; }
 
 .steps-title { font-weight: 600; font-size: 13px; color: var(--color-text-default); }
+
+/* ---------- Data viz colour from the AI sphere's palette, used to highlight one thing per chart (4 Nov) ---------- */
+:root { --grad-v: linear-gradient(0deg, #0B4ABB 0%, #0D5DF4 38%, #FC681E 78%, #FAB615 100%); --grad-h: linear-gradient(90deg, #0D5DF4 0%, #FC681E 62%, #FAB615 100%); --viz-muted: var(--p-color-neutral-300); --viz-faint: var(--p-color-neutral-200); }
+:root[data-theme='dark'] { --viz-muted: var(--p-color-neutral-700); --viz-faint: var(--p-color-neutral-800); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) { --viz-muted: var(--p-color-neutral-700); --viz-faint: var(--p-color-neutral-800); } }
+.bar { background: var(--viz-muted); }
+.bar.highlight { background: var(--grad-v); box-shadow: 0 6px 16px -6px rgb(13 93 244 / 45%); }
+.bar-xmas { background: #FAB615; opacity: .55; }
+.bar.highlight .bar-xmas { opacity: 0; }
+.bar-gap { border-color: #FC681E; }
+.spend-bar { background: var(--viz-faint); }
+.spend-bar i { background: var(--viz-muted); }
+.spend-bar i.top { background: var(--grad-h); }
+.seg.fixed, .legend .fixed { background: var(--viz-muted); }
+.seg.spend, .legend .spend { background: var(--viz-faint); }
+.seg.left, .legend .left { background: var(--grad-h); }
+.progress > div { background: var(--grad-h); }
+.amount-control input[type='range']::-webkit-slider-runnable-track { background: linear-gradient(to right, transparent var(--pct), var(--viz-faint) var(--pct)), var(--grad-h); }
+.amount-control input[type='range']::-moz-range-track { background: linear-gradient(to right, transparent var(--pct), var(--viz-faint) var(--pct)), var(--grad-h); }
+
+/* ---------- start screens (4 Nov) ---------- */
+.greeting { font: 600 15px/20px var(--font); color: var(--color-text-muted); margin: 4px 0 -8px; }
+.root-title { font: 700 28px/34px var(--font); letter-spacing: -.5px; margin: 4px 0 0; }
+.trust-line { display: flex; gap: 6px; align-items: flex-start; font-size: 13px; line-height: 18px; color: var(--color-text-muted); margin-bottom: 8px; }
+.trust-line .icon { margin-top: 2px; flex: none; }
+.shortcut-card { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 12px 14px; border-radius: 18px; background: var(--color-surface-raised); text-align: left; margin-top: 4px; transition: transform .12s var(--ease), background .15s; }
+.shortcut-card:active { transform: scale(.99); }
+.shortcut-card .stack { flex: 1; min-width: 0; }
+.shortcut-card > .icon { color: var(--color-text-muted); }
+.lead-icon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--color-surface-default); box-shadow: 0 1px 2px rgb(23 22 20 / 6%); }
+.empty { gap: 10px; }

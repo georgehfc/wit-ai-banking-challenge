@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import out from '../../data/plan-output.json' with { type: 'json' }
 import { Icon, StatusBadge } from './components'
 import { AiOrb } from './orb'
-import { eur, list, monthLong, monthShort } from './planner'
+import { eur, monthLong, monthShort } from './planner'
 
 export const TYPING_MS = 650
 export const WORD_MS = 28
@@ -12,7 +12,7 @@ export const WIDGET_MS = 260
 export const replyDuration = (text: string, widget: boolean) => TYPING_MS + text.split(/\s+/).length * WORD_MS + (widget ? WIDGET_MS + 200 : 120)
 
 export function TypingDots() {
-  return <span className="typing" role="status" aria-label="AI is writing"><AiOrb size={22} state="thinking" /><span className="dots"><i /><i /><i /></span></span>
+  return <span className="typing" role="status" aria-label="A IA está a escrever"><AiOrb size={22} state="thinking" /><span className="dots"><i /><i /><i /></span></span>
 }
 
 // One assistant reply. Mounts once per turn: typing dots, then the text streams in, then the widget rises in.
@@ -52,7 +52,7 @@ export function AiReply({ text, widget, onGrow, skip = false, tone = 'reply' }: 
 export function UserBubble({ text, quote, image }: { text?: string; quote?: string; image?: string }) {
   return (
     <div className="msg-user">
-      {quote ? <div className="quote">{image && <img className="quote-img" src={image} alt="Screenshot you attached" />}<span className="caption muted">{image ? 'Text in your screenshot · read as text only' : 'Pasted message · read as text only'}</span><p>{quote}</p></div> : <p>{text}</p>}
+      {quote ? <div className="quote">{image && <img className="quote-img" src={image} alt="Captura de ecrã que anexaste" />}<span className="caption muted">{image ? 'Texto da tua captura de ecrã · lido só como texto' : 'Mensagem colada · lida só como texto'}</span><p>{quote}</p></div> : <p>{text}</p>}
     </div>
   )
 }
@@ -70,7 +70,7 @@ export function Folded({ summary, open, onToggle, children }: { summary: ReactNo
 export function Suggestions({ items, onPick }: { items: string[]; onPick: (s: string) => void }) {
   if (!items.length) return null
   return (
-    <div className="suggestions" role="group" aria-label="Suggested replies">
+    <div className="suggestions" role="group" aria-label="Respostas sugeridas">
       {items.map((s, i) => <button key={s} className="chip" style={{ animationDelay: `${i * 40}ms` }} onClick={() => onPick(s)}>{s}</button>)}
     </div>
   )
@@ -92,6 +92,8 @@ export function Num({ value, format = (n: number) => eur(n) }: { value: number; 
 // ---------- Where did my money go? ----------
 const S = out.spending
 type Group = (typeof S.groups)[number]
+// Portuguese labels for the planner's spending groups (ids from plan-output.json).
+const PT: Record<string, string> = { rent: 'Renda', bills: 'Contas e telemóvel', subscriptions: 'Subscrições', transport: 'Transportes', groceries: 'Supermercado', eating_out: 'Restaurantes', shopping: 'Compras', travel: 'Viagens', going_out: 'Saídas', other: 'Outros' }
 export function SpendingBreakdown({ month, onMonth }: { month: string; onMonth: (m: string) => void }) {
   const [open, setOpen] = useState<string | null>(null)
   const [all, setAll] = useState(false)
@@ -104,32 +106,32 @@ export function SpendingBreakdown({ month, onMonth }: { month: string; onMonth: 
   const max = Math.max(...rows.map((r) => r.v))
   return (
     <div className="card spending">
-      <div className="segmented" role="tablist" aria-label="Period">
-        {['all', ...S.months].map((m) => <button key={m} role="tab" aria-selected={m === month} className={m === month ? 'on' : ''} onClick={() => onMonth(m)}>{m === 'all' ? 'Aug–Oct' : monthShort(m)}</button>)}
+      <div className="segmented" role="tablist" aria-label="Período">
+        {['all', ...S.months].map((m) => <button key={m} role="tab" aria-selected={m === month} className={m === month ? 'on' : ''} onClick={() => onMonth(m)}>{m === 'all' ? 'ago–out' : monthShort(m)}</button>)}
       </div>
-      <div className="row-baseline"><span className="amount-sm"><Num value={total} /></span><span className="caption muted">{month === 'all' ? 'spent in 3 months' : `spent in ${monthLong(month)}`}</span></div>
+      <div className="row-baseline"><span className="amount-sm"><Num value={total} /></span><span className="caption muted">{month === 'all' ? 'gastos em 3 meses' : `gastos em ${monthLong(month)}`}</span></div>
       <ul className="spend-list">
         <li>
           <button className="spend-row fixed-row" onClick={() => setOpen(open === 'fixed' ? null : 'fixed')} aria-expanded={open === 'fixed'}>
-            <span className="spend-label"><span>{list(fixed.map((g, i) => i ? g.label.split(' ')[0].toLowerCase() : g.label.split(' ')[0]))}</span><span className="tag">Fixed</span></span>
+            <span className="spend-label"><span>Renda, contas e subscrições</span><span className="tag">Fixo</span></span>
             <span />
             <span className="body-strong num"><Num value={fixedTotal} /></span>
           </button>
-          {open === 'fixed' && <ul className="merchants">{fixed.map((g) => <li key={g.id}><span>{g.label}</span><span className="num">{eur(val(g))}</span></li>)}</ul>}
+          {open === 'fixed' && <ul className="merchants">{fixed.map((g) => <li key={g.id}><span>{PT[g.id] ?? g.label}</span><span className="num">{eur(val(g))}</span></li>)}</ul>}
         </li>
-        {shown.map(({ g, v }) => (
+        {shown.map(({ g, v }, idx) => (
           <li key={g.id}>
             <button className="spend-row" onClick={() => setOpen(open === g.id ? null : g.id)} aria-expanded={open === g.id} disabled={!g.top.length}>
-              <span className="spend-label"><span>{g.label}</span></span>
-              <span className="spend-bar" aria-hidden="true"><i style={{ width: `${(v / max) * 100}%` }} /></span>
+              <span className="spend-label"><span>{PT[g.id] ?? g.label}</span></span>
+              <span className="spend-bar" aria-hidden="true"><i className={idx === 0 ? 'top' : ''} style={{ width: `${(v / max) * 100}%` }} /></span>
               <span className="body-strong num"><Num value={v} /></span>
             </button>
-            {open === g.id && <ul className="merchants">{g.top.map((m) => <li key={m.name}><span>{m.name}</span><span className="num">{eur(m.total)}</span></li>)}<li className="caption muted">Aug–Oct total per place</li></ul>}
+            {open === g.id && <ul className="merchants">{g.top.map((m) => <li key={m.name}><span>{m.name}</span><span className="num">{eur(m.total)}</span></li>)}<li className="caption muted">Total ago–out por local</li></ul>}
           </li>
         ))}
       </ul>
-      {rows.length > 5 && <button className="btn btn-tertiary" onClick={() => setAll(!all)}>{all ? 'Show less' : `Show ${rows.length - 5} more`}</button>}
-      <p className="caption muted">Your current account, Aug–Oct. Tap a row to see where.</p>
+      {rows.length > 5 && <button className="btn btn-tertiary" onClick={() => setAll(!all)}>{all ? 'Mostrar menos' : `Mostrar mais ${rows.length - 5}`}</button>}
+      <p className="caption muted">A tua conta à ordem, ago–out. Toca numa linha para ver onde.</p>
     </div>
   )
 }
@@ -138,9 +140,9 @@ export function SpendingBreakdown({ month, onMonth }: { month: string; onMonth: 
 export function ScamVerdict({ domain, reasons }: { domain: string; reasons: string[] }) {
   return (
     <div className="card verdict">
-      <div className="row-between"><span className="body-strong">Likely a scam</span><StatusBadge kind="danger">Don’t tap the link</StatusBadge></div>
+      <div className="row-between"><span className="body-strong">Provável burla</span><StatusBadge kind="danger">Não toques no link</StatusBadge></div>
       <ul className="reasons">{reasons.map((r) => <li key={r}><Icon name="alert" size={16} /><span>{r}</span></li>)}</ul>
-      <p className="caption muted">Checked against how the bank contacts you. The link ({domain}) was not opened.</p>
+      <p className="caption muted">Comparado com a forma como o banco te contacta. O link ({domain}) não foi aberto.</p>
     </div>
   )
 }
@@ -149,14 +151,14 @@ export function CardControl({ frozen, onToggle }: { frozen: boolean; onToggle: (
   return (
     <div className="card">
       <div className={`bank-card ${frozen ? 'frozen' : ''}`} aria-hidden="true">
-        <span className="caption">Debit card</span>
+        <span className="caption">Cartão de débito</span>
         <span className="bank-card-chip" />
         <span className="caption">Inês Marques</span>
-        {frozen && <span className="frost"><Icon name="lock" size={22} />Frozen</span>}
+        {frozen && <span className="frost"><Icon name="lock" size={22} />Congelado</span>}
       </div>
       <label className="switch-row">
-        <span className="stack"><span className="body-strong">Freeze card</span><span className="caption muted">{frozen ? 'No payments can go through. Unfreeze any time.' : 'Blocks new payments. Your account stays open.'}</span></span>
-        <input type="checkbox" role="switch" checked={frozen} onChange={onToggle} aria-label="Freeze card" />
+        <span className="stack"><span className="body-strong">Congelar cartão</span><span className="caption muted">{frozen ? 'Nenhum pagamento passa. Descongela quando quiseres.' : 'Bloqueia novos pagamentos. A tua conta continua aberta.'}</span></span>
+        <input type="checkbox" role="switch" checked={frozen} onChange={onToggle} aria-label="Congelar cartão" />
       </label>
     </div>
   )

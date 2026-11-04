@@ -29,15 +29,15 @@ export type GoalCardProps = {
 
 export function GoalCard(g: GoalCardProps) {
   return (
-    <section className={`card goal-card ${g.highlight ? 'highlight' : ''}`} aria-label="Holiday goal">
+    <section className={`card goal-card ${g.highlight ? 'highlight' : ''}`} aria-label="Objetivo Férias">
       <div className="row-between">
-        <span className="row-gap"><span className="goal-icon"><Icon name="plane" size={16} /></span><span className="body-strong">Holiday</span></span>
+        <span className="row-gap"><span className="goal-icon"><Icon name="plane" size={16} /></span><span className="body-strong">Férias</span></span>
         <StatusBadge kind={g.status.kind}>{g.status.label}</StatusBadge>
       </div>
-      <div className="row-baseline"><span className="amount-sm">{eur(g.saved)}</span><span className="caption muted">of {eur(g.goal)}</span></div>
+      <div className="row-baseline"><span className="amount-sm">{eur(g.saved)}</span><span className="caption muted">de {eur(g.goal)}</span></div>
       <ProgressBar value={g.saved / g.goal} />
       <p className={`caption ${g.tone === 'accent' ? 'accent' : g.tone === 'warn' ? 'warn' : 'muted'}`}>{g.line}</p>
-      {g.onAsk && <Button kind="tertiary" onClick={g.onAsk}>Ask about this plan</Button>}
+      {g.onAsk && <Button kind="tertiary" onClick={g.onAsk}>Perguntar sobre este plano</Button>}
     </section>
   )
 }
@@ -77,44 +77,45 @@ export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFr
         {tab === 'home' && <>
           <header className="home-header">
             <span className="avatar">IM</span>
-            <div className="search"><Icon name="search" size={18} /><span>Search</span></div>
+            <div className="search"><Icon name="search" size={18} /><span>Pesquisar</span></div>
           </header>
-          <section className="balance" aria-label="Balance">
+          <p className="greeting">Olá, {ines.customer.name.split(' ')[0]}</p>
+          <section className="balance" aria-label="Saldo">
             <span className="caption muted">{account.name} · EUR</span>
             <span className="amount">{eur(account.balance, 2)}</span>
           </section>
-          <nav className="quick" aria-label="Quick actions">
-            {[['plus', 'Add money'], ['swap', 'Move'], ['target', 'Goals'], ['more', 'More']].map(([i, l]) => (
-              <button key={l}><span className="quick-icon"><Icon name={i} /></span><span className="caption">{l}</span></button>
+          <nav className="quick" aria-label="Ações rápidas">
+            {([['plus', 'Carregar', null], ['swap', 'Transferir', 'payments'], ['target', 'Objetivos', 'savings'], ['more', 'Mais', null]] as const).map(([i, l, to]) => (
+              <button key={l} onClick={() => to && onTab(to)}><span className="quick-icon"><Icon name={i} /></span><span className="caption">{l}</span></button>
             ))}
           </nav>
           {goal && <GoalCard {...goal} />}
-          <TxList title="Recent" items={defaultRecent} />
+          <TxList title="Recentes" items={defaultRecent} />
         </>}
         {tab === 'payments' && <>
-          <h1 className="page-title">Payments</h1>
-          <div className="chips">{['Send', 'Request', 'Pay a bill', 'MB WAY'].map((c) => <button key={c} className="chip">{c}</button>)}</div>
-          <TxList title="October" items={oct} />
+          <h1 className="page-title">Pagamentos</h1>
+          <div className="chips">{['Enviar', 'Pedir', 'Pagar contas', 'MB WAY'].map((c) => <button key={c} className="chip">{c}</button>)}</div>
+          <TxList title="Outubro" items={oct} />
         </>}
         {tab === 'savings' && <>
-          <h1 className="page-title">Savings</h1>
+          <h1 className="page-title">Poupança</h1>
           <section className="card">
-            <div className="row-between"><span className="body-strong">{savingsName}</span><span className="tag">{(savingsRate * 100).toLocaleString('en-IE')}% a year, illustrative</span></div>
-            <p className="caption muted">Take money out any time without losing interest.</p>
+            <div className="row-between"><span className="body-strong">{savingsName}</span><span className="tag">{(savingsRate * 100).toLocaleString('pt-PT')}% por ano, ilustrativo</span></div>
+            <p className="caption muted">Levanta quando quiseres sem perder juros.</p>
           </section>
           {goal ? <GoalCard {...goal} /> : (
             <section className="card empty-goal">
-              <span className="body-strong">No goals yet</span>
-              <p className="muted">Tell AI what you’re saving for. It works out an amount that fits your month, and nothing moves until you approve.</p>
-              <Button onClick={onPlanWithAI}>Plan it with AI</Button>
+              <span className="body-strong">Ainda sem objetivos</span>
+              <p className="muted">Diz à IA para que estás a poupar. Ela calcula um valor que cabe no teu mês, e nada se move sem a tua aprovação.</p>
+              <Button onClick={onPlanWithAI}>Planear com a IA</Button>
             </section>
           )}
         </>}
         {tab === 'cards' && <>
-          <h1 className="page-title">Cards</h1>
+          <h1 className="page-title">Cartões</h1>
           <CardControl frozen={frozen} onToggle={onFreeze} />
           <section className="card list-card">
-            {['Card limits', 'Show PIN', 'Replace card'].map((r) => <button key={r} className="list-line"><span>{r}</span><Icon name="chevron" size={18} /></button>)}
+            {['Limites do cartão', 'Ver PIN', 'Substituir cartão'].map((r) => <button key={r} className="list-line"><span>{r}</span><Icon name="chevron" size={18} /></button>)}
           </section>
         </>}
       </div>
@@ -123,13 +124,13 @@ export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFr
           {toast && <TimedToast key={toast.text} {...toast} />}
           {tab === 'home'
             ? <AssistantPill {...pill} onOpen={onOpen} />
-            : <button className={`sphere-fab ${pill.state}`} onClick={onOpen} aria-label={pill.state === 'idle' ? 'Ask AI' : `AI assistant: ${pill.label ?? ''}`}>
+            : <button className={`sphere-fab ${pill.state}`} onClick={onOpen} aria-label={pill.state === 'idle' ? 'Pergunta à IA' : `Assistente de IA: ${pill.label ?? ''}`}>
                 <AiOrb size={48} state={pill.state === 'working' ? 'thinking' : 'idle'} />{(pill.state === 'nudge' || pill.state === 'ready') && <span className="badge" />}
               </button>}
         </div>
       </div>
-      <nav className="tabbar" aria-label="Main">
-        {([['home', 'home', 'Home'], ['payments', 'swap', 'Payments'], ['savings', 'target', 'Savings'], ['cards', 'card', 'Cards']] as const).map(([id, i, l]) => (
+      <nav className="tabbar" aria-label="Principal">
+        {([['home', 'home', 'Início'], ['payments', 'swap', 'Pagamentos'], ['savings', 'target', 'Poupança'], ['cards', 'card', 'Cartões']] as const).map(([id, i, l]) => (
           <button key={id} className={tab === id ? 'on' : ''} aria-current={tab === id ? 'page' : undefined} onClick={() => onTab(id)}><Icon name={i} size={22} /><span>{l}</span></button>
         ))}
       </nav>
@@ -142,15 +143,15 @@ export function Sheet({ open, onClose, title, busy, onHistory, children }: {
   open: boolean; onClose: () => void; title?: string; busy?: boolean; onHistory: () => void; children: ReactNode
 }) {
   return (
-    <div className={`sheet ${open ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="AI assistant" aria-hidden={!open}>
+    <div className={`sheet ${open ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Assistente de IA" aria-hidden={!open}>
       <div className="statusbar"><span>9:41</span></div>
       <header className="topbar">
-        <button className="icon-btn round" onClick={onClose} aria-label="Close assistant"><Icon name="down" /></button>
+        <button className="icon-btn round" onClick={onClose} aria-label="Fechar assistente"><Icon name="down" /></button>
         <div className="topbar-title">
-          <span className="brand"><AiOrb size={16} state={busy ? 'thinking' : 'idle'} /><span className="body-strong">{title ?? 'AI'}</span></span>
-          <span className="caption muted">AI assistant · can make mistakes</span>
+          <span className="brand"><AiOrb size={16} state={busy ? 'thinking' : 'idle'} /><span className="body-strong">{title ?? 'IA'}</span></span>
+          <span className="caption muted">Assistente de IA · pode cometer erros</span>
         </div>
-        <button className="icon-btn round" onClick={onHistory} aria-label="Chats"><Icon name="history" /></button>
+        <button className="icon-btn round" onClick={onHistory} aria-label="Conversas"><Icon name="history" /></button>
       </header>
       {children}
     </div>
@@ -162,7 +163,7 @@ export function Screen({ title, sub, onBack, children, dock, label }: { title?: 
     <div className="screen" aria-label={label}>
       <div className="statusbar"><span>9:41</span></div>
       {title && <header className="topbar">
-        <button className="icon-btn round" onClick={onBack} aria-label="Back"><Icon name="back" /></button>
+        <button className="icon-btn round" onClick={onBack} aria-label="Voltar"><Icon name="back" /></button>
         <div className="topbar-title"><span className="body-strong">{title}</span>{sub && <span className="caption muted">{sub}</span>}</div>
         <span className="icon-btn" />
       </header>}
@@ -175,7 +176,7 @@ export function Screen({ title, sub, onBack, children, dock, label }: { title?: 
 export function BottomSheet({ children, label, onScrim }: { children: ReactNode; label: string; onScrim?: () => void }) {
   return (
     <div className="bsheet-wrap" role="dialog" aria-modal="true" aria-label={label}>
-      <button className="scrim" aria-label="Close" onClick={onScrim} />
+      <button className="scrim" aria-label="Fechar" onClick={onScrim} />
       <div className="bsheet"><span className="grabber" aria-hidden="true" />{children}</div>
     </div>
   )

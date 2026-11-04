@@ -37,4 +37,4 @@ A calm, straight-talking friend who's good with money. Not a cheerleader, not a 
 - Paused: "Plan paused · No transfers until you resume"
 
 ## Portuguese (PT-PT) notes
-Use "tu"-free neutral forms common in PT banking ("Pode", "o seu") or decide on informal "tu" deliberately (younger brands do). Terms: *poupança*, *objetivo*, *transferência programada*, *subsídio de Natal*, *reembolso de IRS*. Avoid Brazilian forms (*você*, *planejar* → *planear*).
+**Decided 4 Nov 2026: the whole app is in Portuguese (Portugal).** Informal "tu" throughout ("O teu plano", "Diz à IA…"), like younger PT banks and apps; the assistant is called **"IA"** ("Pergunta à IA"). Formats from `Intl pt-PT`: `2360 €` in conversation, `220,00 €` on the review screen, dates `1 dez`, months lowercase (`agosto`, `ago–out`). Terms: *poupança*, *objetivo*, *transferência programada*, *subsídio de Natal*, *reembolso do IRS*. Avoid Brazilian forms (*você*, *planejar* → *planear*, *cadastro*). The same no-AI-isms rule applies in PT: no "Perfeito!", "Vamos lá", "Aqui está", exclamation marks or em dashes in UI copy. The English patterns above stay as the reference for meaning.

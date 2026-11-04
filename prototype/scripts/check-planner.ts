@@ -12,6 +12,6 @@ const w = out.scenarios.j1_what_if[0]; const p2 = plan(w.monthly)
 eq('250 total', p2.total, w.total_by_deadline); eq('250 gap', p2.gap, w.gap); eq('250 short', p2.shortMonths, w.short_months_in_history)
 const s = plan(out.plan.monthly, 'september'); const c = out.scenarios.j1_chosen
 eq('sep total', s.total, c.total_from_transfers); eq('sep scheduled', s.scheduledTotal, c.scheduled_total); eq('sep transfers', s.transfers.length, c.transfers)
-const nums = (t: string) => t.match(/€[\d,]+/g); const g = gapOptions(p); eq('gap option figures', g.map((o) => nums(o.result)), out.gap_options.map((o) => nums(o.result)))
+const nums = (t: string) => (t.match(/\d[\d.,\u00a0\u202f ]*\d|\d/g) ?? []).map((x) => x.replace(/\D/g, '')); const g = gapOptions(p); eq('gap option figures', g.map((o) => nums(o.result)), out.gap_options.map((o) => nums(o.result)))
 console.log(fails.length ? 'FAIL\n' + fails.join('\n') : 'OK: TS planner matches plan-output.json (220, 250, September, gap options)')
 process.exit(fails.length ? 1 : 0)
