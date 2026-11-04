@@ -116,6 +116,31 @@ j3 = {"based_on": "chosen plan (September)", "month": ot["month"], "bill": ot["b
            "short_months_in_history_at_new_monthly": [r["month"] for r in picture if r["margin"] < spread_monthly]},
           {"id": "keep", "label": "Keep it as planned", "buffer_dip": round(max(0, monthly - expected_left), 2)}]}
 
+
+# 9. Spending breakdown for "Where did my money go?" (Aug–Oct). Same fixed/everyday split as section 1.
+# Health is folded into "Other" with no merchant names: the assistant never surfaces health spending (GDPR guardrail).
+GROUPS = [("rent", "Rent", ["rent"], "fixed"), ("bills", "Bills and phone", ["utilities", "phone"], "fixed"),
+          ("transport", "Transport", ["transport", "transport_extra"], "mixed"), ("subscriptions", "Subscriptions", ["subscription"], "fixed"),
+          ("groceries", "Groceries", ["groceries"], "everyday"), ("eating_out", "Eating out", ["eating_out"], "everyday"),
+          ("shopping", "Shopping", ["shopping"], "everyday"), ("travel", "Travel", ["travel"], "everyday"),
+          ("going_out", "Going out", ["leisure"], "everyday"), ("other", "Other", ["health"], "everyday")]
+mlist = [r["month"] for r in picture]
+groups = []
+for gid, label, cats, kind in GROUPS:
+    g_tx = [t for t in tx if t["amount"] < 0 and t["category"] in cats]
+    by_m = {m: round(sum(-t["amount"] for t in g_tx if t["date"][:7] == m), 2) for m in mlist}
+    merch = defaultdict(float)
+    for t in g_tx: merch[t["merchant"]] += -t["amount"]
+    top = [] if gid == "other" else [{"name": k, "total": round(v, 2)} for k, v in sorted(merch.items(), key=lambda x: -x[1])[:3]]
+    groups.append({"id": gid, "label": label, "kind": kind, "total": round(sum(by_m.values()), 2), "by_month": by_m, "count": len(g_tx), "top": top})
+groups.sort(key=lambda g: -g["total"])
+spent_by_month = {m: round(sum(g["by_month"][m] for g in groups), 2) for m in mlist}
+spending = {"months": mlist, "groups": groups, "spent_by_month": spent_by_month, "spent_total": round(sum(spent_by_month.values()), 2),
+            "income_by_month": {r["month"]: r["income"] for r in picture},
+            "everyday_by_month": {r["month"]: r["variable"] for r in picture}, "fixed_avg": fixed_avg,
+            "highest_everyday_month": max(picture, key=lambda r: r["variable"])["month"],
+            "travel_in_highest": next(g for g in groups if g["id"] == "travel")["by_month"][max(picture, key=lambda r: r["variable"])["month"]]}
+
 out = {"generated_from": "data/ines.json", "picture": picture,
        "margin": {"min": min(margins), "max": max(margins), "avg": round(sum(margins) / len(margins), 2)},
        "fixed_avg": fixed_avg, "buffer": buffer,
@@ -125,6 +150,7 @@ out = {"generated_from": "data/ines.json", "picture": picture,
        "projection": proj, "interest": interest, "gap_options": options,
        "side_widgets": {"new_subscriptions_this_summer": new_subs, "new_subscriptions_monthly": round(sum(s["monthly"] for s in new_subs), 2),
                         "roundups_monthly_estimate": roundups},
+       "spending": spending,
        "scenarios": {"j1_what_if": what_if, "j1_chosen": chosen, "j2_christmas_lands": j2, "j3_off_track_month": j3}}
 json.dump(out, open("data/plan-output.json", "w"), ensure_ascii=False, indent=2)
 print(f"Margins {margins} | buffer ok={buffer['ok']} (€{balance:.0f} vs €{fixed_avg:.0f})")

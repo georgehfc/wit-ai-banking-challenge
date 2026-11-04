@@ -21,7 +21,7 @@
 ## Working rules
 
 - Claude builds first drafts in Figma through the Figma MCP, George reviews, changes and owns every decision, and must be able to rework anything live in the 45-minute round. Every AI-generated piece is logged in `ai-log/log.md` with what George changed (changed 3 Nov 2026, at George's request).
-- **Order of work (decided 3 Nov):** scope frozen to J1. George settles the experience hands-on in the code prototype first; then Claude builds the J1 components (list in `plan/04` §3, taken from the code) and the ~6 HERO screens in Figma. Figma screens are wireframes until then. **Hold:** no Figma prototype wiring and no summary slides until George says so. J0, J2–J5 live on page 5 as wireframes for the walkthrough.
+- **Order of work (decided 3 Nov):** scope frozen to J1. George settles the experience hands-on in the code prototype first; then Claude builds the J1 components (list in `plan/04` §3, taken from the code) and the ~6 HERO screens in Figma. Figma screens are wireframes until then. **Hold:** no Figma prototype wiring and no summary slides until George says so. J0, J2–J5 live on page 5 as wireframes for the walkthrough (dropped from the prototype on 4 Nov).
 - Log every AI contribution in `ai-log/` the same day, honestly, including what was wrong or discarded.
 - Facts and numbers need a source (Eurostat, INE, Banco de Portugal, EU law). Mark anything unverified.
 - Keep the scope to one core journey, polished. Breadth shows up as hand-offs ("this is a mortgage question…"), not extra flows.
@@ -37,10 +37,11 @@
 - Image uploads to Figma: the container and the Mac shell can't reach Figma's upload endpoint; go through Claude in Chrome (fetch image → POST to the `upload_assets` submit URL). See `ai-log/learnings.md`.
 - Log every AI contribution in `ai-log/log.md` the same day, including corrections; add process lessons to `ai-log/learnings.md`.
 
-## Three flows (decided 3 Nov 2026)
+## One assistant, three conversations (decided 4 Nov 2026)
 
-- **J1 Save for the holiday** (core; the only deliverable journey): intent → understanding → recommendation → adjust (state change) → gap → review → Face ID → confirmation.
-- **J2 Christmas allowance lands**: proactive message, approve moving €600 to the goal.
-- **J3 Off-track month**: short margin, suggest skipping or lowering one transfer, with undo.
-- J4 (borrowing handoff) and J5 (consent) stay single frames. J2–J5 and J0 (the dormant assistant, entry points) are wireframes on page 5; J1 wiring is on hold.
-- Code: `prototype/` (Vite + React + TS, private repo github.com/georgehfc/wit-ai-banking-challenge). Local dev server only while building; share as a static build. J1 runs end to end (`npm run dev`); planner maths ported to `src/planner.ts`, checked against the Python output with `npm run check:planner`; assistant replies are scripted, no live LLM. The assistant is named just "AI".
+- George re-read the brief and moved the emphasis to the conversation itself. The prototype is one assistant chat with three things it can help with, entered from its own shortcuts: **Save for something** (J1, the core journey: intent → understanding → recommendation → adjust (state change) → gap → review → Face ID → confirmation → back on Home), **Where did my money go?** (spending breakdown) and **Check a message I got** (scam check, freeze card).
+- J0 and J2–J5 are dropped from the prototype. Their wireframes stay on Figma page 5 for the walkthrough.
+- Interaction should feel real: typing indicator, streamed replies, widgets after text, suggested replies above the input, older widgets fold into one-line summaries, scroll anchors on the newest message. Microanimations on; Reduce Motion follows the phone setting.
+- Prototype tweaks: app open (default) or closed (lock-screen notification opens the spending summary), colour mode, reset (Esc too).
+- UI copy: TONE.md, plain, no AI-sounding phrases ("Got it", "Let's", "Here's", em dashes, exclamation marks).
+- Code: `prototype/` (Vite + React + TS, private repo github.com/georgehfc/wit-ai-banking-challenge). `src/assistant.tsx` (conversation engine and the three conversations), `src/chat.tsx` (chat primitives and new widgets), `src/shell.tsx`, `src/components.tsx`, `src/planner.ts` (checked with `npm run check:planner`). Replies are scripted, no live LLM. The assistant is named just "AI".

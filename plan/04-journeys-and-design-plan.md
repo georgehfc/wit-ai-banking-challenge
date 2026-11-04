@@ -41,7 +41,27 @@ Guardrail catches credit → HandoffCard: why the assistant won't suggest borrow
   - Dark mode only if time allows; tokens are ready for it.
 - **Claude Code can**: push tokens.json into Figma variables via the Figma MCP; lint contrast; generate a foundations doc frame.
 
-## 3. Components (page "3 · Components") — only what J1 actually uses
+## 3. Components (page "3 · Components") — only what the prototype actually uses
+
+**4 Nov update:** the prototype is now one assistant with three conversations (save, spending, scam check); J0 and J2–J5 code is gone, so the J2–J5 rows below are kept only for the page 5 wireframes. New, from `src/chat.tsx` and `src/assistant.tsx`:
+
+| Group | Component | Variants / states |
+|---|---|---|
+| Conversation | `AiReply` | typing → streaming → widget (one per assistant turn) |
+| | `TypingDots` | default |
+| | `UserBubble` | text · pasted message (quote, "read as text only") |
+| | `Folded` | closed · open (an older widget as a one-line summary) |
+| | `Suggestions` | suggested replies above the input (same path as typing) |
+| | `IntentInput` | idle · typing · AI replying (send disabled) |
+| Widgets | `SpendingBreakdown` | period Aug–Oct · Aug · Sep · Oct; fixed costs row; top 5 + show more; row expanded (top places) |
+| | `ScamVerdict` | likely scam (reasons + "link not opened") |
+| | `CardControl` | active · frozen (freeze switch) |
+| | `Num` | animated number (tabular) |
+| | `Segmented` | period / tweak switcher |
+| Trust | `BottomSheet` | report confirmation |
+| Brand | `AiOrb` | idle · thinking · listening; soap-bubble shader (WebGL), CSS fallback; sizes 20 / 22 / 32 / 88 |
+| Conversation | `PromptBox` (replaces `IntentInput`) | empty (mic) · typing (send) · replying (stop) · recording (timer + levels) · screenshot attached |
+
 Decided 3 Nov: scope frozen to J1; the list below is taken from the code prototype (`prototype/src/components.tsx`), so Figma builds what the experience really uses. Built in Figma after George settles the experience in code. Code name = Figma name.
 
 | Group | Component | Variants / states used in J1 |

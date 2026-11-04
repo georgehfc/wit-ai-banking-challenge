@@ -25,3 +25,10 @@ Running notes on what worked, what didn't and what changed because of it. Feeds 
 - **No ffmpeg? AVFoundation in a 40-line Swift script** made timestamped contact sheets; 8 images covered 6½ minutes of video.
 - **Don't invent a balance to fill a wireframe.** Later-dated Home screens mask the balance (the hide-balance pattern from SECURITY.md) instead of typing a number the planner never produced.
 
+## 4 Nov 2026
+- **Re-reading the brief changed the emphasis.** "Decide how conversational AI, visual interfaces and familiar app interactions work together" pointed at the conversation, not at more journeys. Three short conversations in one assistant show that better than five separate flows.
+- **Long chats need folding.** Once widgets stack up, the page gets long fast. Folding finished widgets into one-line summaries (and anchoring the scroll on the newest message) kept every step on one screen.
+- **Suggested replies should be the same as typing.** Routing chips and typed text through one function means "Make it €250" works whether you tap or type, which is the brief's "move smoothly between conversation and graphical controls".
+- **Component galleries are inspiration, not drop-ins.** Two pasted components (prompt box, gradient orb) each assumed a stack we don't use and carried hidden costs (hard-coded colours, global CSS that hurts focus rings, a 600 KB 3D library). Porting the idea onto our tokens took less time than adapting the project to them.
+- **StrictMode and WebGL:** don't lose the context in effect cleanup; React mounts twice in development and the second mount gets a dead context.
+

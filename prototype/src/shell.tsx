@@ -1,8 +1,9 @@
 // App chrome shared by every journey: Home (assistant asleep), the assistant sheet, full screens, bottom sheets, lock screen.
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import ines from '../../data/ines.json' with { type: 'json' }
-import { AssistantPill, Button, Icon, IntentInput, ProgressBar, StatusBadge, Toast, type PillState } from './components'
+import { AssistantPill, Button, Icon, PromptBox, ProgressBar, StatusBadge, Toast, type PillState } from './components'
 import { day, eur } from './planner'
+import { AiOrb } from './orb'
 
 export const account = ines.accounts[0]
 export const last4 = account.iban_display.slice(-4)
@@ -89,23 +90,35 @@ function TimedToast(t: { text: string; action?: string; onAction?: () => void })
 }
 
 // The assistant, awake: a full-height sheet over the app. Conversation is children; overlay is a full screen on top.
-export function Sheet({ open, onClose, children, input, overlay, watch }: {
+// Scrolling: a short new message keeps the view at the bottom; a tall one (a widget) is anchored at its top, so the page never jumps past it.
+export function Sheet({ open, onClose, children, input, overlay, watch, above, nudge }: {
   open: boolean; onClose: () => void; children: ReactNode
-  input?: { value: string; onChange: (v: string) => void; onSend: () => void }
-  overlay?: ReactNode; watch?: unknown
+  input: { value: string; onChange: (v: string) => void; onSend: (image?: { url: string; name: string }) => void; busy?: boolean; onStop?: () => void; transcript: () => string }
+  overlay?: ReactNode; watch?: unknown; above?: ReactNode; nudge?: (fn: () => void) => void
 }) {
   const scroller = useRef<HTMLDivElement>(null)
-  useEffect(() => { scroller.current?.scrollTo({ top: scroller.current.scrollHeight }) }, [watch])
+  const anchored = useRef<Element | null>(null)
+  const smart = () => {
+    const el = scroller.current; if (!el) return
+    const lastTurn = el.lastElementChild as HTMLElement | null; if (!lastTurn) return
+    if (lastTurn.offsetHeight > el.clientHeight * 0.6) {
+      if (anchored.current === lastTurn) return
+      anchored.current = lastTurn
+      el.scrollTo({ top: lastTurn.offsetTop - 12, behavior: 'smooth' })
+    } else el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+  }
+  nudge?.(smart)
+  useEffect(() => { smart() }, [watch]) // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <div className={`sheet ${open ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="AI assistant" aria-hidden={!open}>
       <div className="statusbar"><span>9:41</span></div>
       <header className="topbar">
-        <button className="icon-btn" onClick={onClose} aria-label="Close assistant"><Icon name="close" /></button>
-        <div className="topbar-title"><span className="body-strong">AI</span><span className="caption muted">AI assistant · can make mistakes</span></div>
+        <button className="icon-btn" onClick={onClose} aria-label="Close assistant"><Icon name="down" /></button>
+        <div className="topbar-title"><span className="brand"><AiOrb size={20} state={input.busy ? 'thinking' : 'idle'} /><span className="body-strong">AI</span></span><span className="caption muted">AI assistant · can make mistakes</span></div>
         <span className="icon-btn" />
       </header>
       <div className="conversation" ref={scroller} aria-live="polite">{children}</div>
-      <div className="input-dock">{input ? <IntentInput {...input} /> : <IntentInput value="" onChange={() => {}} onSend={() => {}} />}</div>
+      <div className="input-dock">{above}<PromptBox {...input} /></div>
       {overlay}
     </div>
   )

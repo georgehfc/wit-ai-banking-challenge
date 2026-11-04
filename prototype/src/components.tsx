@@ -1,6 +1,7 @@
 // Components used by J1, named as in DESIGN.md / Figma page 3 (code name = Figma name).
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { GOAL, eur, monthShort, type Plan, type GapOption } from './planner'
+import { AiOrb } from './orb'
 
 // ---------- Icons (inline, 24 grid, stroke = currentColor) ----------
 const paths: Record<string, ReactNode> = {
@@ -20,6 +21,11 @@ const paths: Record<string, ReactNode> = {
   more: <><circle cx="6" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="18" cy="12" r="1" /></>,
   alert: <><circle cx="12" cy="12" r="9" /><path d="M12 7.5v5M12 16v.5" /></>,
   ok: <><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.5 2.5L16 9.5" /></>,
+  clip: <path d="M20 11.5l-7.8 7.8a5 5 0 01-7.1-7.1l8.5-8.5a3.3 3.3 0 014.7 4.7l-8.5 8.5a1.7 1.7 0 01-2.4-2.4l7.8-7.8" />,
+  mic: <><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0014 0M12 18v3" /></>,
+  square: <rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor" />,
+  lock: <><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" /></>,
+  phone: <path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z" />,
 }
 export function Icon({ name, size = 20 }: { name: keyof typeof paths | string; size?: number }) {
   return <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>
@@ -48,7 +54,7 @@ export function AssistantPill({ state, label, action, onOpen }: { state: PillSta
   const text = label ?? 'Ask AI'
   return (
     <button className={`pill pill-${state}`} onClick={onOpen} aria-label={state === 'idle' ? 'Ask AI, AI assistant' : `AI assistant: ${text}`}>
-      <span className="pill-glyph"><span className="core" />{(state === 'nudge' || state === 'ready') && <span className="badge" />}</span>
+      <span className="pill-glyph"><AiOrb size={32} state={state === 'working' ? 'thinking' : 'idle'} />{(state === 'nudge' || state === 'ready') && <span className="badge" />}</span>
       <span className="pill-label">{text}</span>
       {action && <span className="pill-action">{action}</span>}
     </button>
@@ -87,12 +93,56 @@ export function StepsReceipt({ steps, onDone, summary = 'Read Aug–Oct · Calcu
   return <button className="steps steps-collapsed" onClick={() => setOpen(true)} aria-label={`Worked for 2 seconds, ${steps.length} steps. Show steps`}><span className="step-dot done"><Icon name="check" size={11} /></span><span className="grow-text">Worked for 2 s · {summary}</span><Icon name="chevron" size={14} /></button>
 }
 
-export function IntentInput({ value, onChange, onSend, placeholder = 'I want to…' }: { value: string; onChange: (v: string) => void; onSend: () => void; placeholder?: string }) {
+// PromptBox: the assistant's input. Text that grows as you type; attach a screenshot (scam check); voice; send ↔ stop.
+// Adapted from a 21st.dev "AI prompt box" to the design system (tokens, light/dark, focus rings kept);
+// its Search/Think/Canvas modes were left out: they mean nothing in a banking assistant.
+export function PromptBox({ value, onChange, onSend, busy = false, onStop, placeholder = 'Ask anything', transcript }: {
+  value: string; onChange: (v: string) => void; onSend: (image?: { url: string; name: string }) => void
+  busy?: boolean; onStop?: () => void; placeholder?: string; transcript: () => string
+}) {
+  const ta = useRef<HTMLTextAreaElement>(null)
+  const file = useRef<HTMLInputElement>(null)
+  const [image, setImage] = useState<{ url: string; name: string } | null>(null)
+  const [rec, setRec] = useState(false)
+  const [secs, setSecs] = useState(0)
+  useEffect(() => { const el = ta.current; if (!el) return; el.style.height = 'auto'; el.style.height = `${Math.min(el.scrollHeight, 120)}px` }, [value])
+  useEffect(() => { if (!rec) return; setSecs(0); const t = setInterval(() => setSecs((x) => x + 1), 1000); return () => clearInterval(t) }, [rec])
+  const has = !!value.trim() || !!image
+  const submit = () => { if (!has || busy) return; onSend(image ?? undefined); setImage(null) }
+  const stopRec = () => { setRec(false); onChange(transcript()); setTimeout(() => ta.current?.focus(), 0) }
+  const pickFile = (f?: File) => { if (!f || !f.type.startsWith('image/')) return; const r = new FileReader(); r.onload = () => setImage({ url: String(r.result), name: f.name }); r.readAsDataURL(f) }
+  const mode = busy ? 'stop' : rec ? 'rec' : has ? 'send' : 'mic'
   return (
-    <form className={`intent ${value ? 'typing' : ''}`} onSubmit={(e) => { e.preventDefault(); if (value.trim()) onSend() }}>
-      <textarea rows={value.length > 38 ? 2 : 1} value={value} placeholder={placeholder} aria-label="Message the AI assistant" onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (value.trim()) onSend() } }} />
-      {value && <button className="send" aria-label="Send"><Icon name="up" size={18} /></button>}
+    <form className={`prompt ${busy ? 'busy' : ''} ${rec ? 'recording' : ''}`} onSubmit={(e) => { e.preventDefault(); submit() }}>
+      {image && !rec && (
+        <div className="prompt-attachments">
+          <span className="thumb"><img src={image.url} alt={`Attached: ${image.name}`} /><button type="button" aria-label="Remove screenshot" onClick={() => setImage(null)}><Icon name="close" size={12} /></button></span>
+          <span className="caption muted">Screenshot attached. Read as text only.</span>
+        </div>
+      )}
+      {rec ? (
+        <div className="prompt-rec" role="status" aria-live="polite">
+          <span className="rec-time"><i />{`0:${String(secs).padStart(2, '0')}`}</span>
+          <span className="rec-bars" aria-hidden="true">{Array.from({ length: 28 }, (_, k) => <i key={k} style={{ animationDelay: `${(k % 7) * 90}ms`, height: `${30 + ((k * 37) % 60)}%` }} />)}</span>
+          <span className="caption muted">Listening… tap stop when you’re done</span>
+        </div>
+      ) : (
+        <textarea ref={ta} rows={1} value={value} placeholder={busy ? 'AI is replying…' : placeholder} aria-label="Message the AI assistant"
+          onChange={(e) => onChange(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit() } }}
+          onPaste={(e) => { const f = [...e.clipboardData.files].find((x) => x.type.startsWith('image/')); if (f) { e.preventDefault(); pickFile(f) } }} />
+      )}
+      <div className="prompt-actions">
+        <span className="prompt-left">
+          {!rec && <button type="button" className="prompt-icon" aria-label="Attach a screenshot" title="Attach a screenshot" onClick={() => file.current?.click()} disabled={busy}><Icon name="clip" size={20} /></button>}
+          <input ref={file} type="file" accept="image/*" hidden onChange={(e) => { pickFile(e.target.files?.[0]); e.target.value = '' }} />
+        </span>
+        <button type={mode === 'send' ? 'submit' : 'button'} className={`prompt-main ${mode}`}
+          aria-label={mode === 'stop' ? 'Stop the reply' : mode === 'rec' ? 'Stop recording' : mode === 'send' ? 'Send' : 'Speak instead'}
+          title={mode === 'stop' ? 'Stop the reply' : mode === 'rec' ? 'Stop recording' : mode === 'send' ? 'Send' : 'Speak instead'}
+          onClick={mode === 'stop' ? onStop : mode === 'rec' ? stopRec : mode === 'mic' ? () => setRec(true) : undefined}>
+          <Icon name={mode === 'stop' ? 'square' : mode === 'rec' ? 'square' : mode === 'send' ? 'up' : 'mic'} size={18} />
+        </button>
+      </div>
     </form>
   )
 }

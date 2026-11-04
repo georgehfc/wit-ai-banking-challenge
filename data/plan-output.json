@@ -149,6 +149,265 @@
     "new_subscriptions_monthly": 17.98,
     "roundups_monthly_estimate": 6.85
   },
+  "spending": {
+    "months": [
+      "2026-08",
+      "2026-09",
+      "2026-10"
+    ],
+    "groups": [
+      {
+        "id": "rent",
+        "label": "Rent",
+        "kind": "fixed",
+        "total": 1725.0,
+        "by_month": {
+          "2026-08": 575.0,
+          "2026-09": 575.0,
+          "2026-10": 575.0
+        },
+        "count": 3,
+        "top": [
+          {
+            "name": "Transfer to landlord · Arroios",
+            "total": 1725.0
+          }
+        ]
+      },
+      {
+        "id": "bills",
+        "label": "Bills and phone",
+        "kind": "fixed",
+        "total": 244.47,
+        "by_month": {
+          "2026-08": 81.49,
+          "2026-09": 81.49,
+          "2026-10": 81.49
+        },
+        "count": 12,
+        "top": [
+          {
+            "name": "EDP Comercial (½ share)",
+            "total": 103.8
+          },
+          {
+            "name": "MEO fibra (½ share)",
+            "total": 67.5
+          },
+          {
+            "name": "Vodafone mobile",
+            "total": 38.97
+          }
+        ]
+      },
+      {
+        "id": "transport",
+        "label": "Transport",
+        "kind": "mixed",
+        "total": 153.41,
+        "by_month": {
+          "2026-08": 51.2,
+          "2026-09": 53.88,
+          "2026-10": 48.33
+        },
+        "count": 8,
+        "top": [
+          {
+            "name": "Navegante metropolitano",
+            "total": 120.0
+          },
+          {
+            "name": "Gira bicicletas",
+            "total": 21.46
+          },
+          {
+            "name": "Bolt",
+            "total": 7.89
+          }
+        ]
+      },
+      {
+        "id": "groceries",
+        "label": "Groceries",
+        "kind": "everyday",
+        "total": 146.24,
+        "by_month": {
+          "2026-08": 36.43,
+          "2026-09": 64.69,
+          "2026-10": 45.12
+        },
+        "count": 12,
+        "top": [
+          {
+            "name": "Lidl",
+            "total": 48.86
+          },
+          {
+            "name": "Mercado de Arroios",
+            "total": 42.27
+          },
+          {
+            "name": "Pingo Doce",
+            "total": 30.1
+          }
+        ]
+      },
+      {
+        "id": "shopping",
+        "label": "Shopping",
+        "kind": "everyday",
+        "total": 108.48,
+        "by_month": {
+          "2026-08": 45.81,
+          "2026-09": 0,
+          "2026-10": 62.67
+        },
+        "count": 4,
+        "top": [
+          {
+            "name": "El Corte Inglés",
+            "total": 41.61
+          },
+          {
+            "name": "Worten",
+            "total": 33.77
+          },
+          {
+            "name": "Fnac",
+            "total": 33.1
+          }
+        ]
+      },
+      {
+        "id": "subscriptions",
+        "label": "Subscriptions",
+        "kind": "fixed",
+        "total": 107.88,
+        "by_month": {
+          "2026-08": 35.96,
+          "2026-09": 35.96,
+          "2026-10": 35.96
+        },
+        "count": 12,
+        "top": [
+          {
+            "name": "Disney+",
+            "total": 29.97
+          },
+          {
+            "name": "Netflix",
+            "total": 29.97
+          },
+          {
+            "name": "Spotify",
+            "total": 23.97
+          }
+        ]
+      },
+      {
+        "id": "travel",
+        "label": "Travel",
+        "kind": "everyday",
+        "total": 106.3,
+        "by_month": {
+          "2026-08": 106.3,
+          "2026-09": 0,
+          "2026-10": 0
+        },
+        "count": 2,
+        "top": [
+          {
+            "name": "MB WAY · Sofia (alojamento Lagos)",
+            "total": 60.0
+          },
+          {
+            "name": "Comboios de Portugal",
+            "total": 46.3
+          }
+        ]
+      },
+      {
+        "id": "eating_out",
+        "label": "Eating out",
+        "kind": "everyday",
+        "total": 99.65,
+        "by_month": {
+          "2026-08": 32.08,
+          "2026-09": 33.84,
+          "2026-10": 33.73
+        },
+        "count": 14,
+        "top": [
+          {
+            "name": "Tasca do Zé",
+            "total": 41.1
+          },
+          {
+            "name": "Time Out Market",
+            "total": 26.94
+          },
+          {
+            "name": "Café O Sol",
+            "total": 15.1
+          }
+        ]
+      },
+      {
+        "id": "going_out",
+        "label": "Going out",
+        "kind": "everyday",
+        "total": 35.95,
+        "by_month": {
+          "2026-08": 10.6,
+          "2026-09": 16.66,
+          "2026-10": 8.69
+        },
+        "count": 3,
+        "top": [
+          {
+            "name": "Fábrica Braço de Prata",
+            "total": 19.29
+          },
+          {
+            "name": "Ticketline",
+            "total": 16.66
+          }
+        ]
+      },
+      {
+        "id": "other",
+        "label": "Other",
+        "kind": "everyday",
+        "total": 20.73,
+        "by_month": {
+          "2026-08": 5.13,
+          "2026-09": 6.59,
+          "2026-10": 9.01
+        },
+        "count": 3,
+        "top": []
+      }
+    ],
+    "spent_by_month": {
+      "2026-08": 980.0,
+      "2026-09": 868.11,
+      "2026-10": 900.0
+    },
+    "spent_total": 2748.11,
+    "income_by_month": {
+      "2026-08": 1130.0,
+      "2026-09": 1148.11,
+      "2026-10": 1130.0
+    },
+    "everyday_by_month": {
+      "2026-08": 247.55,
+      "2026-09": 135.66,
+      "2026-10": 167.55
+    },
+    "fixed_avg": 732.45,
+    "highest_everyday_month": "2026-08",
+    "travel_in_highest": 106.3
+  },
   "scenarios": {
     "j1_what_if": [
       {
