@@ -1,0 +1,126 @@
+# STATES.md · State diagrams
+
+How the stateful parts behave, for developers and AI agents. Written from the code on 4 Nov 2026; each diagram names the file that implements it. Renders on GitHub (Mermaid). If the flow changes, change the diagram in the same commit.
+
+Purely visual components (Button, Row, StatusBadge, ProjectionChart) have no states worth drawing.
+
+---
+
+## 1. The assistant: entry, threads and J1 (`prototype/src/assistant.tsx`, `conversation.tsx`)
+
+How you get in, where you land, and the core journey inside a thread.
+
+```mermaid
+stateDiagram-v2
+  direction TB
+  state "App (any tab)" as App
+  state "Start screen (root)" as Root
+  state "Chats panel" as History
+  state "Thread" as Thread {
+    direction TB
+    [*] --> Understanding: intent ("I want to save €3,000…")
+    Understanding --> Recommendation: steps done · monthly picture
+    Recommendation --> Adjusting: change amount (slider / chips / "make it 250")
+    Adjusting --> Recommendation: new plan card, old one folds
+    Recommendation --> Gap: "What about the gap?"
+    Gap --> Chosen: pick IRS / September / smaller trip
+    Recommendation --> Review: full goal reached
+    Chosen --> Review: Review the plan
+    Review --> Chosen: Not now (nothing moved)
+    Review --> FaceID: Approve with Face ID
+    FaceID --> Confirmed: approved
+    Confirmed --> [*]: Done
+  }
+  [*] --> App
+  App --> Root: tap Ask AI (no chats yet)
+  App --> Thread: tap Ask AI (reopens last chat) · tap "Ready"
+  App --> Thread: tap Alert → new "Aug–Oct summary" chat
+  App --> Thread: lock-screen notification (app closed)
+  App --> Thread: Savings · "Plan it with AI"
+  Root --> Thread: shortcut / typed question / screenshot
+  Root --> Thread: "Your holiday plan" (opens the chat that owns it)
+  Thread --> History: chats button
+  Root --> History: "See all"
+  History --> Root: New chat
+  History --> Thread: open
+  History --> History: rename · delete · clear all
+  Thread --> App: close (chat kept) 
+  Confirmed --> App: Done → Home, goal highlighted, Undo toast
+```
+
+Rules the diagram encodes:
+- One plan per person: asking to save in another chat points to the chat that owns the plan ("Open that chat"), never starts a second one.
+- Closing never loses a chat; deleting a chat never undoes an approval.
+- Money only moves after Review → Face ID. Nothing else in the diagram moves money.
+
+## 2. `AssistantPill` and the sphere button (`components.tsx` · `AssistantPill`, `shell.tsx` · `sphere-fab`)
+
+The assistant asleep. Home shows the full pill; other tabs show only the sphere with the same states (a dot for alert/ready, faster sphere for processing).
+
+```mermaid
+stateDiagram-v2
+  [*] --> Rest
+  Rest --> Processing: a chat is working, sheet closed
+  Processing --> Ready: reply finished while closed
+  Rest --> Alert: event (summary ready)
+  Alert --> Dismissed: ×
+  Dismissed --> Alert: Undo (6 s)
+  Dismissed --> Rest: toast times out
+  Alert --> Open: tap → new summary chat
+  Ready --> Open: tap → that chat
+  Rest --> Open: tap → last chat or start screen
+  Processing --> Open: tap → that chat
+  Open --> Rest: close
+```
+
+Labels: Rest "Ask AI" · Alert "Your Aug–Oct summary is ready · View" · Processing "Working on: <chat>" · Ready "Ready: <chat> · Open".
+
+## 3. `ApprovalRequest` / review (`conversation.tsx` · review screen) — the code-handoff component
+
+```mermaid
+stateDiagram-v2
+  [*] --> Drafted: AI proposes (planner numbers)
+  Drafted --> Reviewing: Review the plan
+  Reviewing --> Drafted: Not now / back (nothing moved)
+  Reviewing --> Authenticating: Approve with Face ID
+  Authenticating --> Reviewing: Face ID fails / cancel
+  Authenticating --> Approved: Face ID OK
+  Approved --> Active: Done (goal on Home)
+  Active --> Cancelled: Undo (6 s)
+  Active --> Paused: Pause my plan
+  Paused --> Active: Resume my plan
+```
+
+What the user signs is exactly what executes: amount, from, to, first and last date, number of transfers (PSD2 dynamic linking, `design/SECURITY.md`). Anything outside the payload (Christmas allowance, holiday allowance) is listed as "Not part of this approval".
+
+## 4. `PromptBox` (`components.tsx` · `PromptBox`)
+
+```mermaid
+stateDiagram-v2
+  [*] --> Empty
+  Empty --> Typing: type / paste text
+  Empty --> Attached: attach or paste a screenshot
+  Typing --> Empty: clear
+  Attached --> Empty: remove
+  Typing --> Replying: send
+  Attached --> Replying: send (starts the message check)
+  Empty --> Recording: mic
+  Recording --> Typing: stop (transcript in the box, never auto-sent)
+  Replying --> Empty: reply finished
+  Replying --> Empty: stop (skips to the end of the reply)
+```
+
+Main button: mic (Empty) · send (Typing/Attached) · stop (Replying, Recording).
+
+---
+
+## Gaps found while drawing these (4 Nov)
+
+Drawing the diagrams from the code turned up these. Fixed ones are marked.
+
+1. **Fixed:** "Save for something" after a plan existed went nowhere ("I can't help with that yet"). Now it opens the plan.
+2. **Fixed:** with several chats, a second "Save for something" would have started a second plan. Now it points to the chat that owns it.
+3. **Open:** Face ID failure has no screen. The diagram shows `Authenticating → Reviewing`, but the prototype always succeeds. Worth one frame (retry / use passcode).
+4. **Open:** "Not now" on review keeps the draft, but nothing reminds Inês later. Decide whether a draft plan should show on Home ("Holiday plan · draft").
+5. **Open:** the alert only covers "summary ready". The other proactive events (money arrived, short month) live in the page 5 wireframes, not in the prototype. That is fine for scope; say so in the walkthrough.
+6. **Open:** Paused is reachable from chat and the goal card, but the confirmation screen no longer offers Pause. Consistent with "one place to manage the plan" (the goal), but check it reads clearly.

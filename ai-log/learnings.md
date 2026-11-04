@@ -32,4 +32,5 @@ Running notes on what worked, what didn't and what changed because of it. Feeds 
 - **Component galleries are inspiration, not drop-ins.** Two pasted components (prompt box, gradient orb) each assumed a stack we don't use and carried hidden costs (hard-coded colours, global CSS that hurts focus rings, a 600 KB 3D library). Porting the idea onto our tokens took less time than adapting the project to them.
 - **StrictMode and WebGL:** don't lose the context in effect cleanup; React mounts twice in development and the second mount gets a dead context.
 - **Shaders made for big cards look stripy at icon size.** The same gradient that melts across 800 px turns into hard bands across 32 px. Uneven gradient stops plus a small blur inside a clipped circle brought back the soft look without changing the shader's character.
+- **Diagrams from the code find gaps.** Writing Mermaid state diagrams straight from the implementation showed states with no exit (a dead-end chip) and a path to a duplicate plan once threads existed. Cheap to write, worth doing before polishing.
 

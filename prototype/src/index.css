@@ -402,3 +402,34 @@ h2.title { margin: 0; }
 /* Layering: Home is its own stacking context, so its floating pill never sits above the assistant sheet. */
 .home { z-index: 0; isolation: isolate; }
 .sheet { z-index: 10; }
+
+/* ---------- threads, root, other pages (4 Nov) ---------- */
+.thread { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.topbar-title .brand { display: inline-flex; align-items: center; gap: 6px; line-height: 20px; }
+.topbar-title .brand .body-strong { line-height: 20px; }
+.topbar-title .brand .orb { width: 16px; height: 16px; transform: translateY(-.5px); }
+.section-head { margin-top: 16px; }
+.link { color: var(--color-text-muted); font: 500 13px/16px var(--font); text-decoration: underline; text-underline-offset: 2px; min-height: 32px; }
+.one-line { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
+.list-row.compact .stack { flex: 1; min-width: 0; }
+.thread-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; max-height: 320px; overflow: auto; }
+.thread-list li { display: flex; align-items: center; gap: 4px; padding: 4px 4px 4px 12px; border-radius: var(--p-radius-md); }
+.thread-list li.on { background: var(--color-surface-raised); }
+.thread-open { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; padding: 6px 0; min-height: 44px; justify-content: center; }
+.icon-btn.small { width: 36px; height: 36px; color: var(--color-text-muted); }
+.icon-btn.small:hover { background: var(--color-surface-raised); color: var(--color-text-default); }
+.rename { flex: 1; min-height: 40px; padding: 0 12px; border-radius: var(--p-radius-sm); border: 1px solid var(--color-accent-default); background: var(--color-surface-default); color: inherit; font: inherit; outline: none; }
+.page-title { font: 700 28px/34px var(--font); letter-spacing: -.4px; margin: 8px 0 0; }
+.empty-goal { gap: 8px; }
+.list-card { padding: 4px 16px; gap: 0; }
+.list-line { display: flex; justify-content: space-between; align-items: center; min-height: 52px; border-bottom: 1px solid var(--color-border-default); text-align: left; }
+.list-line:last-child { border-bottom: 0; }
+.dock-float.compact { left: auto; align-items: flex-end; }
+.dock-float.compact .toast { position: absolute; right: 64px; bottom: 6px; width: 260px; }
+.sphere-fab { position: relative; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--color-surface-default); box-shadow: 0 1px 2px rgb(23 22 20 / 8%), 0 8px 24px rgb(23 22 20 / 14%); transition: transform .2s var(--spring); animation: pop .35s var(--spring); }
+.sphere-fab:active { transform: scale(.92); }
+.sphere-fab .badge { position: absolute; top: 4px; right: 4px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--color-surface-default); background: #fc681e; }
+.sphere-fab.ready .badge { background: var(--color-ai-marker); }
+.sphere-fab.working .orb { box-shadow: 0 0 0 3px var(--color-ai-subtle); }
+
+.home .chip { background: var(--color-surface-default); }
