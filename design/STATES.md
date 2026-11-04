@@ -34,7 +34,8 @@ stateDiagram-v2
   }
   [*] --> App
   App --> Root: tap Ask AI (no chats yet)
-  App --> Search: tap "Pesquisar ou perguntar"
+  App --> Thread: tap the mic (opens listening, in the last chat or the start screen)
+  App --> Search: tap the search button (Home dock)
   Search --> App: result (page, action) · Cancelar
   Search --> Thread: "Perguntar à IA" / Enter (query sent)
   App --> Thread: tap Ask AI (reopens last chat) · tap "Ready"

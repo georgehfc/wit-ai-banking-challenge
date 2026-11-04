@@ -46,7 +46,7 @@
 - Prototype tweaks (hidden drawer): app open (default) or closed (lock-screen notification opens the spending summary), Ask AI mode, colour mode, reset (Esc too).
 - UI copy: TONE.md, plain, no AI-sounding phrases ("Got it", "Let's", "Here's", em dashes, exclamation marks).
 - **Language (decided 4 Nov):** the whole prototype is in Portuguese (Portugal), informal "tu", assistant named "IA", pt-PT formats (2360 €, 220,00 €, 1 dez). See TONE.md.
-- **Search + AI merged (4 Nov, D1 in `design/DECISIONS.md`):** one Home field "Pesquisar ou perguntar": instant non-AI results plus a "Perguntar à IA" row. Must be in the summary slides. Log product decisions in DECISIONS.md.
+- **Search + AI merged (4 Nov, D1 in `design/DECISIONS.md`):** search button bottom-left beside the Ask AI pill (Notion pattern; revised after user feedback), search screen with instant non-AI results plus a "Perguntar à IA" row; the pill mic opens the assistant listening. Must be in the summary slides. Log product decisions in DECISIONS.md.
 - **Stroke rule (4 Nov, D2):** gradient stroke = something to act on; rotating gradient = AI working (`.ai-ring`, `.ai-busy`; Figma `brand/viz-highlight`, `brand/ai-working`). Status badges neutral with coloured icons.
 - **Prototype tweaks** are a hidden drawer (pull left from the right edge, handle, or T). Not part of the product.
 - **Data-viz colour (4 Nov):** charts stay neutral; one element per chart gets the sphere palette (`--grad-v` / `--grad-h`, Figma style `brand/viz-highlight`).

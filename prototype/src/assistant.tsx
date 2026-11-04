@@ -30,6 +30,7 @@ export function Assistant({ startClosed, trigger = 'rest' }: { startClosed: bool
   const [open, setOpen] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
   const [searching, setSearching] = useState(false)
+  const [voice, setVoice] = useState(0)
   const [renaming, setRenaming] = useState<string | null>(null)
   const [rootInput, setRootInput] = useState('')
   const [tab, setTab] = useState<Tab>('home')
@@ -83,10 +84,10 @@ export function Assistant({ startClosed, trigger = 'rest' }: { startClosed: bool
   const unseenThread = threads.find((t) => status[t.id]?.unseen)
   function dismissAlert() { setAlert(false); setToast({ text: 'Dispensado. Fica na IA para quando quiseres.', action: 'Anular', onAction: () => { setAlert(true); setToast(null) } }) }
   const pill: PillProps =
-    alert && !open ? { state: 'nudge', label: 'O teu resumo de ago–out está pronto', action: 'Ver', onDismiss: dismissAlert }
+    alert && !open ? { state: 'nudge', label: 'Resumo de ago–out pronto', action: 'Ver', onDismiss: dismissAlert }
       : busyThread && !open ? { state: 'working', label: `A trabalhar: ${busyThread.title}` }
       : unseenThread && !open ? { state: 'ready', label: `Pronto: ${unseenThread.title}`, action: 'Abrir' }
-      : { state: 'idle' }
+      : { state: 'idle', onVoice: () => { setOpen(true); setTimeout(() => setVoice((v) => v + 1), 420) } }
   const openFromPill = () => {
     if (alert) { setAlert(false); startThread({ proactive: 'spending' }); return }
     if (unseenThread) setActiveId(unseenThread.id)
@@ -142,13 +143,13 @@ export function Assistant({ startClosed, trigger = 'rest' }: { startClosed: bool
             </div>
           </div>
           <div className="input-dock">
-            <PromptBox value={rootInput} onChange={setRootInput} transcript={() => INTENT}
+            <PromptBox value={rootInput} onChange={setRootInput} transcript={() => INTENT} recordSignal={active ? undefined : voice}
               onSend={(img) => { const text = rootInput.trim(); setRootInput(''); if (img) startThread({ image: img.url }); else if (text) shortcut(text) }} />
           </div>
         </div>
         {threads.map((t) => (
           <Conversation key={t.id} id={t.id} active={t.id === activeId} visible={open && t.id === activeId} autostart={t.autostart}
-            account={account} actions={actions} onStatus={onStatus} />
+            account={account} actions={actions} onStatus={onStatus} voice={voice} />
         ))}
         {historyOpen && (
           <BottomSheet label="Conversas" onScrim={() => { setHistoryOpen(false); setRenaming(null) }}>

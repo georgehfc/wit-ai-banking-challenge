@@ -46,8 +46,8 @@ function reaction(p: Plan) {
   return `${head} Coube em ${list(ok)}. Em ${list(short)} ficaria curto.`
 }
 
-export function Conversation({ id, active, visible, autostart, account: acct, actions, onStatus }: {
-  id: string; active: boolean; visible: boolean; autostart?: Autostart
+export function Conversation({ id, active, visible, autostart, account: acct, actions, onStatus, voice }: {
+  id: string; active: boolean; visible: boolean; autostart?: Autostart; voice?: number
   account: Account; actions: Actions; onStatus: (id: string, s: ThreadStatus) => void
 }) {
   const [turns, setTurns] = useState<Turn[]>([])
@@ -326,7 +326,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
       <div className="conversation" ref={scroller} aria-live="polite">{turns.map(renderTurn)}</div>
       <div className="input-dock">
         <Suggestions items={suggestions} onPick={(s) => send(s)} />
-        <PromptBox value={input} onChange={setInput} onSend={(img) => send(input, img)} busy={busy}
+        <PromptBox value={input} onChange={setInput} onSend={(img) => send(input, img)} busy={busy} recordSignal={active ? voice : undefined}
           onStop={() => { skipRef.current = true; setSkipping(true) }}
           transcript={() => suggestions[0] && !/^(colar|denunciar)/i.test(suggestions[0]) ? suggestions[0] : SPEND} />
       </div>

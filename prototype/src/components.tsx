@@ -58,15 +58,16 @@ export function Toast({ text, action, onAction }: { text: string; action?: strin
 // Glass pill with a shimmer travelling round its border (adapted from a 21st.dev glassmorphism CTA, in plain CSS).
 export type PillState = 'idle' | 'nudge' | 'working' | 'ready'
 // Modes: rest (idle) · alert (nudge, dismissible) · processing (working) · ready (answer waiting).
-export function AssistantPill({ state, label, action, onOpen, onDismiss }: { state: PillState; label?: string; action?: string; onOpen: () => void; onDismiss?: () => void }) {
+export function AssistantPill({ state, label, action, onOpen, onDismiss, onVoice }: { state: PillState; label?: string; action?: string; onOpen: () => void; onDismiss?: () => void; onVoice?: () => void }) {
   const text = label ?? 'Pergunta à IA'
   return (
     <div className={`pill pill-${state} ai-ring${state === 'working' ? ' ai-busy' : ''}`}>
       <button className="pill-main" onClick={onOpen} aria-label={state === 'idle' ? 'Pergunta à IA, assistente de IA' : `Assistente de IA: ${text}${action ? `. ${action}` : ''}`}>
         <span className="pill-glyph"><AiOrb size={32} state={state === 'working' ? 'thinking' : 'idle'} />{(state === 'nudge' || state === 'ready') && <span className="badge" />}</span>
         <span className="pill-label">{text}</span>
-        {action ? <span className="pill-action">{action}</span> : state === 'idle' ? <span className="pill-spark" aria-hidden="true"><Icon name="mic" size={16} /></span> : null}
+        {action && <span className="pill-action">{action}</span>}
       </button>
+      {state === 'idle' && onVoice && <button className="pill-spark pill-voice" onClick={onVoice} aria-label="Falar com a IA" title="Falar com a IA"><Icon name="mic" size={16} /></button>}
       {onDismiss && <button className="pill-dismiss" onClick={onDismiss} aria-label="Dispensar"><Icon name="close" size={16} /></button>}
     </div>
   )
@@ -107,9 +108,9 @@ export function StepsReceipt({ steps, onDone, summary = 'Read Aug–Oct · Calcu
 // PromptBox: the assistant's input. Text that grows as you type; attach a screenshot (scam check); voice; send ↔ stop.
 // Adapted from a 21st.dev "AI prompt box" to the design system (tokens, light/dark, focus rings kept);
 // its Search/Think/Canvas modes were left out: they mean nothing in a banking assistant.
-export function PromptBox({ value, onChange, onSend, busy = false, onStop, placeholder = 'Pergunta o que quiseres', transcript }: {
+export function PromptBox({ value, onChange, onSend, busy = false, onStop, placeholder = 'Pergunta o que quiseres', transcript, recordSignal }: {
   value: string; onChange: (v: string) => void; onSend: (image?: { url: string; name: string }) => void
-  busy?: boolean; onStop?: () => void; placeholder?: string; transcript: () => string
+  busy?: boolean; onStop?: () => void; placeholder?: string; transcript: () => string; recordSignal?: number
 }) {
   const ta = useRef<HTMLTextAreaElement>(null)
   const file = useRef<HTMLInputElement>(null)
@@ -117,6 +118,7 @@ export function PromptBox({ value, onChange, onSend, busy = false, onStop, place
   const [rec, setRec] = useState(false)
   const [secs, setSecs] = useState(0)
   useEffect(() => { const el = ta.current; if (!el) return; el.style.height = 'auto'; el.style.height = `${Math.min(el.scrollHeight, 120)}px` }, [value])
+  useEffect(() => { if (recordSignal) setRec(true) }, [recordSignal])
   useEffect(() => { if (!rec) return; setSecs(0); const t = setInterval(() => setSecs((x) => x + 1), 1000); return () => clearInterval(t) }, [rec])
   const has = !!value.trim() || !!image
   const submit = () => { if (!has || busy) return; onSend(image ?? undefined); setImage(null) }

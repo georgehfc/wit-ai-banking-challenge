@@ -21,7 +21,7 @@ export const defaultRecent: TxItem[] = tx
   .map((t) => ({ initial: t.merchant[0], title: pretty(t.merchant), sub: day(t.date), amount: t.amount }))
 
 export type Tab = 'home' | 'payments' | 'savings' | 'cards'
-export type PillProps = { state: PillState; label?: string; action?: string; onDismiss?: () => void }
+export type PillProps = { state: PillState; label?: string; action?: string; onDismiss?: () => void; onVoice?: () => void }
 export type GoalCardProps = {
   saved: number; goal: number; status: { kind: 'positive' | 'warning'; label: string }
   line: string; tone?: 'muted' | 'accent' | 'warn'; highlight?: boolean; onAsk?: () => void
@@ -77,9 +77,8 @@ export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFr
         {tab === 'home' && <>
           <header className="home-header">
             <span className="avatar">IM</span>
-            <button className="search" onClick={onSearch} aria-label="Pesquisar ou perguntar"><Icon name="search" size={18} /><span>Pesquisar ou perguntar</span><span className="search-orb"><AiOrb size={18} /></span></button>
+            <span className="greeting-inline">Olá, {ines.customer.name.split(' ')[0]}</span>
           </header>
-          <p className="greeting">Olá, {ines.customer.name.split(' ')[0]}</p>
           <section className="balance" aria-label="Saldo">
             <span className="caption muted">{account.name} · EUR</span>
             <span className="amount">{eur(account.balance, 2)}</span>
@@ -123,7 +122,10 @@ export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFr
         <div className={`dock-float ${tab === 'home' ? '' : 'compact'}`}>
           {toast && <TimedToast key={toast.text} {...toast} />}
           {tab === 'home'
-            ? <AssistantPill {...pill} onOpen={onOpen} />
+            ? <div className={`home-dock ${pill.state === 'nudge' ? 'alerting' : ''}`}>
+                <button className="search-fab" onClick={onSearch} aria-label="Pesquisar" title="Pesquisar" tabIndex={pill.state === 'nudge' ? -1 : 0}><Icon name="search" size={20} /></button>
+                <AssistantPill {...pill} onOpen={onOpen} />
+              </div>
             : <button className={`sphere-fab ${pill.state} ai-ring${pill.state === 'working' ? ' ai-busy' : ''}`} onClick={onOpen} aria-label={pill.state === 'idle' ? 'Pergunta à IA' : `Assistente de IA: ${pill.label ?? ''}`}>
                 <AiOrb size={48} state={pill.state === 'working' ? 'thinking' : 'idle'} />{(pill.state === 'nudge' || pill.state === 'ready') && <span className="badge" />}
               </button>}

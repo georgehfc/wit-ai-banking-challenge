@@ -21,6 +21,8 @@ Decisions that change the product's shape, with the reasoning, so they can be de
 
 ## D1 · One field for search and the AI (4 Nov 2026)
 
+**Revision (4 Nov, evening, George).** People shown the merged field were confused by "two searches" (the header field and the Ask AI pill). Moved to Notion's pattern: no field in the header; a **search button bottom-left** beside the **Ask AI pill** (sphere thumbnail · "Pergunta à IA" · mic). The mic is the right-hand accelerator because voice is the one shortcut that means something here; it opens the assistant already listening. In an alert the search button steps aside so the message and × fit; the alert label is shortened to "Resumo de ago–out pronto". The rest of D1 stands: search results stay instant and non-AI, with one "Perguntar à IA" row.
+
 **Decision (George).** Home keeps one input, **"Pesquisar ou perguntar"**. As you type, exact results appear instantly (payments, places in the app) with no AI involved. One row, **"Perguntar à IA"**, opens the assistant with the query already sent. It comes first when the query reads as a question ("quanto…", "posso…", "?"), last when it looks like a lookup ("EDP").
 
 **The question.** Home had a search bar *and* an Ask AI pill: two inputs that compete ("which one do I use?"). Should the search bar go, with every query going to the AI?
@@ -40,7 +42,7 @@ Decisions that change the product's shape, with the reasoning, so they can be de
 **Why merge.** It keeps search's speed, certainty and the no-AI path, and still leaves one input. The AI isn't a separate destination; it's what search grows into when a lookup isn't enough. Same pattern as Notion's and Raycast's command bars.
 
 **In the prototype** (`prototype/src/search.tsx`)
-- Home header field "Pesquisar ou perguntar" with the sphere at its end.
+- ~~Home header field "Pesquisar ou perguntar"~~ → search button in the bottom dock (revision above).
 - Empty state: lookups to try (Continente, EDP, MB WAY, Congelar cartão) and three AI questions.
 - Results: "Na app" (pages and actions), "Movimentos · ago–out" (count and total), "Perguntar à IA" row.
 - Footer: "Os resultados aparecem logo e não usam IA. Só 'Perguntar à IA' abre uma conversa."

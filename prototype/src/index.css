@@ -575,3 +575,15 @@ h2.title { margin: 0; }
   .tweaks-handle .tweaks-label { display: inline; }
   .tweaks-handle kbd { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 6px; background: var(--color-surface-raised); border: 1px solid var(--color-border-default); font: 600 11px/1 var(--font); color: var(--color-text-muted); }
 }
+
+/* Home dock (Notion pattern, 4 Nov): search button bottom-left, Ask AI pill with the sphere and the mic. The search steps aside while an alert needs the room. */
+.greeting-inline { font: 600 15px/20px var(--font); color: var(--color-text-default); }
+.home-dock { display: flex; align-items: center; gap: 8px; }
+.home-dock .pill { flex: 1; min-width: 0; }
+.search-fab { width: 52px; height: 52px; flex: none; border-radius: 50%; display: grid; place-items: center; background: rgb(255 255 255 / 86%); border: 1px solid var(--color-border-default); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: 0 1px 2px rgb(23 22 20 / 8%), 0 8px 24px rgb(23 22 20 / 14%); color: var(--color-text-default); transition: width .3s var(--spring), margin .3s var(--spring), opacity .2s, transform .12s var(--ease); }
+.search-fab:active { transform: scale(.94); }
+.home-dock.alerting .search-fab { width: 0; margin-right: -8px; opacity: 0; border-width: 0; pointer-events: none; overflow: hidden; }
+:root[data-theme='dark'] .search-fab { background: rgb(23 22 20 / 82%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .search-fab { background: rgb(23 22 20 / 82%); } }
+.pill-voice { margin-right: 11px; flex: none; position: relative; z-index: 2; transition: transform .12s var(--ease); }
+.pill-voice:active { transform: scale(.9); }
