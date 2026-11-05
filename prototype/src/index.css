@@ -704,3 +704,6 @@ h2.title { margin: 0; }
 /* Chat: the last message scrolls clear of the input fade (a spacer, since Safari ignores flex padding-bottom) (5 Nov) */
 .conversation::after { content: ''; flex: none; height: 28px; }
 .input-dock::before { top: -28px; height: 28px; }
+/* More air between the goal label and its dashed line (George, 5 Nov) */
+.chart { margin-top: 30px; }
+.goal-line span { top: -24px; line-height: 14px; }

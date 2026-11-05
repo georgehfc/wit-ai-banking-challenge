@@ -132,7 +132,7 @@ export function SpendingBreakdown({ month, onMonth }: { month: string; onMonth: 
         ))}
       </ul>
       {rows.length > 5 && <button className="btn btn-tertiary" onClick={() => setAll(!all)}>{all ? 'Mostrar menos' : `Mostrar mais ${rows.length - 5}`}</button>}
-      <p className="caption muted">A tua conta à ordem, ago–out. Toca numa linha para ver onde.</p>
+      
     </div>
   )
 }
