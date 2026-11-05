@@ -621,3 +621,63 @@ h2.title { margin: 0; }
 .dock:has(.dock-float.compact)::before { display: none; }
 /* Chats panel rows: 8 px between the title and the row actions (George, Figma ThreadRow) */
 .thread-list li { gap: var(--p-space-2); }
+
+/* ===================== Native iOS structure + motion (5 Nov) ===================== */
+:root { --sb: 54px; --bar: 52px; --tab-h: 77px; --ios: cubic-bezier(.32, .72, 0, 1); --ios-out: cubic-bezier(.22, 1, .36, 1); }
+@media (max-width: 500px) {
+  :root { --sb: max(env(safe-area-inset-top), 12px); --tab-h: calc(50px + max(env(safe-area-inset-bottom), 16px)); }
+  html, body { overflow: hidden; overscroll-behavior: none; }
+  .stage { height: 100dvh; overflow: hidden; }
+}
+.phone { background: #0b0a09; }
+
+/* Bank pages: pinned app bar, large title, content under translucent bars */
+.home { position: absolute; inset: 0; display: block; overflow: hidden; background: var(--color-surface-raised); transform-origin: 50% 0; transition: transform .55s var(--ios), border-radius .55s var(--ios), filter .55s var(--ios); }
+.home.behind { transform: translateY(calc(var(--sb) - 2px)) scale(.92); border-radius: 14px; filter: brightness(.78); }
+.appbar { position: absolute; top: 0; left: 0; right: 0; z-index: 3; transition: background-color .25s var(--ease), box-shadow .25s var(--ease), backdrop-filter .25s; }
+.appbar .statusbar { height: var(--sb); }
+.appbar.scrolled { background: color-mix(in srgb, var(--color-surface-raised) 76%, transparent); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); box-shadow: 0 .5px 0 var(--color-border-default); }
+.appbar-row { height: var(--bar); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+.appbar-title { font: 600 17px/22px var(--font); opacity: 0; transform: translateY(8px); transition: opacity .22s var(--ease), transform .35s var(--ios); }
+.appbar.titled .appbar-title { opacity: 1; transform: none; }
+.appbar-side { width: 36px; }
+.home-scroll { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding: calc(var(--sb) + var(--bar)) 16px calc(var(--tab-h) + 104px); display: flex; flex-direction: column; gap: 16px; animation: tab-in .38s var(--ios) both; scrollbar-width: none; }
+.home-scroll::-webkit-scrollbar { display: none; }
+.large-title { font: 700 32px/38px var(--font); letter-spacing: -.6px; margin: 0 0 -4px; }
+.balance { padding-top: 4px; }
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; min-height: var(--tab-h); background: color-mix(in srgb, var(--color-surface-default) 80%, transparent); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); border-top: .5px solid var(--color-border-default); }
+.tabbar button { transition: color .2s var(--ease), transform .15s var(--ease); }
+.tabbar button:active { transform: scale(.92); }
+.dock { position: absolute; left: 0; right: 0; bottom: var(--tab-h); height: 0; z-index: 4; }
+.dock::before { bottom: 0; height: 88px; background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--color-surface-raised) 85%, transparent)); }
+@keyframes tab-in { from { opacity: 0; transform: translateY(10px); } }
+
+/* Assistant: iOS page sheet over the scaled-back app */
+.modal-status { position: absolute; top: 0; left: 0; right: 0; height: var(--sb); padding: 18px 32px 0; color: #fff; font-weight: 600; z-index: 9; opacity: 0; transition: opacity .3s var(--ease); pointer-events: none; }
+.modal-status.on { opacity: 1; }
+@media (max-width: 500px) { .modal-status { font-size: 0; } }
+.sheet { top: calc(var(--sb) + 10px); border-radius: 14px 14px 0 0; overflow: hidden; transition: transform .55s var(--ios), visibility 0s .55s; box-shadow: 0 -10px 40px rgb(0 0 0 / 28%); }
+.sheet.open { transition: transform .55s var(--ios), visibility 0s; }
+.sheet > .statusbar { display: none; }
+.sheet::before { content: ''; position: absolute; top: 6px; left: 50%; width: 36px; height: 5px; border-radius: 3px; transform: translateX(-50%); background: var(--color-border-default); z-index: 6; }
+.sheet > .topbar { padding-top: 14px; transition: transform .55s var(--ios), opacity .4s var(--ease); }
+.sheet .screen { border-radius: inherit; animation: push .55s var(--ios) both; box-shadow: -12px 0 32px rgb(0 0 0 / 10%); }
+.sheet .screen > .statusbar { height: 14px; font-size: 0; padding: 0; }
+.thread > .conversation, .thread > .input-dock { transition: transform .55s var(--ios), opacity .45s var(--ease); }
+.thread.pushed > .conversation, .thread.pushed > .input-dock, .sheet:has(.thread.pushed) > .topbar { transform: translateX(-26%); opacity: .45; }
+@keyframes push { from { transform: translateX(100%); } }
+
+/* Search: slides up into place */
+.search-screen { animation: search-in .42s var(--ios) both; }
+@keyframes search-in { from { opacity: 0; transform: translateY(16px); } }
+
+/* Bottom sheets and scrims: spring up, fade in */
+.bsheet { animation: sheet-up .5s var(--ios) both; }
+.scrim, .tweaks-scrim { animation: fade .3s var(--ease) both; }
+@keyframes sheet-up { from { transform: translateY(100%); } }
+
+/* Softer message and toast motion */
+.msg-user, .msg-ai, .widget-in, .toast, .steps { animation-duration: .42s; animation-timing-function: var(--ios); }
+@keyframes rise { from { opacity: 0; transform: translateY(10px) scale(.985); } }
+.folded-body { animation: rise .35s var(--ios); }
+.btn, .chip, .shortcut-card, .list-row, .list-line, .search-fab, .sphere-fab { transition-timing-function: var(--ios); }

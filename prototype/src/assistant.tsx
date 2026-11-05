@@ -118,8 +118,9 @@ export function Assistant({ startClosed, trigger = 'rest' }: { startClosed: bool
 
   return (
     <div className="app-launch">
-      <AppScreens tab={tab} onTab={setTab} pill={pill} toast={toast} onOpen={openFromPill} goal={goalCard}
+      <AppScreens behind={open} tab={tab} onTab={setTab} pill={pill} toast={toast} onOpen={openFromPill} goal={goalCard}
         frozen={frozen} onFreeze={() => setFrozen((f) => !f)} onPlanWithAI={() => shortcut(SAVE)} onSearch={() => setSearching(true)} />
+      <div className={`modal-status ${open ? 'on' : ''}`} aria-hidden="true"><span>9:41</span></div>
       {searching && <SearchScreen onClose={() => setSearching(false)} onGo={(t) => { setSearching(false); setTab(t) }}
         onAsk={(q) => { setSearching(false); shortcut(q); setOpen(true) }} />}
       <Sheet open={open} onClose={() => setOpen(false)} title={active ? active.title : undefined} busy={!!(active && status[active.id]?.busy)} onHistory={() => setHistoryOpen(true)}>

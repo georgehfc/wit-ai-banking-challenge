@@ -322,7 +322,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
   )
 
   return (
-    <div className="thread" style={{ display: active ? 'flex' : 'none' }}>
+    <div className={`thread ${view !== 'chat' ? 'pushed' : ''}`} style={{ display: active ? 'flex' : 'none' }}>
       <div className="conversation" ref={scroller} aria-live="polite">{turns.map(renderTurn)}</div>
       <div className="input-dock">
         <Suggestions items={suggestions} onPick={(s) => send(s)} />

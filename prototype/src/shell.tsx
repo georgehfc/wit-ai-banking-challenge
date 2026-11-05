@@ -64,21 +64,30 @@ function TimedToast(t: { text: string; action?: string; onAction?: () => void })
   return on ? <Toast {...t} /> : null
 }
 
-export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFreeze, onPlanWithAI, onSearch }: {
+export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFreeze, onPlanWithAI, onSearch, behind }: {
   tab: Tab; onTab: (t: Tab) => void; pill: PillProps; goal?: GoalCardProps | null
   toast?: null | { text: string; action?: string; onAction?: () => void }
-  onOpen: () => void; frozen: boolean; onFreeze: () => void; onPlanWithAI: () => void; onSearch: () => void
+  onOpen: () => void; frozen: boolean; onFreeze: () => void; onPlanWithAI: () => void; onSearch: () => void; behind?: boolean
 }) {
+  // Native iOS structure: pinned app bar (compact title fades in once the large title scrolls away), content under translucent bars.
+  const [y, setY] = useState(0)
+  useEffect(() => setY(0), [tab])
+  const first = ines.customer.name.split(' ')[0]
+  const title = tab === 'home' ? `Olá, ${first}` : tab === 'payments' ? 'Pagamentos' : tab === 'savings' ? 'Poupança' : 'Cartões'
   const oct = tx.filter((t) => t.date.startsWith('2026-10')).slice(0, 8).map((t) => ({ initial: t.merchant[0], title: pretty(t.merchant), sub: day(t.date), amount: t.amount }))
   return (
-    <div className="home">
-      <div className="statusbar"><span>9:41</span></div>
-      <div className="home-scroll" key={tab}>
+    <div className={`home ${behind ? 'behind' : ''}`}>
+      <header className={`appbar ${y > 4 ? 'scrolled' : ''} ${y > 44 ? 'titled' : ''}`}>
+        <div className="statusbar"><span>9:41</span></div>
+        <div className="appbar-row">
+          <span className="avatar" aria-label={`Perfil de ${ines.customer.name}`}>IM</span>
+          <span className="appbar-title" aria-hidden={y <= 44}>{title}</span>
+          <span className="appbar-side" aria-hidden="true" />
+        </div>
+      </header>
+      <div className="home-scroll" key={tab} onScroll={(e) => setY((e.target as HTMLElement).scrollTop)}>
+        <h1 className="large-title">{title}</h1>
         {tab === 'home' && <>
-          <header className="home-header">
-            <span className="avatar">IM</span>
-            <span className="greeting-inline">Olá, {ines.customer.name.split(' ')[0]}</span>
-          </header>
           <section className="balance" aria-label="Saldo">
             <span className="caption muted">{account.name} · EUR</span>
             <span className="amount">{eur(account.balance, 2)}</span>
@@ -92,12 +101,10 @@ export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFr
           <TxList title="Recentes" items={defaultRecent} />
         </>}
         {tab === 'payments' && <>
-          <h1 className="page-title">Pagamentos</h1>
           <div className="chips">{['Enviar', 'Pedir', 'Pagar contas', 'MB WAY'].map((c) => <button key={c} className="chip">{c}</button>)}</div>
           <TxList title="Outubro" items={oct} />
         </>}
         {tab === 'savings' && <>
-          <h1 className="page-title">Poupança</h1>
           <section className="card">
             <div className="row-between"><span className="body-strong">{savingsName}</span><span className="tag">{(savingsRate * 100).toLocaleString('pt-PT')}% por ano, ilustrativo</span></div>
             <p className="caption muted">Levanta quando quiseres sem perder juros.</p>
@@ -111,7 +118,6 @@ export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFr
           )}
         </>}
         {tab === 'cards' && <>
-          <h1 className="page-title">Cartões</h1>
           <CardControl frozen={frozen} onToggle={onFreeze} />
           <section className="card list-card">
             {['Limites do cartão', 'Ver PIN', 'Substituir cartão'].map((r) => <button key={r} className="list-line"><span>{r}</span><span className="chev"><Icon name="chevron" size={20} /></span></button>)}
