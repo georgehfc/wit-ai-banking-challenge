@@ -37,7 +37,7 @@ type ScamStage = 'paste' | 'verdict' | 'tapped' | 'safe' | 'entered' | 'reported
 export const SAVE = 'Poupar para algo', SPEND = 'Para onde foi o meu dinheiro?', CHECK = 'Verificar uma mensagem'
 export const SHORTCUTS: [string, string][] = [[SAVE, 'Encontra um valor que cabe no teu mês'], [SPEND, 'Os teus últimos 3 meses por categoria'], [CHECK, 'Descobre se um SMS ou email é mesmo do banco']]
 const KEEP = 'Manter o plano como está'
-export const CREDIT_Q = 'Posso pedir emprestados os 640 € para ir em julho na mesma?'
+export const CREDIT_Q = `Posso pedir emprestados os ${eur(plan(SUGGESTED).gap)} para ir em julho na mesma?`
 const SAVE_RE = /poup|guardar|férias|viagem|sav|holiday|€|\d/i
 
 function reaction(p: Plan) {

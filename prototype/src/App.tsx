@@ -1,18 +1,21 @@
 import { useEffect, useRef, useState } from 'react'
 import { Assistant, type Journey, type Trigger } from './assistant'
+import out from '../../data/plan-output.json' with { type: 'json' }
+import { eur } from './planner'
+const S = out.scenarios
 
 // Prototype tweaks, hidden like an admin drawer: pull left from the right edge, tap the handle, or press T.
 // Changes apply at once; "Voltar ao fluxo", the scrim, a swipe right or Esc closes it. Esc with the drawer closed resets.
 const JOURNEYS: [Journey, string, string][] = [
   ['j0', 'J0 · Primeiro uso', 'Introdução e consentimento (início)'],
   ['j1', 'J1 · Poupar para algo', 'A jornada principal'],
-  ['j2', 'J2 · Chega o subsídio de Natal', 'Aprovar 600 € para Férias'],
+  ['j2', 'J2 · Chega o subsídio de Natal', `Aprovar ${eur(S.j2_christmas_lands.to_goal)} para Férias`],
   ['j3', 'J3 · Mês apertado', 'A IA vê um pagamento e propõe mudar janeiro'],
   ['j4', 'J4 · Pedir crédito', 'Passagem para uma pessoa'],
 ]
 const JOURNEY_HINT: Partial<Record<Journey, string>> = {
   j2: 'Dezembro: o subsídio chegou. Toca no alerta do Início (ou começa com a app fechada para ver a notificação).',
-  j3: '28 dez: pagaste 180 € na Worten. Toca no alerta do Início para rever janeiro.',
+  j3: `28 dez: pagaste ${eur(S.j3_off_track_month.bill.amount)} na ${S.j3_off_track_month.bill.merchant}. Toca no alerta do Início para rever janeiro.`,
   j4: 'Abre uma conversa a pedir crédito. Também acontece em J1, na diferença: “Posso pedir emprestado?”.',
   j0: 'Primeiro toque no botão da IA: introdução, depois o pedido de acesso à conta.',
 }
