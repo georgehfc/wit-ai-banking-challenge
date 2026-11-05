@@ -4,6 +4,16 @@ Decisions that change the product's shape, with the reasoning, so they can be de
 
 ---
 
+## D3 · Light grey neutrals instead of beige (5 Nov 2026)
+
+**Decision (George).** Someone he showed it to said the beige background looked "too much like AI" (the warm, creamy palette many AI products use). Neutrals and the ink accent moved to light, slightly cool greys: canvas `#F4F5F7`, borders `#E2E4E8`, muted text `#666A72`, ink `#16171A`; chart greys followed. Brand colours (the sphere's gradient, orange, gold, blue) are unchanged, so colour still means "AI" only where the sphere or a gradient stroke appears.
+
+**Checked.** Every text and UI pair re-checked for WCAG AA in light and dark (muted text 5.4:1 on white, 5.0:1 on the canvas; chart greys 3.6:1 and 6.6:1).
+
+**Where.** `design/tokens/tokens.json` → `tokens.css`; hard-coded greys in `index.css`; Figma Primitives (neutral, accent, chart) plus 40 unbound fills, effect tints and gradient stops; docs.
+
+---
+
 ## D2 · Gradient stroke = where the AI acts (4 Nov 2026)
 
 **Decision (George).** On the assistant's components, a gradient stroke marks something for you to act on, and a rotating gradient stroke marks the AI working. Plain border = idle input.
@@ -58,6 +68,6 @@ Decisions that change the product's shape, with the reasoning, so they can be de
 
 - Scope frozen to J1 plus two supporting conversations in one assistant (3–4 Nov) · `CLAUDE.md`
 - Assistant named "IA", whole app in Portuguese (Portugal), informal "tu" (4 Nov) · `TONE.md`
-- Visual direction: creamy neutrals, grainy gradient sphere, gradient only on one highlighted element per chart and on callouts (4 Nov) · `DESIGN.md`, `CLAUDE.md`
+- Visual direction: grainy gradient sphere on light grey neutrals (beige until D3), gradient only on one highlighted element per chart and on callouts (4 Nov) · `DESIGN.md`, `CLAUDE.md`
 - Face ID failure only in Figma; no reminder for "Agora não"; other proactive alerts as wireframes; Pause stays (4 Nov) · `STATES.md`
 - One plan per person, owned by one chat (4 Nov) · `STATES.md`
