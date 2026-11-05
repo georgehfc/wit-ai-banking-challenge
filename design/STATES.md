@@ -69,7 +69,7 @@ stateDiagram-v2
   Processing --> Ready: reply finished while closed
   Rest --> Alert: event (summary ready)
   Alert --> Dismissed: ×
-  Dismissed --> Alert: Undo (6 s)
+  Dismissed --> Alert: Undo (10 s, paused while focused)
   Dismissed --> Rest: toast times out
   Alert --> Open: tap → new summary chat
   Ready --> Open: tap → that chat
@@ -93,7 +93,7 @@ stateDiagram-v2
   Authenticating --> Reviewing: Face ID fails / cancel
   Authenticating --> Approved: Face ID OK
   Approved --> Active: Done (goal on Home)
-  Active --> Cancelled: Undo (6 s)
+  Active --> Cancelled: Undo (10 s, paused while focused)
   Active --> Paused: Pause my plan
   Paused --> Active: Resume my plan
 ```

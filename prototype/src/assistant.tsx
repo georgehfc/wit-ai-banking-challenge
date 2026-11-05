@@ -153,7 +153,7 @@ export function Assistant({ startClosed, trigger = 'rest', journey = 'j0' }: { s
 
   return (
     <div className="app-launch">
-      <AppScreens behind={open} tab={tab} onTab={setTab} pill={pill} toast={toast} onOpen={openFromPill} goal={goalCard}
+      <AppScreens behind={open} covered={searching || consent === 'intro'} tab={tab} onTab={setTab} pill={pill} toast={toast} onOpen={openFromPill} goal={goalCard}
         frozen={frozen} onFreeze={() => setFrozen((f) => !f)} onPlanWithAI={() => shortcut(SAVE)} onSearch={() => setSearching(true)}
         recent={recentOverride} masked={journey === 'j2' || journey === 'j3'} />
       {consent === 'intro' && (

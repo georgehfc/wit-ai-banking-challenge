@@ -57,17 +57,18 @@ function TxList({ items, title }: { items: TxItem[]; title: string }) {
   )
 }
 
-// Undo window: toasts hide after 6 s.
+// Undo window: 10 s, paused while the toast is hovered or focused (WCAG 2.2.1, timing adjustable).
 function TimedToast(t: { text: string; action?: string; onAction?: () => void }) {
   const [on, setOn] = useState(true)
-  useEffect(() => { const x = setTimeout(() => setOn(false), 6000); return () => clearTimeout(x) }, [])
-  return on ? <Toast {...t} /> : null
+  const [held, setHeld] = useState(false)
+  useEffect(() => { if (held) return; const x = setTimeout(() => setOn(false), 10000); return () => clearTimeout(x) }, [held])
+  return on ? <div onPointerEnter={() => setHeld(true)} onPointerLeave={() => setHeld(false)} onFocus={() => setHeld(true)} onBlur={() => setHeld(false)}><Toast {...t} /></div> : null
 }
 
-export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFreeze, onPlanWithAI, onSearch, behind, recent, masked }: {
+export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFreeze, onPlanWithAI, onSearch, behind, covered, recent, masked }: {
   tab: Tab; onTab: (t: Tab) => void; pill: PillProps; goal?: GoalCardProps | null
   toast?: null | { text: string; action?: string; onAction?: () => void }
-  onOpen: () => void; frozen: boolean; onFreeze: () => void; onPlanWithAI: () => void; onSearch: () => void; behind?: boolean; recent?: TxItem[]; masked?: boolean
+  onOpen: () => void; frozen: boolean; onFreeze: () => void; onPlanWithAI: () => void; onSearch: () => void; behind?: boolean; covered?: boolean; recent?: TxItem[]; masked?: boolean
 }) {
   // Native iOS structure: pinned app bar (compact title fades in once the large title scrolls away), content under translucent bars.
   const [y, setY] = useState(0)
@@ -76,7 +77,7 @@ export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFr
   const title = tab === 'home' ? `Olá, ${first}` : tab === 'payments' ? 'Pagamentos' : tab === 'savings' ? 'Poupança' : 'Cartões'
   const oct = tx.filter((t) => t.date.startsWith('2026-10')).slice(0, 8).map((t) => ({ initial: t.merchant[0], title: pretty(t.merchant), sub: day(t.date), amount: t.amount }))
   return (
-    <div className={`home ${behind ? 'behind' : ''}`}>
+    <div className={`home ${behind ? 'behind' : ''}`} inert={behind || covered || undefined} aria-hidden={behind || covered || undefined}>
       <header className={`appbar ${y > 4 ? 'scrolled' : ''} ${y > 44 ? 'titled' : ''}`}>
         <div className="statusbar"><span>9:41</span></div>
         <div className="appbar-row">
@@ -151,7 +152,7 @@ export function Sheet({ open, onClose, title, busy, onHistory, children }: {
   open: boolean; onClose: () => void; title?: string; busy?: boolean; onHistory: () => void; children: ReactNode
 }) {
   return (
-    <div className={`sheet ${open ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Assistente de IA" aria-hidden={!open}>
+    <div className={`sheet ${open ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Assistente de IA" aria-hidden={!open} inert={!open || undefined}>
       <div className="statusbar"><span>9:41</span></div>
       <header className="topbar">
         <button className="icon-btn round" onClick={onClose} aria-label="Fechar assistente"><Icon name="down" /></button>

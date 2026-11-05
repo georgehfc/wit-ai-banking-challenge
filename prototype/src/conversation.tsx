@@ -395,7 +395,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
 
   return (
     <div className={`thread ${view !== 'chat' ? 'pushed' : ''}`} style={{ display: active ? 'flex' : 'none' }}>
-      <div className="conversation" ref={scroller} aria-live="polite">{turns.map(renderTurn)}</div>
+      <div className="conversation" ref={scroller} aria-live="polite" aria-busy={busy}>{turns.map(renderTurn)}</div>
       <div className="input-dock">
         <Suggestions items={suggestions} onPick={(s) => send(s)} />
         <PromptBox value={input} onChange={setInput} onSend={(img) => send(input, img)} busy={busy} recordSignal={active ? voice : undefined}

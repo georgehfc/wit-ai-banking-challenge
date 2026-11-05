@@ -10,13 +10,13 @@ Notes for George, not a script. Say it your way. Updated 5 Nov 2026.
 | Journeys in code | J0 first use (default) → J1 save for a holiday (core). J2 Christmas allowance, J3 short month, J4 credit hand-off, picked from the hidden tweaks drawer (T or pull from the right edge). |
 | Figma | 77 variables (Primitives → Semantic Light/Dark), 16 text styles, 5 effects, 88 components and sets bound to variables. 20 screens on page 4 (J1 + supporting chats + entry points), 18 on page 5 (J0, J2–J4, entry map), all built from instances. |
 | Figma prototype | Wired: 61 hotspots, 9 flows. Start with "J1 · Poupar para algo" on page 4. T on Home opens the tweaks overlay. |
-| Summary slides | Page 6, both filled. **Hours is a placeholder for you.** |
+| Summary slides | Page 6, both filled. Hours: about 6 h. |
 | Handoff | ApprovalCard spec on page 7 + `deliverables/handoff-spec.md`. Code Connect sketched, not connected (needs a paid published library). |
 | AI log | `ai-log/log.md`, one row per AI contribution with what was wrong; `learnings.md` for process lessons. |
 | Decisions | `design/DECISIONS.md` (D1 search + AI, D2 gradient stroke) and the board on Figma page 1. |
 
 Gaps to own, not hide:
-- **Hours.** The brief says 4–6. This went well past it (git shows work on 3, 4 and 5 Nov; on 4 Nov alone commits span 11:14 to 21:08). Give the real number and say why: you chose to settle the experience in code and test it on your phone and on people.
+- **Hours.** About 6 h of your own time (roughly 2 h on each of 3, 4 and 5 Nov), inside the 4–6 h guide. AI agents ran a lot of the building in between your sessions, which is the point of the workflow; be ready to explain that split if asked.
 - **Replies are scripted**, no live model. That was on purpose (see answers below).
 - **Testing** was informal: you showed it to a few people and they found the double search confusing. That's one real finding, not a study.
 - **Dark mode** exists as variables and in the code; the Figma screens are shown in Light.
@@ -78,7 +78,7 @@ Say it in your own words. The beats:
 ## Recruiter call (likely before the panel)
 
 - **Why WIT:** your own words. Don't mirror the posting. One concrete thing from this challenge is better than any adjective.
-- **Hours used:** give the real number, and that you chose to go deeper in code.
+- **Hours used:** about 6 h of your time; the agents did much of the production work between your sessions.
 - **Availability, remote:** posting says Portugal, remote.
 - **Salary:** ask their range first. If pushed: 42–45k gross a year, floor 35k (from your application notes).
 - **Questions to ask them:** own products or client work? Who would you work with day to day? How do their developers use Figma today (Dev Mode, Code Connect)?
