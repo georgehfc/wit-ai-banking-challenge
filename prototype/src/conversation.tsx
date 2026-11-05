@@ -7,7 +7,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import out from '../../data/plan-output.json' with { type: 'json' }
 import ines from '../../data/ines.json' with { type: 'json' }
 import { AmountControl, Button, FaceId, GapResolver, Icon, MarginSnapshot, ProgressBar, ProjectionChart, PromptBox, Row, StatusBadge, StepsReceipt, fitBadge, type Step } from './components'
-import { AiReply, ApprovalCard, CardControl, Folded, HandoffCard, J3, J3_OPTIONS, MandateNote, Num, ScamVerdict, ShortMonthCard, SpendingBreakdown, Suggestions, UserBubble, replyDuration } from './chat'
+import { AiReply, ApprovalCard, CardControl, Folded, HandoffCard, J3, J3_OPTIONS, MandateNote, MandateSheet, Num, ScamVerdict, ShortMonthCard, SpendingBreakdown, Suggestions, UserBubble, replyDuration } from './chat'
 import { BUFFER, CHRISTMAS, CHRISTMAS_DATE, GOAL, HOLIDAY_ALLOWANCE_DATE, MARGINS, NEEDED, SUGGESTED, cap, day, eur, gapOptions, list, monthLong, monthShort, plan, type Plan } from './planner'
 import { BottomSheet, Screen, account, last4, savingsName } from './shell'
 
@@ -69,6 +69,8 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
   const [jan, setJan] = useState<string | null>(null)
   const [handoffSent, setHandoffSent] = useState(false)
   const [faceFor, setFaceFor] = useState<'j2' | 'j3' | null>(null)
+  const [mandate, setMandate] = useState<{ amount: number; on: boolean }>({ amount: out.scenarios.j2_christmas_lands.to_goal, on: true })
+  const [mandateSheet, setMandateSheet] = useState(false)
   const [flowDone, setFlowDone] = useState<'j2' | 'j3' | null>(null)
 
   const nextId = useRef(1)
@@ -160,8 +162,19 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
 
   // ---------- J2 · The Christmas allowance lands ----------
   const J2 = out.scenarios.j2_christmas_lands
-  const startChristmas = () => say(ai(`O teu subsídio de Natal chegou: ${eur(J2.allowance)}. Quando criaste o plano, pediste-me para perguntar antes de mover ${eur(J2.to_goal)} para Férias. Movo?`, 'approval'), { who: 'ai', text: '', widget: 'mandate', instant: true })
-  const christmasApproved = () => { setApproval('approved'); setFlowDone('j2'); say(ai(`Feito. ${eur(J2.to_goal)} estão em Férias e ${eur(J2.stays_in_account)} ficaram na tua conta. Férias vai em ${eur(J2.goal_saved_after)} de ${eur(GOAL)}.`, 'finish')) }
+  const startChristmas = () => say(ai(`O teu subsídio de Natal chegou: ${eur(J2.allowance)}. Quando criaste o plano, pediste-me para perguntar antes de mover ${eur(J2.to_goal)} para Férias. Movo?`, 'approval', { snap: J2.to_goal }), { who: 'ai', text: '', widget: 'mandate', instant: true })
+  const latestApproval = () => [...turns].reverse().find((t) => t.widget === 'approval')
+  const askAmount = () => latestApproval()?.snap ?? J2.to_goal
+  const christmasApproved = () => { const amt = askAmount(); setApproval('approved'); setFlowDone('j2'); say(ai(`Feito. ${eur(amt)} estão em Férias e ${eur(J2.allowance - amt)} ficaram na tua conta. Férias vai em ${eur(J2.goal_saved_before + amt)} de ${eur(GOAL)}.`, 'finish')) }
+  // Changing the standing instruction re-issues the request: what you see is what you sign.
+  const saveMandate = (amt: number | null) => {
+    setMandateSheet(false)
+    if (amt === null) { setMandate((m) => ({ ...m, on: false })); return say(user('Desligar a instrução'), ai('Instrução desligada. Não volto a perguntar quando o subsídio chegar. Este pedido fica aqui até decidires.')) }
+    const changed = amt !== askAmount()
+    setMandate({ amount: amt, on: true })
+    if (!changed) return say(user('Ligar a instrução'), ai(`Instrução ligada outra vez: pergunto antes de mover ${eur(amt)} quando o subsídio chegar.`))
+    say(user(`Mudar para ${eur(amt)}`), ai(`Atualizado. Passo a perguntar antes de mover ${eur(amt)} quando o subsídio chegar. Este é o novo pedido:`, 'approval', { snap: amt }))
+  }
   const christmasDeclined = () => { setApproval('declined'); say(user('Agora não'), ai(`Nada saiu da conta. Os ${eur(J2.allowance)} ficam na conta à ordem; pergunto-te outra vez se quiseres.`)) }
 
   // ---------- J3 · A payment that changes the plan ----------
@@ -292,12 +305,12 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
       case 'card': return <CardControl frozen={frozen} onToggle={toggleFreeze} />
       case 'fraudline': return <Button kind="secondary" onClick={() => {}}><Icon name="phone" size={18} />Ligar para a linha de fraude</Button>
       case 'openplan': return acct.planThreadId ? <Button kind="secondary" onClick={() => actions.openThread(acct.planThreadId!)}>Abrir essa conversa</Button> : null
-      case 'approval': return <ApprovalCard done={approval} onApprove={() => !busy && setFaceFor('j2')} onDecline={() => !busy && christmasDeclined()} />
-      case 'mandate': return approval ? null : <MandateNote />
+      case 'approval': { const isLatest = t.id === latestApproval()?.id; return <ApprovalCard amount={t.snap ?? J2.to_goal} done={isLatest ? approval : 'replaced'} onApprove={() => !busy && setFaceFor('j2')} onDecline={() => !busy && christmasDeclined()} /> }
+      case 'mandate': return approval ? null : <MandateNote amount={mandate.amount} on={mandate.on} onEdit={() => !busy && setMandateSheet(true)} />
       case 'shortmonth': return <ShortMonthCard picked={jan} onPick={(o) => !busy && !jan && pickJan(o)} />
       case 'review3': return !flowDone && t.id === [...turns].reverse().find((x) => x.widget === 'review3')?.id ? <Button onClick={() => setView('review')}>Rever a alteração</Button> : null
       case 'handoff': { const own = has('plan') ? p : plan(SUGGESTED); return <HandoffCard monthly={own.monthly} gap={own.gap} sent={handoffSent} onKeep={() => !busy && send(has('plan') ? 'Voltar ao meu plano' : SAVE)} onPerson={() => !busy && toPerson()} /> }
-      case 'finish': return flowDone ? <Button onClick={() => actions.complete(flowDone, jan ?? undefined)}>Concluir</Button> : null
+      case 'finish': return flowDone ? <Button onClick={() => actions.complete(flowDone, flowDone === 'j2' ? String(askAmount()) : jan ?? undefined)}>Concluir</Button> : null
       case 'shortcuts': return <div className="shortcut-list">{SHORTCUTS.map(([s]) => s === SAVE ? saveChip : s).map((s) => <button key={s} className="list-row compact" onClick={() => send(s)}><span className="body-strong">{s}</span><Icon name="chevron" /></button>)}</div>
     }
   }
@@ -334,7 +347,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
       {view === 'faceid' && <FaceId onDone={() => { setView('chat'); janApproved() }} />}
     </Screen>
   ) : null
-  const overlay = j3review ?? (faceFor === 'j2' ? <div className="screen-overlay"><FaceId onDone={() => { setFaceFor(null); christmasApproved() }} /></div> : null) ?? (view === 'chat' ? (reportSheet ? (
+  const overlay = j3review ?? (mandateSheet ? <BottomSheet label="Instrução permanente" onScrim={() => setMandateSheet(false)}><MandateSheet amount={mandate.amount} on={mandate.on} onSave={saveMandate} onCancel={() => setMandateSheet(false)} /></BottomSheet> : null) ?? (faceFor === 'j2' ? <div className="screen-overlay"><FaceId onDone={() => { setFaceFor(null); christmasApproved() }} /></div> : null) ?? (view === 'chat' ? (reportSheet ? (
     <BottomSheet label="Denunciar esta mensagem" onScrim={() => setReportSheet(false)}>
       <h2 className="title">Enviar esta mensagem à equipa de fraude?</h2>
       <p className="muted">Vão ver o texto da mensagem e quando a recebeste. Nada da tua conta é partilhado.</p>

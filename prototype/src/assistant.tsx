@@ -86,10 +86,10 @@ export function Assistant({ startClosed, trigger = 'rest', journey = 'j0' }: { s
   const complete = (flow: 'j2' | 'j3', option?: string) => {
     setOpen(false); setTab('home'); setHighlight(true); setTimeout(() => setHighlight(false), 2400)
     if (flow === 'j2') {
-      const before = goal
-      setGoal((g) => g && { ...g, saved: J2.goal_saved_after, note: `Próxima transferência 1 jan · ${eur(J3.transfer, 2)}`, badge: undefined })
-      setRecentOverride([{ initial: 'F', title: 'Para Férias', sub: 'Hoje, 9:13 · aprovado com Face ID', amount: -J2.to_goal }, { initial: 'S', title: 'Subsídio de Natal · Agência Lumen', sub: 'Hoje, 9:12', amount: J2.allowance }])
-      setToast({ text: `${eur(J2.to_goal)} movidos para Férias`, action: 'Anular', onAction: () => { setGoal(before); setToast({ text: `Anulado. Os ${eur(J2.to_goal)} voltaram à conta à ordem.` }) } })
+      const amt = Number(option ?? J2.to_goal), before = goal
+      setGoal((g) => g && { ...g, saved: J2.goal_saved_before + amt, note: `Próxima transferência 1 jan · ${eur(J3.transfer, 2)}`, badge: undefined })
+      setRecentOverride([{ initial: 'F', title: 'Para Férias', sub: 'Hoje, 9:13 · aprovado com Face ID', amount: -amt }, { initial: 'S', title: 'Subsídio de Natal · Agência Lumen', sub: 'Hoje, 9:12', amount: J2.allowance }])
+      setToast({ text: `${eur(amt)} movidos para Férias`, action: 'Anular', onAction: () => { setGoal(before); setToast({ text: `Anulado. Os ${eur(amt)} voltaram à conta à ordem.` }) } })
     } else {
       const spread = option === 'spread', before = goal
       setGoal((g) => g && { ...g, note: `1 jan saltado · próxima transferência 1 fev · ${eur(spread ? J3.options[1].new_monthly! : J3.transfer, 2)}`, badge: undefined })

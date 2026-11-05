@@ -169,25 +169,47 @@ export function CardControl({ frozen, onToggle }: { frozen: boolean; onToggle: (
 
 // ---------- J2 · The Christmas allowance lands: one approval under a standing instruction ----------
 const J2 = out.scenarios.j2_christmas_lands
-export function ApprovalCard({ onApprove, onDecline, done }: { onApprove: () => void; onDecline: () => void; done?: 'approved' | 'declined' }) {
+export function ApprovalCard({ amount, onApprove, onDecline, done }: { amount: number; onApprove: () => void; onDecline: () => void; done?: 'approved' | 'declined' | 'replaced' }) {
   return (
-    <div className="card approval">
+    <div className={`card approval ${done === 'replaced' ? 'replaced' : ''}`}>
       <div className="row-gap"><AiOrb size={20} /><span className="body-strong">A IA quer mover dinheiro</span></div>
-      <Row k="Valor" v={eur(J2.to_goal, 2)} strong />
+      <Row k="Valor" v={eur(amount, 2)} strong />
       <Row k="De" v={`Conta à ordem ··${ines.accounts[0].iban_display.slice(-4)}`} />
       <Row k="Para" v="Objetivo Férias" />
       <Row k="Quando" v="Hoje, uma vez" />
       <hr />
-      <Row k="Fica na conta" v={eur(J2.stays_in_account, 2)} />
-      <Row k="Férias depois disto" v={`${eur(J2.goal_saved_after)} de ${eur(3000)}`} />
+      <Row k="Fica na conta" v={eur(J2.allowance - amount, 2)} />
+      <Row k="Férias depois disto" v={`${eur(J2.goal_saved_before + amount)} de ${eur(3000)}`} />
       <p className="caption muted">Nada se move até confirmares. Transferências nunca têm “permitir sempre”.</p>
-      {done ? <StatusBadge kind={done === 'approved' ? 'positive' : 'warning'}>{done === 'approved' ? 'Aprovado com Face ID' : 'Não movido'}</StatusBadge>
+      {done ? <StatusBadge kind={done === 'approved' ? 'positive' : 'warning'}>{done === 'approved' ? 'Aprovado com Face ID' : done === 'replaced' ? 'Substituído por um novo pedido' : 'Não movido'}</StatusBadge>
         : <div className="stack-actions"><Button kind="secondary" onClick={onDecline}>Agora não</Button><Button onClick={onApprove}>Aprovar com Face ID</Button></div>}
     </div>
   )
 }
-export function MandateNote() {
-  return <div className="mandate"><span className="caption muted">Instrução permanente: perguntar antes de mover até {eur(J2.to_goal)} quando o subsídio chegar.</span><Button kind="tertiary">Alterar</Button></div>
+export function MandateNote({ amount, on, onEdit }: { amount: number; on: boolean; onEdit: () => void }) {
+  return <div className="mandate"><span className="caption muted">{on ? `Instrução permanente: perguntar antes de mover até ${eur(amount)} quando o subsídio chegar.` : 'Instrução permanente desligada. O subsídio fica na conta à ordem.'}</span><Button kind="tertiary" onClick={onEdit}>Alterar</Button></div>
+}
+// Edit the standing instruction. Only "ask before moving X" or "off": money never moves without an approval.
+export const MANDATE_AMOUNTS = [300, 400, J2.to_goal, 800]
+const SCHED = out.scenarios.j1_chosen.scheduled_total   // monthly transfers to September, from the planner
+export function MandateSheet({ amount, on, onSave, onCancel }: { amount: number; on: boolean; onSave: (amount: number | null) => void; onCancel: () => void }) {
+  const [v, setV] = useState(amount)
+  return (
+    <>
+      <h2 className="title">Instrução permanente</h2>
+      <p className="muted">Quando o subsídio de Natal chega, pergunto-te antes de mover este valor para Férias. Nunca o movo sem a tua aprovação.</p>
+      <div className="chips" role="radiogroup" aria-label="Valor a pedir">
+        {MANDATE_AMOUNTS.map((x) => <button key={x} role="radio" aria-checked={v === x} className={`chip ${v === x ? 'selected' : ''}`} onClick={() => setV(x)}>{eur(x)}</button>)}
+      </div>
+      <div className="card flat gap">
+        <Row k="Fica na conta" v={eur(J2.allowance - v, 2)} />
+        <Row k="Férias depois disto" v={`${eur(J2.goal_saved_before + v)} de ${eur(3000)}`} />
+      </div>
+      {v !== J2.to_goal && <p className="caption muted">O plano contava com {eur(J2.to_goal)}. Com {eur(v)}, Férias chega a {eur(SCHED + v)} até setembro, em vez de {eur(SCHED + J2.to_goal)}.</p>}
+      <div className="actions"><Button kind="secondary" grow onClick={onCancel}>Cancelar</Button><Button grow onClick={() => onSave(v)} disabled={on && v === amount}>Guardar</Button></div>
+      {on && <Button kind="tertiary" onClick={() => onSave(null)}>Desligar esta instrução</Button>}
+    </>
+  )
 }
 
 // ---------- J3 · A short month: the assistant spots a payment that changes the plan ----------
