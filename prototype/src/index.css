@@ -681,3 +681,6 @@ h2.title { margin: 0; }
 @keyframes rise { from { opacity: 0; transform: translateY(10px) scale(.985); } }
 .folded-body { animation: rise .35s var(--ios); }
 .btn, .chip, .shortcut-card, .list-row, .list-line, .search-fab, .sphere-fab { transition-timing-function: var(--ios); }
+/* App bar avatar 40 px (George, Figma AppBar 5 Nov); the right spacer matches so the title stays centred */
+.appbar .avatar { width: 40px; height: 40px; }
+.appbar-side { width: 40px; }
