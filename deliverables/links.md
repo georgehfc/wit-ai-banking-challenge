@@ -15,7 +15,7 @@
 - 4 Screens: J1 00–09 (HERO), Conversations C1–C3, Entry & app E1–E6
 - 5 Prototype: J0 first use, Entradas (button states + entry map), J2, J3, J4, built from components; old English wireframes archived on "— Scratch"
 - 6 Summary slides: journey & rationale; AI tools & links
-- 7 Handoff: ApprovalCard
+- 7 Handoff: ApprovalCard spec + Agent handoff (what a real agent handoff contains)
 
 ## Figma prototype (wired 5 Nov)
 - Page "4 · Screens" flows: **J1 · Poupar para algo (app aberta)** (start on 00), **Alerta no Início → resumo** (E1), **App fechada → notificação** (E6). Press **T** on Home for the tweaks overlay.

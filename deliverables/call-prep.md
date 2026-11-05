@@ -35,7 +35,7 @@ Say it in your own words. The beats:
 1. **Prototype first (8 min).** Phone or desktop, J1 end to end. Then one secondary journey (J2 or J3) from the drawer to show breadth.
 2. **Figma structure (10 min).** Page 2 variables (Primitives → Semantic, Light/Dark, code syntax = CSS vars) → page 3 components (AssistantPill states, PromptBox states, PlanCard variants, the AiMessage callout with a widget slot) → page 4 screens built from instances → page 7 handoff.
 3. **AI workflow (8 min).** Slide 2. Pick two concrete stories: the planner check catching hand-typed numbers (three times), and the double-search finding that moved search into the dock.
-4. **Trade-offs (8 min).** Scripted vs live LLM, code-first vs Figma-first, scope (one journey polished, the rest secondary).
+4. **Trade-offs (8 min).** Scripted vs live LLM, code-first vs Figma-first, scope (one journey polished, the rest secondary). Then the agent handoff talking point (below) with Figma page 7.
 5. **Live iteration (10 min).** See below.
 
 ## Likely questions and what to say
@@ -63,6 +63,31 @@ Say it in your own words. The beats:
 **How does this scale to other products?** The same parts: intent → understanding (steps receipt) → callout with a widget → review → approval. New journeys are new widgets and planner rules, not new screens.
 
 **Why Portuguese, informal "tu"?** The persona is in Lisbon and the brief is a Portuguese company; "tu" matches younger PT banking apps. Easy to switch.
+
+## Talking point: designing the agent is part of the job
+
+**When:** after the Figma walkthrough, before AI workflow. Or when they ask "how would this go to production?" or "what's AI-specific about your role?".
+
+**The point, in your words:** the screens are the visible half. In a bank the AI designer also designs the agent: what it handles and hands off, which systems it can call and with what permission, how it asks when it's unsure, what the app shows for each answer, the safety rules, and the conversations it's tested against. You don't train the model; you specify its behaviour so engineers and AI coding agents can build it.
+
+**What a real agent handoff would contain** (show the Figma page 7 frame; you built small versions of most):
+
+| Artifact | What it is | In this project |
+|---|---|---|
+| Agent spec | Scope, persona, what it refuses | `design/AGENT.md`, `ASSISTANT.md` |
+| Intent and entity map | Every ask it understands, the data it pulls out | `AGENT.md` §3, `prototype/src/nlu.ts` |
+| Tool contracts | Each bank system it can call, inputs/outputs, permission level | `AGENT.md` §2 (planner, spending, scam check, cards, transfers) |
+| Conversation policy | Clarify vs guess, fallback, hand-off, tone | `AGENT.md` §4, `TONE.md` |
+| UI contract | Which widget each result renders, callout rules, suggestions | `AGENT.md` §5, component library, `STATES.md` |
+| Guardrails and risk register | What it must never do, how money moves, consent | `SECURITY.md`, `DECISIONS.md`, ApprovalCard spec |
+| Prompt and examples | System prompt, few-shot examples per intent | Not built (scripted here); would be written from the policy |
+| Eval set | Conversations with the expected tool call, widget and wording; run on every change | `npm run check:nlu` (43 phrases) as a seed |
+| Success metrics | Plans started vs approved, clarifications per task, hand-off rate, wrong-number incidents (target 0) | Not built; name them |
+| Observability and feedback | Logged intents, failed understandings, thumbs up/down, review loop | Not built; name it |
+
+**Line to land it:** "The prototype is scripted on purpose, but it follows the same contract a model would, so the model can be swapped in without changing the design. That contract is the handoff."
+
+**If they push:** "Would you write the prompts?" Yes, together with engineering, from the policy and the eval set; the evals are what tell you a prompt change made it worse. "Which model?" Doesn't matter much for the design; what matters is that numbers come from tools and every risky action goes through the approval step.
 
 ## Live iteration: rehearse these
 
