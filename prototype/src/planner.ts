@@ -88,3 +88,13 @@ export const monthLong = (ym: string) => LONG[Number(ym.slice(5, 7)) - 1]
 export const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 export const day = (iso: string, withYear = false) => `${Number(iso.slice(8, 10))} ${monthShort(iso)}${withYear ? ' ' + iso.slice(0, 4) : ''}`
 export const list = (xs: string[]) => xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} e ${xs[xs.length - 1]}`
+
+// What a different goal or deadline would need each month (same rule as the plan: monthly transfers from 1 Dec,
+// the Christmas allowance counted once). Rounded up to 10 €. Used to answer "e se fossem 5000 €?" honestly.
+export function neededMonthly(goal: number, lastMonth: string /* 'YYYY-MM' */): { monthly: number; transfers: number } {
+  const months: string[] = []
+  for (let y = 2026, m = 12; `${y}-${String(m).padStart(2, '0')}` <= lastMonth; m === 12 ? (y++, m = 1) : m++) months.push(`${y}-${String(m).padStart(2, '0')}`)
+  const transfers = Math.max(1, months.length)
+  const christmas = lastMonth >= '2026-12' ? CHRISTMAS : 0
+  return { monthly: Math.ceil(Math.max(0, goal - christmas) / transfers / 10) * 10, transfers }
+}

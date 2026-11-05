@@ -10,7 +10,8 @@
     "prebuild": "npm run tokens",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "check:planner": "node --experimental-strip-types --no-warnings scripts/check-planner.ts"
+    "check:planner": "node --experimental-strip-types --no-warnings scripts/check-planner.ts",
+    "check:nlu": "node --experimental-strip-types --no-warnings scripts/check-nlu.ts"
   },
   "dependencies": {
     "react": "^19.3.1",

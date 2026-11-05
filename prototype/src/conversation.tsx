@@ -8,7 +8,8 @@ import out from '../../data/plan-output.json' with { type: 'json' }
 import ines from '../../data/ines.json' with { type: 'json' }
 import { AmountControl, Button, FaceId, GapResolver, Icon, MarginSnapshot, ProgressBar, ProjectionChart, PromptBox, Row, StatusBadge, StepsReceipt, fitBadge, type Step } from './components'
 import { AiReply, ApprovalCard, CardControl, Folded, HandoffCard, J3, J3_OPTIONS, MandateNote, MandateSheet, Num, ScamVerdict, ShortMonthCard, SpendingBreakdown, Suggestions, UserBubble, replyDuration } from './chat'
-import { BUFFER, CHRISTMAS, CHRISTMAS_DATE, GOAL, HOLIDAY_ALLOWANCE_DATE, MARGINS, NEEDED, SUGGESTED, cap, day, eur, gapOptions, list, monthLong, monthShort, plan, type Plan } from './planner'
+import { BUFFER, CHRISTMAS, CHRISTMAS_DATE, GOAL, HOLIDAY_ALLOWANCE_DATE, MARGINS, NEEDED, SUGGESTED, cap, day, eur, gapOptions, list, monthLong, neededMonthly, plan, type Plan } from './planner'
+import { parse } from './nlu'
 import { BottomSheet, Screen, account, last4, savingsName } from './shell'
 
 export const INTENT = ines.intent.text
@@ -38,7 +39,6 @@ export const SAVE = 'Poupar para algo', SPEND = 'Para onde foi o meu dinheiro?',
 export const SHORTCUTS: [string, string][] = [[SAVE, 'Encontra um valor que cabe no teu mês'], [SPEND, 'Os teus últimos 3 meses por categoria'], [CHECK, 'Descobre se um SMS ou email é mesmo do banco']]
 const KEEP = 'Manter o plano como está'
 export const CREDIT_Q = `Posso pedir emprestados os ${eur(plan(SUGGESTED).gap)} para ir em julho na mesma?`
-const SAVE_RE = /poup|guardar|férias|viagem|sav|holiday|€|\d/i
 
 function reaction(p: Plan) {
   const ok = p.okMonths.map(monthLong), short = p.shortMonths.map(monthLong)
@@ -193,42 +193,83 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
   const toPerson = () => { setHandoffSent(true); say(user('Falar com uma pessoa'), ai('Enviei o resumo à equipa de crédito. Um especialista vai contactar-te; até lá, nada muda no teu plano.')) }
 
   // ---------- routing: typed text and suggested replies take the same path ----------
+  // Clarifying question waiting for an answer ("300 € por mês ou objetivo total?")
+  const [ask, setAsk] = useState<null | { amount: number }>(null)
+  const [chips, setChips] = useState<string[] | null>(null)   // one-off suggestions for a clarifying moment
+  const CAT_PT: Record<string, string> = { rent: 'renda', bills: 'contas e telemóvel', subscriptions: 'subscrições', transport: 'transportes', groceries: 'supermercado', eating_out: 'restaurantes', shopping: 'compras', travel: 'viagens', going_out: 'saídas', other: 'outros' }
+  const spendingCategory = (text: string, cat: string, m?: string) => {
+    if (cat === 'health') return say(user(text), ai('Não mostro gastos de saúde por categoria nem por local. Ficam juntos em "Outros".'))
+    const g = SP.groups.find((x) => x.id === cat)
+    if (!g) return say(user(text), ai('Não encontrei essa categoria nos teus movimentos de agosto a outubro.'))
+    const v = m ? (g.by_month as Record<string, number>)[m] ?? 0 : g.total, top = g.top[0]
+    say(user(text), ai(`Em ${CAT_PT[cat] ?? g.label} gastaste ${eur(v)} ${m ? `em ${monthLong(m)}` : 'de agosto a outubro'}${!m && top && g.top.length > 1 ? `, mais em ${top.name} (${eur(top.total)})` : ''}.`))
+  }
+  // A goal or deadline the detailed plan doesn't cover yet: answer with the planner's maths, say what it can plan.
+  const otherGoal = (text: string, goalAmount: number, monthKey?: string) => {
+    const mm = monthKey ? ({ jan: '01', janeiro: '01', fev: '02', fevereiro: '02', mar: '03', marco: '03', abr: '04', abril: '04', mai: '05', maio: '05', jun: '06', junho: '06', jul: '07', julho: '07', ago: '08', agosto: '08', set: '09', setembro: '09', out: '10', outubro: '10', nov: '11', novembro: '11', dez: '12', dezembro: '12' } as Record<string, string>)[monthKey] : '07'
+    const last = `${Number(mm) >= 12 ? 2026 : 2027}-${mm}`
+    if (last < '2026-12') return say(user(text), ai('Isso é antes da primeira transferência possível (1 dez). Para quando queres o dinheiro?'))
+    const need = neededMonthly(goalAmount, last), lo = out.margin.min, hi = out.margin.max
+    const verdict = need.monthly <= lo ? 'cabe em todos os últimos 3 meses' : need.monthly <= hi ? 'cabe em alguns meses, noutros ficaria curto' : 'é mais do que te sobrou em qualquer mês'
+    setChips([`Fazer o plano para ${eur(GOAL)}`])
+    say(user(text), ai(`Para ${eur(goalAmount)} até ${monthLong(last)} precisavas de cerca de ${eur(need.monthly)} por mês em ${need.transfers} transferências${last >= '2026-12' ? ', mais o subsídio de Natal' : ''}. Sobraram-te entre ${eur(lo)} e ${eur(hi)} por mês, por isso ${verdict}. O plano detalhado está preparado para ${eur(GOAL)} em julho.`))
+  }
   const send = (raw: string, image?: { url: string; name: string }) => {
     const text = raw.trim(); setInput('')
     if (busy) return
     if (image) { if (scam === null) setScam('paste'); return checkSms(SMS, image.url) }
     if (!text) return
-    const n = Number((text.replace(/[,.]/g, '').match(/\d{2,4}/) ?? [])[0])
     if (scam === 'paste') return checkSms(text === 'Colar a mensagem' ? SMS : text)
-    if (/^denunciar|^report/i.test(text) && scam === 'verdict') return setReportSheet(true)
-    if (/toquei|cliquei|abri o link|tap|click/i.test(text) && scam === 'verdict') return tapped(text)
-    if (scam === 'tapped' && /^n[ãa]o|^no/i.test(text)) return safe(text)
-    if (scam === 'tapped' && /^sim|escrevi|cart[ãa]o|^yes/i.test(text)) return entered(text)
-    if (/emprest|cr[ée]dito|borrow|\bloan/i.test(text)) return credit(text)
-    if (/para onde foi|onde.*dinheiro|gastei|gastos|where.*money|spen[dt]/i.test(text)) return startSpending(text)
-    if (/mensagem|sms|burla|e-?mail|message|scam/i.test(text)) return startScam(text)
+    const q = parse(text), n = q.amount
+    setChips(null)
+    // answer to a clarifying question
+    if (ask) { const a = ask; setAsk(null); if (/objetivo|total|goal/i.test(text)) return otherGoal(text, a.amount); if (/m[êe]s|month|mensal/i.test(text)) { startSave(INTENT).then(() => { if (a.amount >= 100 && a.amount <= 500 && a.amount !== SUGGESTED) setAmount(Math.round(a.amount / 10) * 10, `${eur(a.amount)} por mês`) }); return } }
+    // message check steps
+    if (q.intent === 'report' && scam === 'verdict') return setReportSheet(true)
+    if (q.intent === 'scam_tapped' && scam === 'verdict') return tapped(text)
+    if (scam === 'tapped' && (q.intent === 'no' || /s[óo] abri/i.test(text))) return safe(text)
+    if (scam === 'tapped' && (q.intent === 'yes' || q.intent === 'scam_entered')) return entered(text)
+    // small talk and help
+    if (q.intent === 'greeting') return say(user(text), ai(`Olá, ${ines.customer.name.split(' ')[0]}. Posso ajudar com:`, 'shortcuts'))
+    if (q.intent === 'thanks') return say(user(text), ai('De nada. Estou aqui se precisares.'))
+    if (q.intent === 'help') return say(user(text), ai('Faço um plano de poupança que cabe no teu mês, mostro para onde foi o teu dinheiro e verifico se uma mensagem é mesmo do banco. Nada se move sem a tua aprovação.', 'shortcuts'))
+    if (q.intent === 'credit') return credit(text)
+    // spending
     if (has('spending') && /ago.?–?.?out|todos|tr[êe]s meses/i.test(text)) { setMonth('all'); return say(user(text), ai(`De volta aos três meses: ${eur(SP.spent_total)} gastos.`)) }
-    if (has('spending') && /\b(ago|set|out)/i.test(text) && !/poup/i.test(text)) { const m = SP.months.find((x) => monthShort(x) === text.toLowerCase().match(/\b(ago|set|out)/)![1])!; return showMonth(m, text) }
-    if (/^(voltar ao meu plano|ver o meu plano|o teu plano de férias)$/i.test(text) || ((saveStage !== 'none' || !ownsPlan || goalOn) && text === SAVE)) return backToPlan(text)
-    if (goalOn && /^pausar|^pause/i.test(text)) { actions.setPaused(true); return say(user(text), ai('Em pausa. Não sai nenhuma transferência até retomares. Mais nada muda.')) }
-    if (goalOn && /^retomar|^resume/i.test(text)) { actions.setPaused(false); const q = plan(goal!.monthly, goal!.choice === 'september' ? 'september' : 'july'); return say(user(text), ai(`Retomado. Próxima transferência: ${eur(goal!.monthly)} a ${day(q.transfers[0])}.`)) }
-    if (saveStage === 'none' && SAVE_RE.test(text)) return ownsPlan && !goalOn ? startSave(text === SAVE ? INTENT : text) : backToPlan(text)
-    if (saveStage === 'plan' || saveStage === 'gap') {
-      if (/porqu|why/i.test(text)) return why(text)
-      if (n >= 100 && n <= 500) return setAmount(Math.round(n / 10) * 10, text)
-      if (/diferen[çc]a|falta|fechar|gap/i.test(text) && p.gap > 0) return showGap(text)
-      if (/rever|aprovar|parece bem|avan[çc]a|review/i.test(text)) { say(user(text)); setView('review'); return }
+    if (q.intent === 'spending_category') return spendingCategory(text, q.category!, q.month && SP.months.includes(q.month) ? q.month : undefined)
+    if (q.intent === 'spending_month' && q.month) { if (!SP.months.includes(q.month)) return say(user(text), ai('Só tenho os teus movimentos de agosto a outubro.')); return has('spending') ? showMonth(q.month, text) : startSpending(text) }
+    if (q.intent === 'spending') return startSpending(text)
+    if (q.intent === 'scam') return startScam(text)
+    // the plan
+    if (q.intent === 'back_to_plan' || ((saveStage !== 'none' || !ownsPlan || goalOn) && (text === SAVE || q.intent === 'save'))) return backToPlan(text)
+    if (q.intent === 'pause') return goalOn ? (actions.setPaused(true), say(user(text), ai('Em pausa. Não sai nenhuma transferência até retomares. Mais nada muda.'))) : say(user(text), ai('Ainda não tens um plano ativo para pausar.'))
+    if (q.intent === 'resume') { if (!goalOn) return say(user(text), ai('Ainda não tens um plano ativo.')); actions.setPaused(false); const r = plan(goal!.monthly, goal!.choice === 'september' ? 'september' : 'july'); return say(user(text), ai(`Retomado. Próxima transferência: ${eur(goal!.monthly)} a ${day(r.transfers[0])}.`)) }
+    if (q.intent === 'saved_so_far') { if (!goalOn && saveStage === 'none') setChips([SAVE]); return say(user(text), ai(goalOn ? `Férias tem ${eur(goal!.saved ?? 0)} de ${eur(GOAL)}.${(goal!.saved ?? 0) === 0 ? ' A primeira transferência ainda não saiu.' : ''}` : saveStage !== 'none' ? 'Ainda não aprovaste o plano, por isso ainda não há nada poupado.' : 'Ainda não tens um plano de poupança. Queres fazer um?')) }
+    if (q.intent === 'next_transfer') { if (!goalOn) return say(user(text), ai('Ainda não há transferências agendadas.')); const r = plan(goal!.monthly, goal!.choice === 'september' ? 'september' : 'july'); return say(user(text), ai(paused ? 'O plano está em pausa: não há transferências até retomares.' : `${eur(goal!.monthly)} a ${day(r.transfers[0])}, da conta à ordem para Férias.`)) }
+    if (saveStage === 'none' && ownsPlan && !goalOn) {
+      if (q.intent === 'save' && n && q.amountKind === 'goal' && n !== GOAL) return otherGoal(text, n, q.month)
+      if (q.intent === 'save' && q.month && !/^jul/.test(q.month) && !/^set/.test(q.month)) return otherGoal(text, n && q.amountKind === 'goal' ? n : GOAL, q.month)
+      if (q.intent === 'save' || text === SAVE) return startSave(text === SAVE ? INTENT : text)
+      if (q.intent === 'amount' && n) { if (n === GOAL || /fazer o plano/i.test(text)) return startSave(INTENT); if (q.amountKind === 'goal') return otherGoal(text, n); setAsk({ amount: n }); setChips([`${eur(n)} por mês`, `Objetivo de ${eur(n)}`]); return say(user(text), ai(`${eur(n)} por mês, ou como objetivo total?`)) }
     }
-    if (saveStage === 'gap' && !choice) { if (/manter|como est[áa]/i.test(text)) return pick('keep'); if (/setembro/i.test(text)) return pick('september'); if (/irs|reembolso/i.test(text)) return pick('irs'); if (/mais pequena|viagem de/i.test(text)) return pick('trim') }
-    if (saveStage === 'chosen' && !goalOn && /rever|aprovar|ok|sim/i.test(text)) { say(user(text)); setView('review'); return }
-    say(user(text), ai('Ainda não consigo ajudar com isso. Posso ajudar com:', 'shortcuts'))
+    if (saveStage === 'plan' || saveStage === 'gap') {
+      if (q.intent === 'why') return why(text)
+      if (q.intent === 'amount' && n) return n >= 100 && n <= 500 ? setAmount(Math.round(n / 10) * 10, text) : say(user(text), ai(`Posso ajustar entre ${eur(150)} e ${eur(NEEDED)} por mês. Que valor queres experimentar?`))
+      if (q.intent === 'gap' && p.gap > 0) return showGap(text)
+      if (q.intent === 'deadline' && /^set/.test(q.month ?? '')) return pick('september')
+      if (q.intent === 'deadline') return say(user(text), ai('Consigo planear até julho ou, se adiares, até setembro. Outras datas ainda não estão no planeador.'))
+      if (q.intent === 'review') { say(user(text)); setView('review'); return }
+    }
+    if (saveStage === 'gap' && !choice) { if (q.intent === 'keep') return pick('keep'); if (q.intent === 'irs') return pick('irs'); if (q.intent === 'trim') return pick('trim') }
+    if (saveStage === 'chosen' && !goalOn && (q.intent === 'review' || q.intent === 'yes')) { say(user(text)); setView('review'); return }
+    say(user(text), ai('Não percebi bem. Posso ajudar com isto:', 'shortcuts'))
   }
 
   // ---------- suggested replies: follow where this conversation is ----------
   const last = [...turns].reverse().find((t) => t.widget)?.widget
   const saveChip = !ownsPlan || goalOn ? 'Ver o meu plano' : saveStage === 'none' ? SAVE : 'Voltar ao meu plano'
   const monthChip = month === 'all' ? `Mostrar ${monthLong(SP.highest_everyday_month)}` : 'Mostrar ago–out'
-  const suggestions: string[] = busy || view !== 'chat' || !turns.length ? [] :
+  const suggestions: string[] = busy || view !== 'chat' || !turns.length ? [] : chips ? chips :
     scam === 'paste' ? ['Colar a mensagem'] :
     scam === 'verdict' && last === 'verdict' ? ['Denunciar', 'Toquei no link'] :
     scam === 'tapped' ? ['Não, só abri', 'Sim, escrevi os dados do cartão'] :

@@ -27,6 +27,7 @@ jobs:
           cache-dependency-path: prototype/package-lock.json
       - run: npm ci
       - run: npm run check:planner
+      - run: npm run check:nlu
       - run: npm run build
       - name: Publish dist to gh-pages
         run: |
