@@ -4,23 +4,23 @@ import { Assistant, type Journey, type Trigger } from './assistant'
 // Prototype tweaks, hidden like an admin drawer: pull left from the right edge, tap the handle, or press T.
 // Changes apply at once; "Voltar ao fluxo", the scrim, a swipe right or Esc closes it. Esc with the drawer closed resets.
 const JOURNEYS: [Journey, string, string][] = [
+  ['j0', 'J0 · Primeiro uso', 'Introdução e consentimento (início)'],
   ['j1', 'J1 · Poupar para algo', 'A jornada principal'],
   ['j2', 'J2 · Chega o subsídio de Natal', 'Aprovar 600 € para Férias'],
   ['j3', 'J3 · Mês apertado', 'A IA vê um pagamento e propõe mudar janeiro'],
   ['j4', 'J4 · Pedir crédito', 'Passagem para uma pessoa'],
-  ['j5', 'J5 · Primeiro uso', 'Introdução e consentimento'],
 ]
 const JOURNEY_HINT: Partial<Record<Journey, string>> = {
   j2: 'Dezembro: o subsídio chegou. Toca no alerta do Início (ou começa com a app fechada para ver a notificação).',
   j3: '28 dez: pagaste 180 € na Worten. Toca no alerta do Início para rever janeiro.',
   j4: 'Abre uma conversa a pedir crédito. Também acontece em J1, na diferença: “Posso pedir emprestado?”.',
-  j5: 'Primeiro toque no botão da IA: introdução, depois o pedido de acesso à conta.',
+  j0: 'Primeiro toque no botão da IA: introdução, depois o pedido de acesso à conta.',
 }
 
 export default function App() {
   const [start, setStart] = useState<'open' | 'closed'>('open')
   const [trigger, setTrigger] = useState<Trigger>('rest')
-  const [journey, setJourney] = useState<Journey>('j1')
+  const [journey, setJourney] = useState<Journey>('j0')
   const [run, setRun] = useState(0)
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [open, setOpen] = useState(false)
@@ -58,7 +58,7 @@ export default function App() {
 
   return (
     <main className="stage">
-      <div className="phone" key={`${journey}-${start}-${trigger}-${run}`}><Assistant startClosed={start === 'closed' && journey !== 'j4' && journey !== 'j5'} trigger={trigger} journey={journey} /></div>
+      <div className="phone" key={`${journey}-${start}-${trigger}-${run}`}><Assistant startClosed={start === 'closed' && journey !== 'j4' && journey !== 'j0'} trigger={trigger} journey={journey} /></div>
 
       <div className="edge-zone" aria-hidden="true" onPointerDown={down('open')} onPointerMove={move} onPointerUp={up} onPointerCancel={up} />
       {!open && <button className="tweaks-handle" onClick={() => setOpen(true)} aria-label="Abrir ajustes do protótipo (T)" title="Ajustes (T)"><i /><span className="tweaks-label">Ajustes</span><kbd>T</kbd></button>}

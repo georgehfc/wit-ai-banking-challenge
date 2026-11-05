@@ -14,8 +14,8 @@ import { AiOrb } from './orb'
 import { SearchScreen } from './search'
 
 export type Trigger = 'rest' | 'alert' | 'processing'
-// Journeys selectable from the prototype tweaks: J1 is the core; J2–J5 start from a preset account state.
-export type Journey = 'j1' | 'j2' | 'j3' | 'j4' | 'j5'
+// Journeys selectable from the prototype tweaks: J0 first use (default on landing) leads into J1, the core; J2–J4 start from a preset account state.
+export type Journey = 'j0' | 'j1' | 'j2' | 'j3' | 'j4'
 const J2 = out.scenarios.j2_christmas_lands, J3 = out.scenarios.j3_off_track_month
 const PRESET_GOAL: Goal = { monthly: 220, choice: 'september', paused: false }
 type Thread = { id: string; title: string; autostart?: Autostart }
@@ -33,7 +33,7 @@ const titleFor = (a: Autostart) =>
 let seq = 0
 const newId = () => `t${++seq}`
 
-export function Assistant({ startClosed, trigger = 'rest', journey = 'j1' }: { startClosed: boolean; trigger?: Trigger; journey?: Journey }) {
+export function Assistant({ startClosed, trigger = 'rest', journey = 'j0' }: { startClosed: boolean; trigger?: Trigger; journey?: Journey }) {
   const [threads, setThreads] = useState<Thread[]>([])
   const [activeId, setActiveId] = useState<string | null>(null)
   const [status, setStatus] = useState<Record<string, ThreadStatus>>({})
@@ -46,7 +46,7 @@ export function Assistant({ startClosed, trigger = 'rest', journey = 'j1' }: { s
   const [tab, setTab] = useState<Tab>('home')
   // account
   const [goal, setGoal] = useState<Goal | null>(journey === 'j2' ? { ...PRESET_GOAL, saved: J2.goal_saved_before, note: `${eur(J2.to_goal)} à espera da tua aprovação` } : journey === 'j3' ? { ...PRESET_GOAL, saved: J3.saved_now, note: `Os ${eur(J3.transfer)} de 1 jan iam mexer na tua reserva`, badge: { kind: 'warning', label: 'Curto este mês' } } : null)
-  const [consent, setConsent] = useState<'none' | 'intro' | 'asking' | 'granted' | 'declined'>(journey === 'j5' ? 'none' : 'granted')
+  const [consent, setConsent] = useState<'none' | 'intro' | 'asking' | 'granted' | 'declined'>(journey === 'j0' ? 'none' : 'granted')
   const [recentOverride, setRecentOverride] = useState<TxItem[] | undefined>(journey === 'j2' ? [{ initial: 'S', title: 'Subsídio de Natal · Agência Lumen', sub: 'Hoje, 9:12', amount: J2.allowance }] : journey === 'j3' ? [{ initial: 'W', title: `${J3.bill.merchant} · ${J3.bill.label.toLowerCase()}`, sub: day(J3.bill.paid), amount: -J3.bill.amount }] : undefined)
   const [frozen, setFrozen] = useState(false)
   const [highlight, setHighlight] = useState(false)
@@ -175,7 +175,7 @@ export function Assistant({ startClosed, trigger = 'rest', journey = 'j1' }: { s
             <div className="empty">
               <span className="hero-orb"><AiOrb size={72} label="Assistente de IA" /></span>
               <h1 className="root-title">{goal ? 'O teu plano está ativo. E agora?' : 'Em que posso ajudar?'}</h1>
-              <p className="trust-line"><Icon name="lock" size={14} />{journey === 'j5' && consent === 'granted' ? 'Obrigado. Já posso ler a tua conta à ordem (ago–out) até 2 fev 2027. Nada se move sem a tua aprovação.' : consent === 'declined' ? 'Sem acesso à conta, só posso ajudar com perguntas gerais, como verificar uma mensagem.' : 'Leio a tua conta à ordem dos últimos 3 meses. Nada se move sem a tua aprovação.'}</p>
+              <p className="trust-line"><Icon name="lock" size={14} />{journey === 'j0' && consent === 'granted' ? 'Obrigado. Já posso ler a tua conta à ordem (ago–out) até 2 fev 2027. Nada se move sem a tua aprovação.' : consent === 'declined' ? 'Sem acesso à conta, só posso ajudar com perguntas gerais, como verificar uma mensagem.' : 'Leio a tua conta à ordem dos últimos 3 meses. Nada se move sem a tua aprovação.'}</p>
               {consent === 'declined' && <Button kind="secondary" onClick={() => setConsent('asking')}>Permitir acesso à conta</Button>}
               {SHORTCUTS.map(([t, s]) => {
                 const needsData = consent === 'declined' && t !== SHORTCUTS[2][0]
