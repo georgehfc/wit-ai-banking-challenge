@@ -695,3 +695,12 @@ h2.title { margin: 0; }
 .home-scroll { padding-bottom: 0; }
 .home-scroll::after { content: ''; flex: none; height: calc(var(--tab-h) + 128px); }
 .spend-label > span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Monthly picture: "150 € livres" stays on one line (5 Nov) */
+.margin-row .body-strong { width: auto; min-width: 96px; white-space: nowrap; }
+/* Projection chart: goal label sits on the left, where bars are short, with air above the line (5 Nov) */
+.chart { margin-top: 24px; }
+.goal-line span { left: 0; right: auto; top: -20px; }
+/* Chat: the last message scrolls clear of the input fade (a spacer, since Safari ignores flex padding-bottom) (5 Nov) */
+.conversation::after { content: ''; flex: none; height: 28px; }
+.input-dock::before { top: -28px; height: 28px; }
