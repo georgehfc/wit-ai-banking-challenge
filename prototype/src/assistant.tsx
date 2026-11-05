@@ -53,7 +53,9 @@ export function Assistant({ startClosed, trigger = 'rest' }: { startClosed: bool
   }
   // "Save for something" never starts a second plan: it opens the chat that owns it.
   const shortcut = (s: string) => {
-    if ((s === SAVE || s === 'O teu plano de férias') && planThreadId) { setActiveId(planThreadId); return }
+    // Saving is one conversation per person: reopen the chat that owns the plan (or the one already under way), never a second one.
+    const saveThreadId = planThreadId ?? threads.find((t) => /poup|férias|save|holiday/i.test(t.autostart?.text ?? ''))?.id
+    if ((s === SAVE || s === 'O teu plano de férias') && saveThreadId) { setActiveId(saveThreadId); setHistoryOpen(false); setOpen(true); return }
     startThread({ text: s })
   }
   const openThread = (id: string) => { setActiveId(id); setHistoryOpen(false); setOpen(true) }

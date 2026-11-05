@@ -199,6 +199,8 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
   const preview = [...turns].reverse().find((t) => t.who === 'ai')?.text ?? ''
   useEffect(() => { onStatus(id, { busy, unseen, hasPlan: has('plan'), preview }) }, [busy, unseen, turns.length]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (visible) setUnseen(false) }, [visible])
+  // Reopening a chat lands on its latest message.
+  useEffect(() => { if (!visible) return; const el = scroller.current; if (el) requestAnimationFrame(() => { el.scrollTop = el.scrollHeight }) }, [visible])
   useEffect(() => {
     if (started.current || !autostart) return
     started.current = true
