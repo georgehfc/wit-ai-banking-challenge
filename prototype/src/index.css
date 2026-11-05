@@ -707,3 +707,7 @@ h2.title { margin: 0; }
 /* More air between the goal label and its dashed line (George, 5 Nov) */
 .chart { margin-top: 30px; }
 .goal-line span { top: -24px; line-height: 14px; }
+.journey-list button { flex-direction: row !important; align-items: center !important; gap: 12px !important; }
+.journey-emoji { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 10px; background: var(--color-surface-raised); font-size: 20px; line-height: 1; }
+.journey-list button.on .journey-emoji { background: var(--color-surface-default); }
+.journey-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }

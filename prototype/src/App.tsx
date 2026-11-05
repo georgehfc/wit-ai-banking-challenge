@@ -6,12 +6,13 @@ const S = out.scenarios
 
 // Prototype tweaks, hidden like an admin drawer: pull left from the right edge, tap the handle, or press T.
 // Changes apply at once; "Voltar ao fluxo", the scrim, a swipe right or Esc closes it. Esc with the drawer closed resets.
-const JOURNEYS: [Journey, string, string][] = [
-  ['j0', 'J0 · Primeiro uso', 'Introdução e consentimento (início)'],
-  ['j1', 'J1 · Poupar para algo', 'A jornada principal'],
-  ['j2', 'J2 · Chega o subsídio de Natal', `Aprovar ${eur(S.j2_christmas_lands.to_goal)} para Férias`],
-  ['j3', 'J3 · Mês apertado', 'A IA vê um pagamento e propõe mudar janeiro'],
-  ['j4', 'J4 · Pedir crédito', 'Passagem para uma pessoa'],
+// Prototype-only labels: emoji on purpose, a different set from the app's line icons, so the drawer reads as a tool, not the product.
+const JOURNEYS: [Journey, string, string, string][] = [
+  ['j0', '👋', 'Primeiro uso', 'Introdução e consentimento (início)'],
+  ['j1', '🏖️', 'Poupar para algo', 'A jornada principal'],
+  ['j2', '🎄', 'Chega o subsídio de Natal', `Aprovar ${eur(S.j2_christmas_lands.to_goal)} para Férias`],
+  ['j3', '🔧', 'Mês apertado', 'A IA vê um pagamento e propõe mudar janeiro'],
+  ['j4', '🤝', 'Pedir crédito', 'Passagem para uma pessoa'],
 ]
 const JOURNEY_HINT: Partial<Record<Journey, string>> = {
   j2: 'Dezembro: o subsídio chegou. Toca no alerta do Início (ou começa com a app fechada para ver a notificação).',
@@ -72,7 +73,7 @@ export default function App() {
           <div className="tweak">
             <span className="panel-note">Jornada</span>
             <div className="journey-list" role="radiogroup" aria-label="Jornada">
-              {JOURNEYS.map(([k, l, sub]) => <button key={k} role="radio" aria-checked={journey === k} className={journey === k ? 'on' : ''} onClick={() => { setJourney(k); reset() }}><span className="body-strong">{l}</span><span className="caption muted">{sub}</span></button>)}
+              {JOURNEYS.map(([k, emoji, l, sub]) => <button key={k} role="radio" aria-checked={journey === k} className={journey === k ? 'on' : ''} onClick={() => { setJourney(k); reset() }}><span className="journey-emoji" aria-hidden="true">{emoji}</span><span className="journey-text"><span className="body-strong">{l}</span><span className="caption muted">{sub}</span></span></button>)}
             </div>
           </div>
           {seg('Começar com a app', start, [['open', 'Aberta'], ['closed', 'Fechada']] as const, (s) => { setStart(s); reset() })}
