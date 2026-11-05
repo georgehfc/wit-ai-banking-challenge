@@ -694,3 +694,4 @@ h2.title { margin: 0; }
    so the room is a real spacer after the content: tab bar + floating dock + breathing space. (5 Nov) */
 .home-scroll { padding-bottom: 0; }
 .home-scroll::after { content: ''; flex: none; height: calc(var(--tab-h) + 128px); }
+.spend-label > span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

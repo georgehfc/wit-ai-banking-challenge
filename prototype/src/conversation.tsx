@@ -317,7 +317,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
     actions.onPlanSet({ monthly, choice })
   }
   const j3review = jan && jan !== 'keep' && (view === 'review' || view === 'faceid') ? (
-    <Screen label="Rever a alteração" title="Rever a alteração" sub="Preparado pela IA · tu aprovas" onBack={() => setView('chat')}
+    <Screen label="Rever a alteração" title="Rever a alteração" sub="Preparado pela IA" onBack={() => setView('chat')}
       dock={<><p className="caption muted">Nada muda até aprovares.</p>
         <div className="actions"><Button kind="secondary" grow onClick={() => { setView('chat'); say(ai('Nada mudou. A transferência de 1 jan mantém-se até decidires.')) }}>Agora não</Button><Button grow onClick={() => setView('faceid')}>Aprovar com Face ID</Button></div></>}>
       <h1 className="title">{jan === 'spread' ? `Saltar os ${eur(J3.transfer)} de 1 jan e depois mover ${eur(J3.options[1].new_monthly!)} por mês de 1 fev a 1 set.` : `Saltar os ${eur(J3.transfer)} de 1 jan. O resto do plano fica igual.`}</h1>
@@ -356,7 +356,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
       <div className="card flat"><span className="label accent">{day(CHRISTMAS_DATE)}</span><p>Antes de mover {eur(CHRISTMAS)} do teu subsídio de Natal, vais receber um pedido.</p></div>
     </Screen>
   ) : (
-    <Screen label="Rever o teu plano" title="Rever o teu plano" sub="Preparado pela IA · tu aprovas" onBack={() => setView('chat')}
+    <Screen label="Rever o teu plano" title="Rever o teu plano" sub="Preparado pela IA" onBack={() => setView('chat')}
       dock={<><p className="caption muted">Nada sai da conta até aprovares.</p>
         <div className="actions"><Button kind="secondary" grow onClick={() => { setView('chat'); say(ai('Nada saiu da conta. O plano fica aqui para quando quiseres.')) }}>Agora não</Button><Button grow onClick={() => setView('faceid')}>Aprovar com Face ID</Button></div></>}>
       <h1 className="title">{eur(fp.q.monthly)} por mês da {account.name} para Férias, de {day(first, true)} a {day(lastT, true)}.</h1>

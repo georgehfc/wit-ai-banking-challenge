@@ -5,7 +5,7 @@ import out from '../../data/plan-output.json' with { type: 'json' }
 import ines from '../../data/ines.json' with { type: 'json' }
 import { Button, Icon, OptionList, Row, StatusBadge, type OptionItem } from './components'
 import { AiOrb } from './orb'
-import { eur, monthLong, monthShort } from './planner'
+import { eur, monthShort } from './planner'
 
 export const TYPING_MS = 650
 export const WORD_MS = 28
@@ -110,11 +110,11 @@ export function SpendingBreakdown({ month, onMonth }: { month: string; onMonth: 
       <div className="segmented" role="tablist" aria-label="Período">
         {['all', ...S.months].map((m) => <button key={m} role="tab" aria-selected={m === month} className={m === month ? 'on' : ''} onClick={() => onMonth(m)}>{m === 'all' ? 'ago–out' : monthShort(m)}</button>)}
       </div>
-      <div className="row-baseline"><span className="amount-sm"><Num value={total} /></span><span className="caption muted">{month === 'all' ? 'gastos em 3 meses' : `gastos em ${monthLong(month)}`}</span></div>
+      <div className="row-baseline"><span className="amount-sm"><Num value={total} /></span></div>
       <ul className="spend-list">
         <li>
           <button className="spend-row fixed-row" onClick={() => setOpen(open === 'fixed' ? null : 'fixed')} aria-expanded={open === 'fixed'}>
-            <span className="spend-label"><span>Renda, contas e subscrições</span><span className="tag">Fixo</span></span>
+            <span className="spend-label"><span>Renda e contas</span><span className="tag">Fixo</span></span>
             <span />
             <span className="body-strong num"><Num value={fixedTotal} /></span>
           </button>
@@ -127,7 +127,7 @@ export function SpendingBreakdown({ month, onMonth }: { month: string; onMonth: 
               <span className="spend-bar" aria-hidden="true"><i className={idx === 0 ? 'top' : ''} style={{ width: `${(v / max) * 100}%` }} /></span>
               <span className="body-strong num"><Num value={v} /></span>
             </button>
-            {open === g.id && <ul className="merchants">{g.top.map((m) => <li key={m.name}><span>{m.name}</span><span className="num">{eur(m.total)}</span></li>)}<li className="caption muted">Total ago–out por local</li></ul>}
+            {open === g.id && <ul className="merchants">{g.top.map((m) => <li key={m.name}><span>{m.name}</span><span className="num">{eur(m.total)}</span></li>)}</ul>}
           </li>
         ))}
       </ul>
