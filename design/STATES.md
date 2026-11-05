@@ -143,3 +143,12 @@ Drawing the diagrams from the code turned up these. Fixed ones are marked.
 4. **Decided:** no reminder for a plan left at "Not now" (out of scope, low value). The draft stays in its chat.
 5. **Decided:** the prototype's alert is "summary ready" only; money arrived and short month stay as Figma wireframes (page 5).
 6. **Decided:** keep Pause where it is (chat suggestions and the goal).
+
+## Motion (5 Nov)
+
+iOS conventions, one curve (`--ios`: cubic-bezier(.32,.72,0,1)), Reduce Motion turns all of it into instant changes.
+- Assistant opens as a **page sheet**: slides up (0.55 s) while the app scales to 92 %, dims and rounds behind it; status bar turns white on black. Closing reverses it.
+- Review / confirmation **push** in from the right (0.55 s); the chat and header parallax 26 % left and dim.
+- Tabs cross-fade with a 10 px rise (0.38 s). Bottom sheets spring up; scrims fade.
+- Bank pages: app bar turns translucent with a hairline once content scrolls under it; the compact title fades in when the large title leaves.
+- Figma prototype uses the same: MOVE_IN/OUT for the sheet, PUSH for review, SMART_ANIMATE inside the chat.
