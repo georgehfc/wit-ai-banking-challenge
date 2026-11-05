@@ -1,11 +1,26 @@
 import { useEffect, useRef, useState } from 'react'
-import { Assistant, type Trigger } from './assistant'
+import { Assistant, type Journey, type Trigger } from './assistant'
 
 // Prototype tweaks, hidden like an admin drawer: pull left from the right edge, tap the handle, or press T.
 // Changes apply at once; "Voltar ao fluxo", the scrim, a swipe right or Esc closes it. Esc with the drawer closed resets.
+const JOURNEYS: [Journey, string, string][] = [
+  ['j1', 'J1 · Poupar para algo', 'A jornada principal'],
+  ['j2', 'J2 · Chega o subsídio de Natal', 'Aprovar 600 € para Férias'],
+  ['j3', 'J3 · Mês apertado', 'A IA vê um pagamento e propõe mudar janeiro'],
+  ['j4', 'J4 · Pedir crédito', 'Passagem para uma pessoa'],
+  ['j5', 'J5 · Primeiro uso', 'Introdução e consentimento'],
+]
+const JOURNEY_HINT: Partial<Record<Journey, string>> = {
+  j2: 'Dezembro: o subsídio chegou. Toca no alerta do Início (ou começa com a app fechada para ver a notificação).',
+  j3: '28 dez: pagaste 180 € na Worten. Toca no alerta do Início para rever janeiro.',
+  j4: 'Abre uma conversa a pedir crédito. Também acontece em J1, na diferença: “Posso pedir emprestado?”.',
+  j5: 'Primeiro toque no botão da IA: introdução, depois o pedido de acesso à conta.',
+}
+
 export default function App() {
   const [start, setStart] = useState<'open' | 'closed'>('open')
   const [trigger, setTrigger] = useState<Trigger>('rest')
+  const [journey, setJourney] = useState<Journey>('j1')
   const [run, setRun] = useState(0)
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [open, setOpen] = useState(false)
@@ -43,7 +58,7 @@ export default function App() {
 
   return (
     <main className="stage">
-      <div className="phone" key={`${start}-${trigger}-${run}`}><Assistant startClosed={start === 'closed'} trigger={trigger} /></div>
+      <div className="phone" key={`${journey}-${start}-${trigger}-${run}`}><Assistant startClosed={start === 'closed' && journey !== 'j4' && journey !== 'j5'} trigger={trigger} journey={journey} /></div>
 
       <div className="edge-zone" aria-hidden="true" onPointerDown={down('open')} onPointerMove={move} onPointerUp={up} onPointerCancel={up} />
       {!open && <button className="tweaks-handle" onClick={() => setOpen(true)} aria-label="Abrir ajustes do protótipo (T)" title="Ajustes (T)"><i /><span className="tweaks-label">Ajustes</span><kbd>T</kbd></button>}
@@ -51,9 +66,15 @@ export default function App() {
       <aside className={`tweaks ${open ? 'open' : ''}`} aria-label="Ajustes do protótipo" aria-hidden={!open} onPointerDown={down('close')} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
         <div className="panel">
           <div className="panel-head"><p className="panel-title">Ajustes do protótipo</p></div>
+          <div className="tweak">
+            <span className="panel-note">Jornada</span>
+            <div className="journey-list" role="radiogroup" aria-label="Jornada">
+              {JOURNEYS.map(([k, l, sub]) => <button key={k} role="radio" aria-checked={journey === k} className={journey === k ? 'on' : ''} onClick={() => { setJourney(k); reset() }}><span className="body-strong">{l}</span><span className="caption muted">{sub}</span></button>)}
+            </div>
+          </div>
           {seg('Começar com a app', start, [['open', 'Aberta'], ['closed', 'Fechada']] as const, (s) => { setStart(s); reset() })}
-          {seg('IA no Início', trigger, [['rest', 'Repouso'], ['alert', 'Alerta'], ['processing', 'Processar']] as const, (k) => { setTrigger(k); setStart('open'); reset() })}
-          <span className="panel-note">{trigger === 'alert' ? 'Toca no botão para abrir, ou × para dispensar (com Anular).' : trigger === 'processing' ? 'A trabalhar em segundo plano, depois “pronto”. Toca para abrir.' : 'Toca em “Pergunta à IA” para começar.'}</span>
+          {journey === 'j1' && seg('IA no Início', trigger, [['rest', 'Repouso'], ['alert', 'Alerta'], ['processing', 'Processar']] as const, (k) => { setTrigger(k); setStart('open'); reset() })}
+          <span className="panel-note">{JOURNEY_HINT[journey] ?? (trigger === 'alert' ? 'Toca no botão para abrir, ou × para dispensar (com Anular).' : trigger === 'processing' ? 'A trabalhar em segundo plano, depois “pronto”. Toca para abrir.' : 'Toca em “Pergunta à IA” para começar.')}</span>
           {seg('Cor', theme, [['light', 'Clara'], ['dark', 'Escura']] as const, setTheme)}
           <button className="panel-btn" onClick={reset}>Repor o protótipo</button>
           <button className="panel-btn tweaks-back" onClick={() => setOpen(false)}>Voltar ao fluxo</button>

@@ -64,10 +64,10 @@ function TimedToast(t: { text: string; action?: string; onAction?: () => void })
   return on ? <Toast {...t} /> : null
 }
 
-export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFreeze, onPlanWithAI, onSearch, behind }: {
+export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFreeze, onPlanWithAI, onSearch, behind, recent, masked }: {
   tab: Tab; onTab: (t: Tab) => void; pill: PillProps; goal?: GoalCardProps | null
   toast?: null | { text: string; action?: string; onAction?: () => void }
-  onOpen: () => void; frozen: boolean; onFreeze: () => void; onPlanWithAI: () => void; onSearch: () => void; behind?: boolean
+  onOpen: () => void; frozen: boolean; onFreeze: () => void; onPlanWithAI: () => void; onSearch: () => void; behind?: boolean; recent?: TxItem[]; masked?: boolean
 }) {
   // Native iOS structure: pinned app bar (compact title fades in once the large title scrolls away), content under translucent bars.
   const [y, setY] = useState(0)
@@ -90,7 +90,7 @@ export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFr
         {tab === 'home' && <>
           <section className="balance" aria-label="Saldo">
             <span className="caption muted">{account.name} · EUR</span>
-            <span className="amount">{eur(account.balance, 2)}</span>
+            <span className="amount">{masked ? '•••• €' : eur(account.balance, 2)}</span>
           </section>
           <nav className="quick" aria-label="Ações rápidas">
             {([['plus', 'Carregar', null], ['swap', 'Transferir', 'payments'], ['target', 'Objetivos', 'savings'], ['more', 'Mais', null]] as const).map(([i, l, to]) => (
@@ -98,7 +98,7 @@ export function AppScreens({ tab, onTab, pill, goal, toast, onOpen, frozen, onFr
             ))}
           </nav>
           {goal && <GoalCard {...goal} />}
-          <TxList title="Recentes" items={defaultRecent} />
+          <TxList title={recent ? 'Hoje' : 'Recentes'} items={recent ?? defaultRecent} />
         </>}
         {tab === 'payments' && <>
           <div className="chips">{['Enviar', 'Pedir', 'Pagar contas', 'MB WAY'].map((c) => <button key={c} className="chip">{c}</button>)}</div>

@@ -100,7 +100,7 @@ j2 = {"date": xmas["expected_by"], "allowance": xmas["amount_net_estimate"], "to
       "stays_in_account": round(xmas["amount_net_estimate"] - a.christmas, 2),
       "goal_saved_before": round(saved_before_xmas, 2), "goal_saved_after": round(saved_before_xmas + a.christmas, 2)}
 ot = d["scenarios"]["off_track_month"]
-expected_left = round(sum(margins) / len(margins) - ot["bill"]["amount"], 2)    # estimate: average month minus the bill
+expected_left = round(sum(margins) / len(margins) - ot["bill"]["amount"], 2)    # estimate: what an average month leaves, minus the 180 € paid on 28 Dec (so the 1 Jan transfer would draw on the buffer)
 later = [t for t in sep_transfers if t.isoformat()[:7] > ot["month"]]
 extra = math.ceil(monthly / len(later))
 spread_monthly = monthly + extra

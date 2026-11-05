@@ -684,3 +684,8 @@ h2.title { margin: 0; }
 /* App bar avatar 40 px (George, Figma AppBar 5 Nov); the right spacer matches so the title stays centred */
 .appbar .avatar { width: 40px; height: 40px; }
 .appbar-side { width: 40px; }
+.stack-actions { display: flex; flex-direction: column; gap: 8px; } .stack-actions .btn { width: 100%; } .approval { gap: 10px; }
+.intro-points { display: flex; flex-direction: column; gap: 10px; } .intro-points p { margin: 0; }
+.journey-list { display: flex; flex-direction: column; gap: 6px; }
+.journey-list button { display: flex !important; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; padding: 10px 12px !important; }
+.journey-list button.on { border-color: transparent !important; background: var(--color-accent-subtle) !important; box-shadow: inset 0 0 0 1.5px var(--color-accent-default); }

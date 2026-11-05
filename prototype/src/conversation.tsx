@@ -7,7 +7,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import out from '../../data/plan-output.json' with { type: 'json' }
 import ines from '../../data/ines.json' with { type: 'json' }
 import { AmountControl, Button, FaceId, GapResolver, Icon, MarginSnapshot, ProgressBar, ProjectionChart, PromptBox, Row, StatusBadge, StepsReceipt, fitBadge, type Step } from './components'
-import { AiReply, CardControl, Folded, Num, ScamVerdict, SpendingBreakdown, Suggestions, UserBubble, replyDuration } from './chat'
+import { AiReply, ApprovalCard, CardControl, Folded, HandoffCard, J3, J3_OPTIONS, MandateNote, Num, ScamVerdict, ShortMonthCard, SpendingBreakdown, Suggestions, UserBubble, replyDuration } from './chat'
 import { BUFFER, CHRISTMAS, CHRISTMAS_DATE, GOAL, HOLIDAY_ALLOWANCE_DATE, MARGINS, NEEDED, SUGGESTED, cap, day, eur, gapOptions, list, monthLong, monthShort, plan, type Plan } from './planner'
 import { BottomSheet, Screen, account, last4, savingsName } from './shell'
 
@@ -19,16 +19,17 @@ const newSubs = out.side_widgets.new_subscriptions_this_summer
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 export type Choice = 'irs' | 'september' | 'trim' | 'keep' | null
-export type Goal = { monthly: number; choice: Choice; paused: boolean }
-export type Autostart = { text?: string; image?: string; proactive?: 'spending' }
+export type Goal = { monthly: number; choice: Choice; paused: boolean; saved?: number; note?: string; badge?: { kind: 'positive' | 'warning'; label: string } }
+export type Autostart = { text?: string; image?: string; proactive?: 'spending' | 'christmas' | 'shortmonth' }
 export type ThreadStatus = { busy: boolean; unseen: boolean; hasPlan: boolean; preview: string }
 export type Account = { goal: Goal | null; frozen: boolean; planThreadId: string | null }
 export type Actions = {
   setFrozen: (v: boolean) => void; setPaused: (v: boolean) => void
   onPlanSet: (g: { monthly: number; choice: Choice }) => void; openThread: (id: string) => void
+  complete: (flow: 'j2' | 'j3', option?: string) => void
 }
 
-type Widget = 'margin' | 'plan' | 'gap' | 'review' | 'spending' | 'verdict' | 'card' | 'fraudline' | 'shortcuts' | 'openplan'
+type Widget = 'margin' | 'plan' | 'gap' | 'review' | 'spending' | 'verdict' | 'card' | 'fraudline' | 'shortcuts' | 'openplan' | 'approval' | 'mandate' | 'shortmonth' | 'review3' | 'handoff' | 'finish'
 type Turn = { id: number; who: 'user' | 'ai' | 'steps'; tone?: 'status' | 'reply' | 'callout'; title?: string; text?: string; quote?: string; image?: string; widget?: Widget; snap?: number; steps?: Step[]; summary?: string; instant?: boolean }
 type NewTurn = Omit<Turn, 'id'>
 type ScamStage = 'paste' | 'verdict' | 'tapped' | 'safe' | 'entered' | 'reported' | null
@@ -36,6 +37,7 @@ type ScamStage = 'paste' | 'verdict' | 'tapped' | 'safe' | 'entered' | 'reported
 export const SAVE = 'Poupar para algo', SPEND = 'Para onde foi o meu dinheiro?', CHECK = 'Verificar uma mensagem'
 export const SHORTCUTS: [string, string][] = [[SAVE, 'Encontra um valor que cabe no teu mês'], [SPEND, 'Os teus últimos 3 meses por categoria'], [CHECK, 'Descobre se um SMS ou email é mesmo do banco']]
 const KEEP = 'Manter o plano como está'
+export const CREDIT_Q = 'Posso pedir emprestados os 640 € para ir em julho na mesma?'
 const SAVE_RE = /poup|guardar|férias|viagem|sav|holiday|€|\d/i
 
 function reaction(p: Plan) {
@@ -63,6 +65,11 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
   const [scam, setScam] = useState<ScamStage>(null)
   const [reportSheet, setReportSheet] = useState(false)
   const [skipping, setSkipping] = useState(false)
+  const [approval, setApproval] = useState<'approved' | 'declined' | undefined>()
+  const [jan, setJan] = useState<string | null>(null)
+  const [handoffSent, setHandoffSent] = useState(false)
+  const [faceFor, setFaceFor] = useState<'j2' | 'j3' | null>(null)
+  const [flowDone, setFlowDone] = useState<'j2' | 'j3' | null>(null)
 
   const nextId = useRef(1)
   const visibleRef = useRef(visible); visibleRef.current = visible
@@ -88,7 +95,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
   }
   const user = (text: string, quote?: string, image?: string): NewTurn => ({ who: 'user', text, quote, image })
   // Callouts (the gradient rule) only for the key results: the plan, the spending summary, the scam verdict.
-  const ai = (text: string, widget?: Widget, extra?: Partial<NewTurn>): NewTurn => ({ who: 'ai', text, widget, tone: widget && ['plan', 'spending', 'verdict'].includes(widget) ? 'callout' : 'reply', ...extra })
+  const ai = (text: string, widget?: Widget, extra?: Partial<NewTurn>): NewTurn => ({ who: 'ai', text, widget, tone: widget && ['plan', 'spending', 'verdict', 'approval', 'shortmonth', 'handoff'].includes(widget) ? 'callout' : 'reply', ...extra })
 
   const p = plan(monthly)
   const has = (w: Widget) => turns.some((t) => t.widget === w)
@@ -151,6 +158,27 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
   }
   const sendReport = () => { setReportSheet(false); setScam('reported'); say(user('Denunciar'), ai('Denunciado. A equipa de fraude usa denúncias como esta para tirar sites falsos do ar. Não precisas de fazer mais nada.')) }
 
+  // ---------- J2 · The Christmas allowance lands ----------
+  const J2 = out.scenarios.j2_christmas_lands
+  const startChristmas = () => say(ai(`O teu subsídio de Natal chegou: ${eur(J2.allowance)}. Quando criaste o plano, pediste-me para perguntar antes de mover ${eur(J2.to_goal)} para Férias. Movo?`, 'approval'), { who: 'ai', text: '', widget: 'mandate', instant: true })
+  const christmasApproved = () => { setApproval('approved'); setFlowDone('j2'); say(ai(`Feito. ${eur(J2.to_goal)} estão em Férias e ${eur(J2.stays_in_account)} ficaram na tua conta. Férias vai em ${eur(J2.goal_saved_after)} de ${eur(GOAL)}.`, 'finish')) }
+  const christmasDeclined = () => { setApproval('declined'); say(user('Agora não'), ai(`Nada saiu da conta. Os ${eur(J2.allowance)} ficam na conta à ordem; pergunto-te outra vez se quiseres.`)) }
+
+  // ---------- J3 · A payment that changes the plan ----------
+  const startShortMonth = () => say(
+    { who: 'steps', title: 'A verificar o próximo mês', steps: [{ label: `Vi o pagamento de ${eur(J3.bill.amount)} na ${J3.bill.merchant}`, role: 'Dados' }, { label: 'Estimei o que sobra este mês', role: 'Planeador' }, { label: 'Comparei com a transferência de 1 jan', role: 'Regras' }], summary: 'Viu o pagamento · Planeador · Regras' },
+    ai(`Pagaste ${eur(J3.bill.amount)} na ${J3.bill.merchant} (${J3.bill.label.toLowerCase()}) a ${day(J3.bill.paid)}. Com isso, este mês deve sobrar-te cerca de ${eur(J3.expected_left_estimate)}, e a transferência de ${eur(J3.transfer)} a 1 jan ia mexer na tua reserva. Queres rever janeiro?`, 'shortmonth'))
+  const pickJan = (oid: string) => {
+    setJan(oid); const o = J3_OPTIONS.find((x) => x.id === oid)!
+    if (oid === 'keep') return say(user(o.label), ai(`Combinado. A transferência de ${eur(J3.transfer)} a 1 jan mantém-se; os ${eur(J3.buffer_dip_if_kept)} saem da tua reserva. Se mudares de ideias, é só dizer.`))
+    say(user(o.label), ai(oid === 'spread' ? `Então janeiro fica saltado e, de fevereiro a setembro, passam a ser ${eur(J3.options[1].new_monthly!)} por mês. Chegas a ${eur(J3.options[1].total_by_deadline!)} em setembro.` : `Então janeiro fica saltado e o resto do plano não muda. Chegas a ${eur(J3.options[0].total_by_deadline!)} em setembro, ${eur(J3.options[0].short_of_plan!)} abaixo do plano.`, 'review3'))
+  }
+  const janApproved = () => { setFlowDone('j3'); say(ai(jan === 'spread' ? `Feito. Janeiro fica saltado e, a partir de 1 fev, o plano move ${eur(J3.options[1].new_monthly!)} por mês. Podes anular até 1 jan.` : `Feito. Janeiro fica saltado; a próxima transferência é a 1 fev. Podes anular até 1 jan.`, 'finish')) }
+
+  // ---------- J4 · Borrowing: hand off to a person ----------
+  const credit = (text: string) => say(user(text), ai('Isso é uma questão de crédito. Não sou a pessoa certa para sugerir um empréstimo; mostro-te quem pode ajudar e passo o que falámos.', 'handoff'))
+  const toPerson = () => { setHandoffSent(true); say(user('Falar com uma pessoa'), ai('Enviei o resumo à equipa de crédito. Um especialista vai contactar-te; até lá, nada muda no teu plano.')) }
+
   // ---------- routing: typed text and suggested replies take the same path ----------
   const send = (raw: string, image?: { url: string; name: string }) => {
     const text = raw.trim(); setInput('')
@@ -163,6 +191,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
     if (/toquei|cliquei|abri o link|tap|click/i.test(text) && scam === 'verdict') return tapped(text)
     if (scam === 'tapped' && /^n[ãa]o|^no/i.test(text)) return safe(text)
     if (scam === 'tapped' && /^sim|escrevi|cart[ãa]o|^yes/i.test(text)) return entered(text)
+    if (/emprest|cr[ée]dito|borrow|\bloan/i.test(text)) return credit(text)
     if (/para onde foi|onde.*dinheiro|gastei|gastos|where.*money|spen[dt]/i.test(text)) return startSpending(text)
     if (/mensagem|sms|burla|e-?mail|message|scam/i.test(text)) return startScam(text)
     if (has('spending') && /ago.?–?.?out|todos|tr[êe]s meses/i.test(text)) { setMonth('all'); return say(user(text), ai(`De volta aos três meses: ${eur(SP.spent_total)} gastos.`)) }
@@ -192,6 +221,8 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
     scam === 'tapped' ? ['Não, só abri', 'Sim, escrevi os dados do cartão'] :
     last === 'spending' ? [monthChip, saveChip, CHECK] :
     saveStage === 'plan' && last === 'plan' && !goalOn ? (p.gap > 0 ? [monthly === SUGGESTED ? `Porquê ${eur(SUGGESTED)}?` : `Volta aos ${eur(SUGGESTED)}`, monthly === 250 ? `Põe ${eur(280)}` : `Põe ${eur(250)}`, 'E a diferença?'] : ['Rever o plano']) :
+    saveStage === 'gap' && !choice && last === 'gap' ? ['Posso pedir emprestado?'] :
+    last === 'handoff' && !handoffSent ? [] :
     goalOn && ownsPlan && (saveStage === 'chosen' || last === undefined) ? [paused ? 'Retomar o plano' : 'Pausar o plano', SPEND, CHECK] :
     scam === 'safe' || scam === 'reported' || (scam === 'entered' && frozen) ? [SPEND, saveChip] : []
 
@@ -205,6 +236,8 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
     if (started.current || !autostart) return
     started.current = true
     if (autostart.proactive === 'spending') startSpending(null)
+    else if (autostart.proactive === 'christmas') startChristmas()
+    else if (autostart.proactive === 'shortmonth') startShortMonth()
     else if (autostart.image) { setScam('paste'); checkSms(SMS, autostart.image) }
     else if (autostart.text) send(autostart.text)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -259,6 +292,12 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
       case 'card': return <CardControl frozen={frozen} onToggle={toggleFreeze} />
       case 'fraudline': return <Button kind="secondary" onClick={() => {}}><Icon name="phone" size={18} />Ligar para a linha de fraude</Button>
       case 'openplan': return acct.planThreadId ? <Button kind="secondary" onClick={() => actions.openThread(acct.planThreadId!)}>Abrir essa conversa</Button> : null
+      case 'approval': return <ApprovalCard done={approval} onApprove={() => !busy && setFaceFor('j2')} onDecline={() => !busy && christmasDeclined()} />
+      case 'mandate': return approval ? null : <MandateNote />
+      case 'shortmonth': return <ShortMonthCard picked={jan} onPick={(o) => !busy && !jan && pickJan(o)} />
+      case 'review3': return !flowDone && t.id === [...turns].reverse().find((x) => x.widget === 'review3')?.id ? <Button onClick={() => setView('review')}>Rever a alteração</Button> : null
+      case 'handoff': { const own = has('plan') ? p : plan(SUGGESTED); return <HandoffCard monthly={own.monthly} gap={own.gap} sent={handoffSent} onKeep={() => !busy && send(has('plan') ? 'Voltar ao meu plano' : SAVE)} onPerson={() => !busy && toPerson()} /> }
+      case 'finish': return flowDone ? <Button onClick={() => actions.complete(flowDone, jan ?? undefined)}>Concluir</Button> : null
       case 'shortcuts': return <div className="shortcut-list">{SHORTCUTS.map(([s]) => s === SAVE ? saveChip : s).map((s) => <button key={s} className="list-row compact" onClick={() => send(s)}><span className="body-strong">{s}</span><Icon name="chevron" /></button>)}</div>
     }
   }
@@ -277,7 +316,25 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
     setTurns((x) => [...x, { id: nextId.current++, who: 'ai', instant: true, text: `O teu plano de férias está ativo. Primeira transferência: ${eur(fp.q.monthly)} a ${day(first)}.` }])
     actions.onPlanSet({ monthly, choice })
   }
-  const overlay = view === 'chat' ? (reportSheet ? (
+  const j3review = jan && jan !== 'keep' && (view === 'review' || view === 'faceid') ? (
+    <Screen label="Rever a alteração" title="Rever a alteração" sub="Preparado pela IA · tu aprovas" onBack={() => setView('chat')}
+      dock={<><p className="caption muted">Nada muda até aprovares.</p>
+        <div className="actions"><Button kind="secondary" grow onClick={() => { setView('chat'); say(ai('Nada mudou. A transferência de 1 jan mantém-se até decidires.')) }}>Agora não</Button><Button grow onClick={() => setView('faceid')}>Aprovar com Face ID</Button></div></>}>
+      <h1 className="title">{jan === 'spread' ? `Saltar os ${eur(J3.transfer)} de 1 jan e depois mover ${eur(J3.options[1].new_monthly!)} por mês de 1 fev a 1 set.` : `Saltar os ${eur(J3.transfer)} de 1 jan. O resto do plano fica igual.`}</h1>
+      <div className="card">
+        <Row k="1 jan" v={`Saltada · ${eur(0, 2)}`} />
+        <Row k="A partir de 1 fev" v={`${eur(jan === 'spread' ? J3.options[1].new_monthly! : J3.transfer, 2)} por mês`} strong />
+        <Row k="Transferências restantes" v={String(J3.options[1].count)} />
+        <Row k="De" v={`${account.name} ··${last4}`} />
+        <Row k="Para" v={`Férias · ${savingsName}`} />
+        <Row k="Até 1 set" v={`${eur(jan === 'spread' ? J3.options[1].total_by_deadline! : J3.options[0].total_by_deadline!)} poupados`} />
+      </div>
+      {jan === 'spread' && <div className="card flat gap"><StatusBadge kind="warning">Esforço</StatusBadge><p className="muted">{eur(J3.options[1].new_monthly!)} é mais do que sobrou em agosto e outubro. Se um mês ficar apertado, volto a perguntar-te.</p></div>}
+      <p className="caption muted">Podes anular até 1 jan. Calculado pelo planeador.</p>
+      {view === 'faceid' && <FaceId onDone={() => { setView('chat'); janApproved() }} />}
+    </Screen>
+  ) : null
+  const overlay = j3review ?? (faceFor === 'j2' ? <div className="screen-overlay"><FaceId onDone={() => { setFaceFor(null); christmasApproved() }} /></div> : null) ?? (view === 'chat' ? (reportSheet ? (
     <BottomSheet label="Denunciar esta mensagem" onScrim={() => setReportSheet(false)}>
       <h2 className="title">Enviar esta mensagem à equipa de fraude?</h2>
       <p className="muted">Vão ver o texto da mensagem e quando a recebeste. Nada da tua conta é partilhado.</p>
@@ -321,7 +378,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
       <p className="caption muted">Pausa ou muda o plano quando quiseres no objetivo Férias. O dinheiro em Férias pode ser levantado a qualquer momento.</p>
       {view === 'faceid' && <FaceId onDone={() => setView('confirm')} />}
     </Screen>
-  )
+  ))
 
   return (
     <div className={`thread ${view !== 'chat' ? 'pushed' : ''}`} style={{ display: active ? 'flex' : 'none' }}>

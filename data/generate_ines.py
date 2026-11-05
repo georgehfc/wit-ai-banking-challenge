@@ -101,7 +101,7 @@ data = {
                "goal": 3000.00, "deadline": "2027-07-15", "trip": "with friends, July 2027"},
     "scenarios": {
         "_note": "Future events for J2/J3 storyboards. Not transactions yet; the planner turns them into numbers.",
-        "off_track_month": {"month": "2027-01", "bill": {"label": "Laptop repair", "amount": 180.00, "due": "2027-01-12"}},
+        "off_track_month": {"month": "2027-01", "bill": {"label": "Reparação do portátil", "merchant": "Worten", "amount": 180.00, "paid": "2026-12-28", "kind": "paid_upfront"}},
     },
     "transactions": txns,
 }

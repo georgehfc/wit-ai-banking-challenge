@@ -573,9 +573,11 @@
       "based_on": "chosen plan (September)",
       "month": "2027-01",
       "bill": {
-        "label": "Laptop repair",
+        "label": "Reparação do portátil",
+        "merchant": "Worten",
         "amount": 180.0,
-        "due": "2027-01-12"
+        "paid": "2026-12-28",
+        "kind": "paid_upfront"
       },
       "expected_left_estimate": 40.0,
       "transfer": 220,

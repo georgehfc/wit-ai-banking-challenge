@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import out from '../../data/plan-output.json' with { type: 'json' }
 import ines from '../../data/ines.json' with { type: 'json' }
-import { Icon, StatusBadge } from './components'
+import { Button, Icon, OptionList, Row, StatusBadge, type OptionItem } from './components'
 import { AiOrb } from './orb'
 import { eur, monthLong, monthShort } from './planner'
 
@@ -162,6 +162,60 @@ export function CardControl({ frozen, onToggle }: { frozen: boolean; onToggle: (
         <span className="stack"><span className="body-strong">Congelar cartão</span><span className="caption muted">{frozen ? 'Nenhum pagamento passa. Descongela quando quiseres.' : 'Bloqueia novos pagamentos. A tua conta continua aberta.'}</span></span>
         <input type="checkbox" role="switch" checked={frozen} onChange={onToggle} aria-label="Congelar cartão" />
       </label>
+    </div>
+  )
+}
+
+
+// ---------- J2 · The Christmas allowance lands: one approval under a standing instruction ----------
+const J2 = out.scenarios.j2_christmas_lands
+export function ApprovalCard({ onApprove, onDecline, done }: { onApprove: () => void; onDecline: () => void; done?: 'approved' | 'declined' }) {
+  return (
+    <div className="card approval">
+      <div className="row-gap"><AiOrb size={20} /><span className="body-strong">A IA quer mover dinheiro</span></div>
+      <Row k="Valor" v={eur(J2.to_goal, 2)} strong />
+      <Row k="De" v={`Conta à ordem ··${ines.accounts[0].iban_display.slice(-4)}`} />
+      <Row k="Para" v="Objetivo Férias" />
+      <Row k="Quando" v="Hoje, uma vez" />
+      <hr />
+      <Row k="Fica na conta" v={eur(J2.stays_in_account, 2)} />
+      <Row k="Férias depois disto" v={`${eur(J2.goal_saved_after)} de ${eur(3000)}`} />
+      <p className="caption muted">Nada se move até confirmares. Transferências nunca têm “permitir sempre”.</p>
+      {done ? <StatusBadge kind={done === 'approved' ? 'positive' : 'warning'}>{done === 'approved' ? 'Aprovado com Face ID' : 'Não movido'}</StatusBadge>
+        : <div className="stack-actions"><Button kind="secondary" onClick={onDecline}>Agora não</Button><Button onClick={onApprove}>Aprovar com Face ID</Button></div>}
+    </div>
+  )
+}
+export function MandateNote() {
+  return <div className="mandate"><span className="caption muted">Instrução permanente: perguntar antes de mover até {eur(J2.to_goal)} quando o subsídio chegar.</span><Button kind="tertiary">Alterar</Button></div>
+}
+
+// ---------- J3 · A short month: the assistant spots a payment that changes the plan ----------
+export const J3 = out.scenarios.j3_off_track_month
+export const J3_OPTIONS: OptionItem[] = [
+  { id: 'skip', label: `Saltar os ${eur(J3.transfer)} de janeiro`, result: `${eur(J3.options[0].total_by_deadline!)} até setembro · faltam ${eur(J3.options[0].short_of_plan!)} para o plano`, certain: true },
+  { id: 'spread', label: `Distribuir: +${eur(J3.options[1].extra!)} nas próximas ${J3.options[1].count}`, result: `${eur(J3.options[1].new_monthly!)} por mês fev–set · ${eur(J3.options[1].total_by_deadline!)} até set. Mais do que sobrou em agosto e outubro.`, certain: true },
+  { id: 'keep', label: 'Manter como planeado', result: `Os ${eur(J3.buffer_dip_if_kept)} saem da tua reserva de ${eur(900)}`, certain: true },
+]
+export function ShortMonthCard({ picked, onPick }: { picked: string | null; onPick: (id: string) => void }) {
+  return (
+    <div className="card">
+      <div className="estimate"><span className="body-strong">Este mês deve sobrar cerca de {eur(J3.expected_left_estimate)}</span><span className="caption muted">Estimativa com base em ago–out, já com os {eur(J3.bill.amount)} pagos</span></div>
+      <OptionList title="Mudar janeiro" label="Opções para janeiro" options={J3_OPTIONS} picked={picked} onPick={onPick} />
+      <p className="caption muted">Não escolho por ti. O que escolheres pode ser anulado até 1 jan.</p>
+    </div>
+  )
+}
+
+// ---------- J4 · Borrowing is a hand-off, never advice ----------
+export function HandoffCard({ monthly, gap, onKeep, onPerson, sent }: { monthly: number; gap: number; onKeep: () => void; onPerson: () => void; sent?: boolean }) {
+  return (
+    <div className="card">
+      <div className="row-between"><span className="body-strong">Crédito pessoal</span><span className="tag">Com uma pessoa</span></div>
+      <p className="muted">Pedir emprestado tem custos e precisa de uma análise do que podes pagar. Um especialista de crédito mostra-te o custo total antes de decidires.</p>
+      <span className="label muted">O que vou passar</span>
+      <ul className="bullets"><li>O teu objetivo: férias de {eur(3000)}</li><li>O teu plano: {eur(monthly)} por mês, faltam {eur(gap)} em julho</li><li>Perguntaste sobre um empréstimo para fechar a diferença</li></ul>
+      {sent ? <StatusBadge kind="positive">Resumo enviado</StatusBadge> : <div className="stack-actions"><Button kind="secondary" onClick={onKeep}>Manter o meu plano</Button><Button onClick={onPerson}>Falar com uma pessoa</Button></div>}
     </div>
   )
 }
