@@ -717,3 +717,16 @@ h2.title { margin: 0; }
 .pill-voice::before { content: ''; position: absolute; inset: -7px; border-radius: 50%; }
 /* Card text stays legible over the bright bands */
 .bc-num, .bc-name, .bc-label { text-shadow: 0 1px 3px rgb(0 0 0 / 45%); }
+
+/* ---------- Thinking + writing (6 Nov) ---------- */
+/* One dot in the brand gradient glides left–right on a short track and pulses: the AI working its way through. */
+.typing .seek { position: relative; display: inline-block; width: 30px; height: 10px; }
+.typing .seek::before { content: ''; position: absolute; left: 3px; right: 3px; top: 4.5px; height: 1px; border-radius: 1px; background: var(--color-border-default); }
+.typing .seek i { position: absolute; left: 0; top: 2px; width: 6px; height: 6px; border-radius: 50%; background: var(--grad-h); box-shadow: 0 0 8px rgb(13 93 244 / 35%);
+  animation: seek 1.1s var(--ease) infinite alternate, seek-pulse .55s ease-in-out infinite alternate; }
+@keyframes seek { from { translate: 0 0; } to { translate: 24px 0; } }
+@keyframes seek-pulse { from { scale: .7; opacity: .65; } to { scale: 1.2; opacity: 1; } }
+/* Soft "ink" reveal: each streamed word is drawn in left to right, from slightly blurred to sharp. Type stays the same. */
+.msg-ai .word { display: inline-block; animation: ink .36s cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes ink { from { opacity: .15; filter: blur(2px); clip-path: inset(0 100% 0 0); translate: 0 1px; } to { opacity: 1; filter: blur(0); clip-path: inset(0 -2px 0 0); translate: 0 0; } }
+.msg-ai.status .word { animation: ink .4s cubic-bezier(.22, 1, .36, 1) both; }

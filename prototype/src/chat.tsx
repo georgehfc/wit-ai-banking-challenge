@@ -13,7 +13,7 @@ export const WIDGET_MS = 260
 export const replyDuration = (text: string, widget: boolean) => TYPING_MS + text.split(/\s+/).length * WORD_MS + (widget ? WIDGET_MS + 200 : 120)
 
 export function TypingDots() {
-  return <span className="typing" role="status" aria-label="A IA está a escrever"><AiOrb size={22} state="thinking" /><span className="dots"><i /><i /><i /></span></span>
+  return <span className="typing" role="status" aria-label="A IA está a escrever"><AiOrb size={22} state="thinking" /><span className="seek" aria-hidden="true"><i /></span></span>
 }
 
 // One assistant reply. Mounts once per turn: typing dots, then the text streams in, then the widget rises in.
