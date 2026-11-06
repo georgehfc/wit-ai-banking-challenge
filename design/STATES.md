@@ -141,7 +141,7 @@ Drawing the diagrams from the code turned up these. Fixed ones are marked.
 2. **Fixed:** with several chats, a second "Save for something" would have started a second plan. Now it points to the chat that owns it.
 3. **Decided (George, 4 Nov):** Face ID failure is a Figma frame only; the prototype always succeeds.
 4. **Decided:** no reminder for a plan left at "Not now" (out of scope, low value). The draft stays in its chat.
-5. **Decided:** the prototype's alert is "summary ready" only; money arrived and short month stay as Figma wireframes (page 5).
+5. **Decided:** the prototype's alert is "summary ready" only; money arrived and short month stay as Figma wireframes (page 5). Superseded 5 Nov: J2 and J3 are journeys in the build and, since 6 Nov, on Figma page 4 with the rest.
 6. **Decided:** keep Pause where it is (chat suggestions and the goal).
 
 ## Motion (5 Nov)

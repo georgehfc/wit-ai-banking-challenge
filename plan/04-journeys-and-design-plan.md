@@ -43,7 +43,7 @@ Guardrail catches credit → HandoffCard: why the assistant won't suggest borrow
 
 ## 3. Components (page "3 · Components") — only what the prototype actually uses
 
-**4 Nov update:** the prototype is now one assistant with three conversations (save, spending, scam check); J0 and J2–J5 code is gone, so the J2–J5 rows below are kept only for the page 5 wireframes. New, from `src/chat.tsx` and `src/assistant.tsx`:
+**4 Nov update:** the prototype is now one assistant with three conversations (save, spending, scam check); J0 and J2–J5 code is gone, so the J2–J5 rows below are kept only for the page 5 wireframes. (5–6 Nov: J0 and J2–J4 are back in the build and all five journeys are on Figma page 4.) New, from `src/chat.tsx` and `src/assistant.tsx`:
 
 | Group | Component | Variants / states |
 |---|---|---|

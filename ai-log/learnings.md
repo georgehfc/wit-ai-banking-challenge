@@ -36,3 +36,5 @@ Running notes on what worked, what didn't and what changed because of it. Feeds 
 
 
 - **Translating a scripted chat (4 Nov):** routing regexes and suggestion chips must change together with the copy, or tapping a PT chip falls through to "I can't help with that". Keep EN patterns as a fallback, and make number checks compare digits, not formatted strings (pt-PT "2360 €" vs "€2,360").
+
+- **Figma prototype links stay on one page.** Journeys split across pages can't link to each other or to a shared picker. Keep every journey that should feel like one app on one page; use separate pages for states and references. (6 Nov)

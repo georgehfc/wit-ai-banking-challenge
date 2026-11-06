@@ -8,8 +8,8 @@ Notes for George, not a script. Say it your way. Updated 5 Nov 2026.
 |---|---|
 | Code prototype | Builds clean, types pass, planner check passes (app numbers = `data/planner.py`). Live on GitHub Pages, serving the current build. |
 | Journeys in code | J0 first use (default) → J1 save for a holiday (core). J2 Christmas allowance, J3 short month, J4 credit hand-off, picked from the hidden tweaks drawer (T or pull from the right edge). |
-| Figma | 77 variables (Primitives → Semantic Light/Dark), 16 text styles, 5 effects, 88 components and sets bound to variables. 20 screens on page 4 (J1 + supporting chats + entry points), 18 on page 5 (J0, J2–J4, entry map), all built from instances. |
-| Figma prototype | Wired: 61 hotspots, 9 flows. Start with "J1 · Poupar para algo" on page 4. T on Home opens the tweaks overlay. |
+| Figma | 77 variables (Primitives → Semantic Light/Dark), 16 text styles, 5 effects, 88 components and sets bound to variables. 41 screens on page 4 (J0 → J4 in the build's order, supporting chats, entry points), button states on page 5, all built from instances. |
+| Figma prototype | All five journeys on page 4, 137 links, no dead ends. Start on "0 · Escolher jornada" (the same drawer as the build) or "J1"; T on any screen brings the picker back. J0 runs into J1, J2 can start from the lock screen. |
 | Summary slides | Page 6, both filled. Hours: about 6 h. |
 | Handoff | ApprovalCard spec on page 7 + `deliverables/handoff-spec.md`. Code Connect sketched, not connected (needs a paid published library). |
 | AI log | `ai-log/log.md`, one row per AI contribution with what was wrong; `learnings.md` for process lessons. |
@@ -20,7 +20,8 @@ Gaps to own, not hide:
 - **Replies are scripted**, no live model. That was on purpose (see answers below).
 - **Testing** was informal: you showed it to a few people and they found the double search confusing. That's one real finding, not a study.
 - **Dark mode** exists as variables and in the code; the Figma screens are shown in Light.
-- **The cover page** is just the WIT logo. Fine, but you could add a one-line "start on page 4, flow J1".
+- **The cover page** is just the WIT logo. Fine, but you could add a one-line "start on page 4, flow 0 · Escolher jornada".
+- **Face ID failure**: STATES.md says it lives in Figma, but there is no frame for it yet. Error states are the classic follow-up question.
 
 ## The 2-minute version
 
@@ -36,7 +37,7 @@ Say it in your own words. The beats:
 2. **Figma structure (10 min).** Page 2 variables (Primitives → Semantic, Light/Dark, code syntax = CSS vars) → page 3 components (AssistantPill states, PromptBox states, PlanCard variants, the AiMessage callout with a widget slot) → page 4 screens built from instances → page 7 handoff.
 3. **AI workflow (8 min).** Slide 2. Pick two concrete stories: the planner check catching hand-typed numbers (three times), and the double-search finding that moved search into the dock.
 4. **Trade-offs (8 min).** Scripted vs live LLM, code-first vs Figma-first, scope (one journey polished, the rest secondary). Then the agent handoff talking point (below) with Figma page 7.
-5. **Live iteration (10 min).** See below.
+5. **Live iteration (10 min).** See below. If you prompt an AI live, use the PRISM shape from the Memorisely course: say what's there now, change one thing, spell out the control and its behaviour, and say what must not change. The "Maintain" part is what stops a live edit breaking the rest.
 
 ## Likely questions and what to say
 

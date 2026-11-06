@@ -18,12 +18,12 @@
 - 7 Handoff: ApprovalCard spec + Agent handoff (what a real agent handoff contains)
 
 ## Figma prototype (wired 5 Nov)
-- Page "4 · Screens" flows: **J1 · Poupar para algo (app aberta)** (start on 00), **Alerta no Início → resumo** (E1), **App fechada → notificação** (E6). Press **T** on Home for the tweaks overlay.
-- Page "5 · Prototype" flows: J0 primeiro uso, Entradas · estados do botão, J2 subsídio de Natal (fechada / aberta), J3 mês apertado, J4 passagem para crédito.
+- Page "4 · Protótipo · todas as jornadas" (6 Nov: everything on one page, in the build's order). Flows: **0 · Escolher jornada** (the Ajustes drawer, same list as the build), 👋 J0 Primeiro uso → J1, 🏖️ J1 Poupar para algo, 🎄 J2 Subsídio de Natal (app fechada / aberta), 🔧 J3 Mês apertado, 🤝 J4 Pedir crédito, 🔒 App fechada → notificação, Alerta no Início. Press **T** on any screen to get back to the picker.
+- Page "5 · Entradas": the AI button states (repouso, a trabalhar, pronto) and the trigger map.
 - Transitions: sheet up/down (assistant), iOS push/pop (review), Smart Animate between chat steps, timed advances for "thinking" (1.8 s) and Face ID (1.4 s). Curve cubic-bezier(.32,.72,0,1).
 
 ## Submission form (Zoho) · draft answers, George submits
 - **Challenge Link:** https://www.figma.com/design/OoHpwsDJex2JomXCL3xPft (set sharing to "Anyone with the link can view" first)
 - **Total number of hours:** 6
-- **Other Information:** Prototype in code (best on a phone): https://georgehfc.github.io/wit-ai-banking-challenge/ · Repo with specs, state diagrams and the AI log: https://github.com/georgehfc/wit-ai-banking-challenge · In Figma, start on page 4, flow "J1 · Poupar para algo"; page 6 has the summary slides, page 7 the handoff spec.
+- **Other Information:** Prototype in code (best on a phone): https://georgehfc.github.io/wit-ai-banking-challenge/ · Repo with specs, state diagrams and the AI log: https://github.com/georgehfc/wit-ai-banking-challenge · In Figma, open the prototype on page 4 and pick a journey from "0 · Escolher jornada" (J1 is the core one; T brings the picker back); page 6 has the summary slides, page 7 the handoff spec.
 - **Challenge Name:** AI-Assisted Design Challenge
