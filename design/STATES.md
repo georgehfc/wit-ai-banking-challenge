@@ -139,7 +139,7 @@ Drawing the diagrams from the code turned up these. Fixed ones are marked.
 
 1. **Fixed:** "Save for something" after a plan existed went nowhere ("I can't help with that yet"). Now it opens the plan.
 2. **Fixed:** with several chats, a second "Save for something" would have started a second plan. Now it points to the chat that owns it.
-3. **Decided (George, 4 Nov):** Face ID failure is a Figma frame only; the prototype always succeeds.
+3. **Decided (George, 4 Nov):** Face ID failure is a Figma frame only; the prototype always succeeds. Built 6 Nov: "J1 · 07b · Face ID falhou" on page 4 (tap the Face ID glyph to reach it): back to the same review, a neutral notice with a warning icon ("O Face ID não te reconheceu · Nada foi movido"), same buttons, no automatic retry.
 4. **Decided:** no reminder for a plan left at "Not now" (out of scope, low value). The draft stays in its chat.
 5. **Decided:** the prototype's alert is "summary ready" only; money arrived and short month stay as Figma wireframes (page 5). Superseded 5 Nov: J2 and J3 are journeys in the build and, since 6 Nov, on Figma page 4 with the rest.
 6. **Decided:** keep Pause where it is (chat suggestions and the goal).

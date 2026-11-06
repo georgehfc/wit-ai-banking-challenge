@@ -8,8 +8,8 @@ Notes for George, not a script. Say it your way. Updated 5 Nov 2026.
 |---|---|
 | Code prototype | Builds clean, types pass, planner check passes (app numbers = `data/planner.py`). Live on GitHub Pages, serving the current build. |
 | Journeys in code | J0 first use (default) → J1 save for a holiday (core). J2 Christmas allowance, J3 short month, J4 credit hand-off, picked from the hidden tweaks drawer (T or pull from the right edge). |
-| Figma | 77 variables (Primitives → Semantic Light/Dark), 16 text styles, 5 effects, 88 components and sets bound to variables. 41 screens on page 4 (J0 → J4 in the build's order, supporting chats, entry points), button states on page 5, all built from instances. |
-| Figma prototype | All five journeys on page 4, 137 links, no dead ends. Start on "0 · Escolher jornada" (the same drawer as the build) or "J1"; T on any screen brings the picker back. J0 runs into J1, J2 can start from the lock screen. |
+| Figma | 77 variables (Primitives → Semantic Light/Dark), 16 text styles, 5 effects, 88 components and sets bound to variables. 42 screens on page 4 (J0 → J4 in the build's order, supporting chats, entry points), button states on page 5, all built from instances. |
+| Figma prototype | All five journeys on page 4, about 140 links, no dead ends; the cover says where to start. Start on "0 · Escolher jornada" (the same drawer as the build) or "J1"; T on any screen brings the picker back. J0 runs into J1, J2 can start from the lock screen. |
 | Summary slides | Page 6, both filled. Hours: about 6 h. |
 | Handoff | ApprovalCard spec on page 7 + `deliverables/handoff-spec.md`. Code Connect sketched, not connected (needs a paid published library). |
 | AI log | `ai-log/log.md`, one row per AI contribution with what was wrong; `learnings.md` for process lessons. |
@@ -21,7 +21,7 @@ Gaps to own, not hide:
 - **Testing** was informal: you showed it to a few people and they found the double search confusing. That's one real finding, not a study.
 - **Dark mode** exists as variables and in the code; the Figma screens are shown in Light.
 - **The cover page** is just the WIT logo. Fine, but you could add a one-line "start on page 4, flow 0 · Escolher jornada".
-- **Face ID failure**: STATES.md says it lives in Figma, but there is no frame for it yet. Error states are the classic follow-up question.
+- **Error states**: Face ID failure has a screen now (J1 · 07b, tap the Face ID glyph). Bank errors (transfer rejected, connection lost) are only described in STATES.md, not drawn.
 
 ## The 2-minute version
 
@@ -48,6 +48,8 @@ Say it in your own words. The beats:
 **How do you stop the AI making up numbers?** It never produces them. Every figure on screen comes from the planner (`plan-output.json`), and a check script fails the build if the app disagrees with it. That script caught real mistakes.
 
 **What did AI get wrong?** Hand-typed numbers that didn't match the planner. A stacking bug that put the pill over the sheet (you caught it on the live page). The first AI marks (orb, bubble, robot) didn't fit, and you rejected them. A misleading confirmation line ("3100 € em transferências" included the Christmas allowance). A J3 trigger that didn't match how people pay for repairs. All in the log.
+
+**How did you set the AI up?** Not a blank chat. The repo has the rules and reference files Claude works from: the brief, project rules (CLAUDE.md), tone, tokens, accessibility, security, the agent spec. Same idea as a configured assistant with knowledge files. Every first prompt carried the context and constraints, and follow-ups changed one thing and said what to keep.
 
 **How did you judge quality?** Against the brief and the rules you wrote down (TONE.md, the stroke rule, numbers only from the planner). Screenshots after every Figma batch, a binding audit, contrast checks, clicking every path, and testing on your iPhone, where you found the Safari scroll bug and the dead "Planear com a IA" button.
 

@@ -48,7 +48,7 @@ Figma variant property → prop: the card has no visual variants beyond state; t
 | authenticating | Face ID sheet over the chat | System biometric prompt in production. |
 | approved | Rows + `StatusBadge positive` "Aprovado com Face ID" | Buttons removed; the reply below confirms and offers "Concluir". |
 | declined | Rows + `StatusBadge warning` "Não movido" | Reply: nothing moved, can ask again. |
-| failed | Rows + error line, buttons back | Biometric fail or bank error. Never retries by itself. (Figma only in the prototype.) |
+| failed | Rows + error line, buttons back | Biometric fail or bank error. Never retries by itself. Figma: "J1 · 07b · Face ID falhou" (the full-screen review version of this state). |
 
 ## Rules (non-negotiable)
 
