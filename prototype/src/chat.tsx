@@ -7,10 +7,10 @@ import { Button, Icon, OptionList, Row, StatusBadge, type OptionItem } from './c
 import { AiOrb } from './orb'
 import { eur, monthShort } from './planner'
 
-export const TYPING_MS = 650
-export const WORD_MS = 28
+export const TYPING_MS = 1500   // long enough for the thinking dot to go across, come back and pulse (6 Nov)
+export const CHAR_MS = 16, CHARS_PER_TICK = 2   // typewriter: about 125 characters a second (6 Nov)
 export const WIDGET_MS = 260
-export const replyDuration = (text: string, widget: boolean) => TYPING_MS + text.split(/\s+/).length * WORD_MS + (widget ? WIDGET_MS + 200 : 120)
+export const replyDuration = (text: string, widget: boolean) => TYPING_MS + Math.ceil(text.length / CHARS_PER_TICK) * CHAR_MS + (widget ? WIDGET_MS + 200 : 120)
 
 export function TypingDots() {
   return <span className="typing" role="status" aria-label="A IA está a escrever"><AiOrb size={22} state="thinking" /><span className="seek" aria-hidden="true"><i /></span></span>
@@ -19,8 +19,7 @@ export function TypingDots() {
 // One assistant reply. Mounts once per turn: typing dots, then the text streams in, then the widget rises in.
 // tone: 'status' = quiet progress line (no typing dots) · 'reply' = plain text · 'callout' = key result, marked with the gradient rule.
 export function AiReply({ text, widget, onGrow, skip = false, tone = 'reply' }: { text: string; widget?: ReactNode; onGrow?: () => void; skip?: boolean; tone?: 'status' | 'reply' | 'callout' }) {
-  const words = text.split(/(\s+)/)
-  const total = words.filter((w) => w.trim()).length
+  const total = text.length
   const [phase, setPhase] = useState<'typing' | 'text' | 'done'>(tone === 'status' ? 'text' : 'typing')
   const [n, setN] = useState(0)
   useEffect(() => { const t = setTimeout(() => setPhase('text'), TYPING_MS); return () => clearTimeout(t) }, [])
@@ -28,21 +27,19 @@ export function AiReply({ text, widget, onGrow, skip = false, tone = 'reply' }: 
   useEffect(() => {
     if (phase !== 'text') return
     if (n >= total) { const t = setTimeout(() => setPhase('done'), widget ? 120 : 0); return () => clearTimeout(t) }
-    const t = setTimeout(() => setN((x) => x + 1), WORD_MS)
+    const t = setTimeout(() => setN((x) => Math.min(total, x + CHARS_PER_TICK)), CHAR_MS)
     return () => clearTimeout(t)
   }, [phase, n]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { onGrow?.() }, [phase, n === total]) // eslint-disable-line react-hooks/exhaustive-deps
-  let shown = 0
   return (
     <div className={`msg-ai ${tone}`}>
       {tone === 'callout' && <span className="ai-rule" aria-hidden="true" />}
       <div className="msg-ai-content">
         {phase === 'typing' ? <TypingDots /> : (
-          <p aria-label={text}>{words.map((w, i) => {
-            if (!w.trim()) return w
-            shown++
-            return shown <= n || phase === 'done' ? <span key={i} className="word">{w}</span> : null
-          })}</p>
+          // Typewriter: the whole reply is laid out from the start (untyped part invisible), so lines never jump as letters land.
+          <p aria-label={text}>{phase === 'done' ? <span aria-hidden="true">{text}</span> : <>
+            <span aria-hidden="true">{text.slice(0, n)}</span><span className="caret" aria-hidden="true" /><span className="untyped" aria-hidden="true">{text.slice(n)}</span>
+          </>}</p>
         )}
         {phase === 'done' && widget && <div className="widget-in">{widget}</div>}
       </div>

@@ -151,6 +151,6 @@ iOS conventions, one curve (`--ios`: cubic-bezier(.32,.72,0,1)), Reduce Motion t
 - Review / confirmation **push** in from the right (0.55 s); the chat and header parallax 26 % left and dim.
 - Tabs cross-fade with a 10 px rise (0.38 s). Bottom sheets spring up; scrims fade.
 - Bank pages: app bar turns translucent with a hairline once content scrolls under it; the compact title fades in when the large title leaves.
-- Thinking: the sphere plus one gradient dot gliding left–right on a short track while it pulses (replaced the three bouncing dots, 6 Nov).
-- Writing: replies stream word by word with a soft ink reveal (each word drawn left to right, blur 2 px → 0, 0.36 s). Same Inter type; a handwriting font was ruled out for legibility and tone in a bank.
+- Thinking: the sphere plus one grey dot gliding left–right (0.7 s per leg) and pulsing once per leg; the thinking phase lasts 1.5 s so a full there-and-back shows (replaced the three bouncing dots, 6 Nov).
+- Writing: typewriter. Letters land about 125 a second with a thin blinking caret; the untyped rest is laid out invisibly so lines never jump. Reduce Motion shows the full reply at once.
 - Figma prototype uses the same: MOVE_IN/OUT for the sheet, PUSH for review, SMART_ANIMATE inside the chat.

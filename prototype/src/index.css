@@ -730,3 +730,12 @@ h2.title { margin: 0; }
 .msg-ai .word { display: inline-block; animation: ink .36s cubic-bezier(.22, 1, .36, 1) both; }
 @keyframes ink { from { opacity: .15; filter: blur(2px); clip-path: inset(0 100% 0 0); translate: 0 1px; } to { opacity: 1; filter: blur(0); clip-path: inset(0 -2px 0 0); translate: 0 0; } }
 .msg-ai.status .word { animation: ink .4s cubic-bezier(.22, 1, .36, 1) both; }
+/* Thinking dot, revised (6 Nov): grey, no track; 0.7 s per leg so one full there-and-back + pulse shows in the 1.5 s thinking phase */
+.typing .seek::before { content: none; }
+.typing .seek i { background: var(--color-text-muted); box-shadow: none; animation: seek .7s ease-in-out infinite alternate, seek-pulse .7s ease-in-out infinite alternate; }
+/* Typewriter (6 Nov): letters land one by one; a thin caret follows; untyped text keeps its space so nothing reflows */
+.msg-ai .untyped { color: transparent; }
+.msg-ai .caret { position: relative; display: inline-block; width: 0; }
+.msg-ai .caret::after { content: ''; position: absolute; left: 1px; top: -1em; width: 2px; height: 1.15em; border-radius: 1px; background: var(--color-text-muted); animation: caret .9s steps(1) infinite; }
+@keyframes caret { 50% { opacity: 0; } }
+.msg-ai .word { animation: none; }
