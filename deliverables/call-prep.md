@@ -9,7 +9,7 @@ Notes for George, not a script. Say it your way. Updated 5 Nov 2026.
 | Code prototype | Builds clean, types pass, planner check passes (app numbers = `data/planner.py`). Live on GitHub Pages, serving the current build. |
 | Journeys in code | J0 first use (default) → J1 save for a holiday (core). J2 Christmas allowance, J3 short month, J4 credit hand-off, picked from the hidden tweaks drawer (T or pull from the right edge). |
 | Figma | 77 variables (Primitives → Semantic Light/Dark), 16 text styles, 5 effects, 88 components and sets bound to variables. 42 screens on page 4 (J0 → J4 in the build's order, supporting chats, entry points), button states on page 5, all built from instances. |
-| Figma prototype | All five journeys on page 4, about 140 links, no dead ends; the cover says where to start. Start on "0 · Escolher jornada" (the same drawer as the build) or "J1"; T on any screen brings the picker back. J0 runs into J1, J2 can start from the lock screen. |
+| Figma prototype | All five journeys on page 4, about 140 links, no dead ends; the cover says where to start. The submitted link starts on J0 Home (first tap opens the intro). T on any screen opens the drawer with that journey selected; pick a journey and app aberta/fechada, see it selected, then "Voltar ao fluxo". J0 runs into J1; J2 and J3 can start from the lock screen. |
 | Summary slides | Page 6, both filled. Hours: about 6 h. |
 | Handoff | ApprovalCard spec on page 7 + `deliverables/handoff-spec.md`. Code Connect sketched, not connected (needs a paid published library). |
 | AI log | `ai-log/log.md`, one row per AI contribution with what was wrong; `learnings.md` for process lessons. |
