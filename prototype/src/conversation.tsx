@@ -338,7 +338,7 @@ export function Conversation({ id, active, visible, autostart, account: acct, ac
       }
       case 'gap': return choice
         ? <Folded open={expanded.has(t.id)} onToggle={() => toggle(t.id)} summary={<>Escolhido: {choice === 'keep' ? KEEP : gapOptions(p).find((o) => o.id === choice)!.label}</>}><GapResolver gap={p.gap} options={gapOptions(p)} picked={choice} onPick={() => {}} /></Folded>
-        : <><GapResolver gap={p.gap} options={gapOptions(p)} picked={choice} onPick={(gid) => !busy && pick(gid)} /><Button kind="tertiary" onClick={() => !busy && pick('keep')}>{KEEP}</Button></>
+        : <><GapResolver gap={p.gap} options={gapOptions(p)} picked={choice} onPick={(gid) => !busy && pick(gid)} /><Button kind="tertiary" icon="check" onClick={() => !busy && pick('keep')}>{KEEP}</Button></>
       case 'review': return t.id === [...turns].reverse().find((x) => x.widget === 'review')?.id && !goalOn ? <Button onClick={() => setView('review')}>Rever o plano</Button> : null
       case 'spending': return latest ? <SpendingBreakdown month={month} onMonth={setMonth} />
         : <Folded open={expanded.has(t.id)} onToggle={() => toggle(t.id)} summary={<>Gasto ago–out: {eur(SP.spent_total)}</>}><SpendingBreakdown month={month} onMonth={setMonth} /></Folded>

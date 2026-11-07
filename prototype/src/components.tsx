@@ -38,8 +38,8 @@ export function Icon({ name, size = 20 }: { name: keyof typeof paths | string; s
 }
 
 // ---------- Basics ----------
-export function Button({ kind = 'primary', children, onClick, disabled, grow }: { kind?: 'primary' | 'secondary' | 'tertiary'; children: ReactNode; onClick?: () => void; disabled?: boolean; grow?: boolean }) {
-  return <button className={`btn btn-${kind}${grow ? ' grow' : ''}`} onClick={onClick} disabled={disabled}>{children}</button>
+export function Button({ kind = 'primary', children, onClick, disabled, grow, icon }: { kind?: 'primary' | 'secondary' | 'tertiary'; children: ReactNode; onClick?: () => void; disabled?: boolean; grow?: boolean; icon?: string }) {
+  return <button className={`btn btn-${kind}${grow ? ' grow' : ''}${icon ? ' icon-left' : ''}`} onClick={onClick} disabled={disabled}>{icon && <Icon name={icon} size={18} />}{children}</button>
 }
 export function StatusBadge({ kind, children }: { kind: 'positive' | 'warning' | 'danger'; children: ReactNode }) {
   return <span className={`status status-${kind}`}><Icon name={kind === 'positive' ? 'ok' : 'alert'} size={14} />{children}</span>
