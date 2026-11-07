@@ -175,7 +175,7 @@ export function Assistant({ startClosed, trigger = 'rest', journey = 'j0' }: { s
             <div className="empty">
               <span className="hero-orb"><AiOrb size={72} label="Assistente de IA" /></span>
               <h1 className="root-title">{goal ? 'O teu plano está ativo. E agora?' : 'Em que posso ajudar?'}</h1>
-              <p className="trust-line"><Icon name="lock" size={14} />{journey === 'j0' && consent === 'granted' ? 'Obrigado. Já posso ler a tua conta à ordem (ago–out) até 2 fev 2027. Nada se move sem a tua aprovação.' : consent === 'declined' ? 'Sem acesso à conta, só posso ajudar com perguntas gerais, como verificar uma mensagem.' : 'Leio a tua conta à ordem dos últimos 3 meses. Nada se move sem a tua aprovação.'}</p>
+              <p className="trust-line"><Icon name="lock" size={14} />{journey === 'j0' && consent === 'granted' ? 'Só leitura, até 2 fev 2027. Nada se move sem ti.' : consent === 'declined' ? 'Sem acesso à conta: só perguntas gerais.' : 'Só leio a tua conta à ordem. Nada se move sem ti.'}</p>
               {consent === 'declined' && <Button kind="secondary" onClick={() => setConsent('asking')}>Permitir acesso à conta</Button>}
               {SHORTCUTS.map(([t, s]) => {
                 const needsData = consent === 'declined' && t !== SHORTCUTS[2][0]
