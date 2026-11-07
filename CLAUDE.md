@@ -4,7 +4,7 @@
 
 **What.** George's take-home challenge for the AI-Assisted UI/UX Designer role at WIT Software: an AI-native mobile banking experience that turns a user's intent ("save €3,000 for a holiday next summer…") into a clear, trustworthy, approvable journey. Full brief: `brief.md`.
 
-**Deadline.** Submit by **9 Nov 2026** through the Zoho form linked in WIT's email of 2 Nov (fields: challenge link, total hours used, optional extra link). George told WIT he'd submit by the end of that week.
+**Submitted 7 Nov 2026** (deadline was 9 Nov 2026) through the Zoho form linked in WIT's email of 2 Nov (fields: challenge link, total hours used, optional extra link). George told WIT he'd submit by the end of that week.
 
 **Deliverables.** Figma file with 4–6 polished mobile screens built from a small design system (Auto Layout, components and variants, variables); a clickable prototype of one core journey with at least one state change; 1–2 summary slides (journey, rationale, AI tools, links); optional component-to-code handoff. Recommended effort 4–6 hours. If shortlisted: a 45-minute walkthrough with a small live iteration.
 

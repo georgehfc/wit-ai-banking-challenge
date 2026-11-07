@@ -22,7 +22,7 @@
 - Page "5 · Entradas": the AI button states (repouso, a trabalhar, pronto) and the trigger map.
 - Transitions: sheet up/down (assistant), iOS push/pop (review), Smart Animate between chat steps, timed advances for "thinking" (1.8 s) and Face ID (1.4 s). Curve cubic-bezier(.32,.72,0,1).
 
-## Submission form (Zoho) · draft answers, George submits
+## Submission form (Zoho) · submitted by George, 7 Nov 2026
 - **Challenge Link (prototype, starts on J0 Home):** https://www.figma.com/proto/OoHpwsDJex2JomXCL3xPft/WIT-%C2%B7-AI-Assisted-Design-Challenge?node-id=246-3099&t=PzfmFbwKaFipslZc-1&scaling=min-zoom&content-scaling=fixed&page-id=2%3A5&starting-point-node-id=246%3A3099&show-proto-sidebar=1 (sharing set to "Anyone can view", 7 Nov)
 - **Total number of hours:** 6
 - **Other Information (one link only):** https://www.figma.com/design/OoHpwsDJex2JomXCL3xPft (the design file: system, screens, slides, handoff). The code prototype is linked from slide 2 and the Figma cover.
