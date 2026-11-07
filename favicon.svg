@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0.15" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/><stop offset=".22" stop-color="#FBF4EC"/><stop offset=".40" stop-color="#FAB615"/>
+      <stop offset=".52" stop-color="#FC681E"/><stop offset=".68" stop-color="#0D5DF4"/><stop offset=".88" stop-color="#0B4ABB"/><stop offset="1" stop-color="#17131C"/>
+    </linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="1.6"/></filter>
+    <clipPath id="c"><circle cx="32" cy="32" r="30"/></clipPath>
+  </defs>
+  <g clip-path="url(#c)"><rect x="-4" y="-4" width="72" height="72" fill="url(#g)" filter="url(#soft)"/></g>
+  <circle cx="32" cy="32" r="29.5" fill="none" stroke="#fff" stroke-opacity=".25"/>
+</svg>
